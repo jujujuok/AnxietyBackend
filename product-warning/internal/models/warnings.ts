@@ -1,7 +1,7 @@
-import { IFoodWarningModel } from "./food-warning.ts";
-import { IProductWarningModel } from "./product-warning.ts";
+import { IFoodWarningModel } from "./foodWarning";
+import { IProductWarningModel } from "./productWarning";
 
 export interface IWarningsModel {
-    foods: IFoodWarningModel[];
-    products: IProductWarningModel[];
+  foods: IFoodWarningModel[];
+  products: IProductWarningModel[];
 }
