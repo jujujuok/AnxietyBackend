@@ -37,8 +37,6 @@ const setupServices = async () => {
 const setupRoutes = async (server: FastifyInstance, service: TypeService) => {
   const typeController = new TypeController(service);
 
-  console.log("Controller: ", typeController);
-
   server.register(addTypeRoutes(typeController), { prefix: "/types" });
 };
 
@@ -53,7 +51,7 @@ const setupLog = async (server: FastifyInstance) => {
 
 const addTypeRoutes = (controller: TypeController): FastifyPluginCallback => {
   return (instance, options, done) => {
-    instance.get("/type", controller.getTypes);
+    instance.get("/type", controller.getTypes.bind(controller));
     done();
   };
 };
