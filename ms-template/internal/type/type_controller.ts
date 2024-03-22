@@ -5,7 +5,7 @@ export class TypeController {
   constructor(private readonly typeService: TypeService) {}
 
   async getTypes(req: FastifyRequest, reply: FastifyReply) {
-    const users = await this.typeService.getTypes();
-    return reply.send(users);
+    const types = await this.typeService.getTypes();
+    return reply.send(types);
   }
 }
