@@ -12,7 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "fastify": "^4.26.2"
+    "fastify": "^4.26.2",
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
