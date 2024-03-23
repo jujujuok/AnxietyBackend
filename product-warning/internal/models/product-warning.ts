@@ -1,1 +1,4 @@
-export interface IProductWarningModel {}
+export interface IProductWarningModel {
+    type: string;
+    title: string;
+}

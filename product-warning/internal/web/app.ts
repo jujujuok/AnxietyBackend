@@ -52,6 +52,7 @@ const setupLog = async (server: FastifyInstance) => {
 const addProductWarningRoutes = (controller: ProductWarningController): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/all", controller.getAll.bind(controller));
+    instance.get("/update", controller.getUpdate.bind(controller));
     done();
   };
 };

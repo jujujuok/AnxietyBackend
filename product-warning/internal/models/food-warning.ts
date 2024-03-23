@@ -1,1 +1,4 @@
-export interface IFoodWarningModel {}
+export interface IFoodWarningModel {
+    type: string;
+    title: string;
+}

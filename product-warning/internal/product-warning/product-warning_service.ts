@@ -1,6 +1,9 @@
 import { ITypeModel } from "../models/type";
+import { IProductWarningModel } from "../models/product-warning";
+import { IWarningsModel } from "../models/warnings";
 import { ProductWarningRepository } from "./product-warning_repository";
 import axios from 'axios';
+import { time } from "console";
 
 
 export class ProductWarningService {
@@ -34,24 +37,65 @@ export class ProductWarningService {
     };
     
     const data = await this.callApi(body);
-    console.log(data);
+    var warnings: IWarningsModel = { foods: [], products: [] };
+    data.response.docs.forEach((warning: any) => {
+      if (warning._type === '.ProductWarning') {
+        const productWarning: IProductWarningModel = {
+          type: warning._type,
+          title: warning.title,
+        }
+        warnings.products.push(productWarning);
+      }
+      else if (warning._type === '.FoodWarning') {
+        const foodWarning: IProductWarningModel = {
+          type: warning._type,
+          title: warning.title,
+        }
+        warnings.foods.push(foodWarning);
+      }
+    });
 
-    return this.productWarningRepository.getTypes();
+    return warnings;
   }
 
   async getUpdate(){
+    const now = new Date();
+    const timestamp = now.getTime() - 6 * 60 * 1000;
+
     const body = {
       "food": {
-        "sort": "publishedDate desc, title asc"
+        "sort": "publishedDate desc, title asc",
+        "fq": [
+          "publishedDate >" + timestamp
+        ]
       },
       "products": {
-        "sort": "publishedDate desc, title asc"
+        "sort": "publishedDate desc, title asc",
+        "fq": [
+          "publishedDate >" + timestamp
+        ]
       }
     };
     
-    const data = await this.callApi(body);
-    console.log(data);
+    var data = await this.callApi(body);
+    var warnings: IWarningsModel = { foods: [], products: [] };
+    data.response.docs.forEach((warning: any) => {
+      if (warning._type === '.ProductWarning') {
+        const productWarning: IProductWarningModel = {
+          type: warning._type,
+          title: warning.title,
+        }
+        warnings.products.push(productWarning);
+      }
+      else if (warning._type === '.FoodWarning') {
+        const foodWarning: IProductWarningModel = {
+          type: warning._type,
+          title: warning.title,
+        }
+        warnings.foods.push(foodWarning);
+      }
+    });
 
-    return this.productWarningRepository.getTypes();
+    return warnings;
   }
 }
