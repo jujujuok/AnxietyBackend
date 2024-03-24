@@ -1,0 +1,50 @@
+openapi: '3.0.2'
+info:
+  title: Anxiety
+  description: Collection of all security related APIs for Germany.
+  version: '0.1'
+servers:
+  - url: https://localhost:8000
+    description: Local server
+
+components:
+  schemas:
+    dashboardItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - Interpol_Red
+            - Interpol_UN
+            - Product_Warning
+        severity:
+          type: string
+          enum:
+            - information
+            - warning
+            - danger
+            - extreme danger
+        title:
+          type: string
+        describtion:
+          type: string
+        since:
+          type: integer
+
+paths:
+  /dashboard:
+    get:
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/dashboardItem'
