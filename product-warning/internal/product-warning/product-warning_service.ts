@@ -1,5 +1,6 @@
 import { ITypeModel } from "../models/type";
 import { IProductWarningModel } from "../models/product-warning";
+import { IFoodWarningModel } from "../models/food-warning";
 import { IWarningsModel } from "../models/warnings";
 import { ProductWarningRepository } from "./product-warning_repository";
 import axios from 'axios';
@@ -47,9 +48,10 @@ export class ProductWarningService {
         warnings.products.push(productWarning);
       }
       else if (warning._type === '.FoodWarning') {
-        const foodWarning: IProductWarningModel = {
+        const foodWarning: IFoodWarningModel = {
           type: warning._type,
           title: warning.title,
+          affectedStates: warning.affectedStates
         }
         warnings.foods.push(foodWarning);
       }
@@ -83,18 +85,23 @@ export class ProductWarningService {
       if (warning._type === '.ProductWarning') {
         const productWarning: IProductWarningModel = {
           type: warning._type,
-          title: warning.title,
+          title: warning.title
         }
         warnings.products.push(productWarning);
       }
       else if (warning._type === '.FoodWarning') {
-        const foodWarning: IProductWarningModel = {
+        const foodWarning: IFoodWarningModel = {
           type: warning._type,
           title: warning.title,
+          affectedStates: warning.affectedStates
         }
         warnings.foods.push(foodWarning);
       }
     });
+    
+    if (warnings.foods.length === 0 && warnings.products.length === 0) {
+      return "No new warnings found!";
+    }
 
     return warnings;
   }
