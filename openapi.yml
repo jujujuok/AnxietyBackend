@@ -7,6 +7,68 @@ servers:
   - url: https://localhost:8000
     description: Local server
 
+tags:
+  - name: dashboard
+    description: 'Retrieving Information for the Dashboard'
+  - name: map
+    description: "Retrieving Information for the map of germany"
+  - name: world-map
+    description: "Retrieving Information for the worldmap"
+
+paths:
+  /dashboard:
+    get:
+      tags:
+        - dashboard
+      description: 'Get all dashboard items.'
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/dashboardItem'
+  /dashboard/update:
+    get:
+      tags:
+        - dashboard
+      description: ''
+      parameters:
+        - name: timestamp
+          in: query
+          description: 'Timestamp of the last update.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+
+  /dashboard/{id}:
+    get:
+      tags:
+        - dashboard
+      description: 'Get a dashboard item by id.'
+      parameters:
+        - name: id
+          in: path
+          description: 'ID of the dashboard item to get.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dashboardItemDetails'
+        '404':
+          description: Not Found
+
 components:
   schemas:
     dashboardItem:
@@ -20,6 +82,7 @@ components:
             - Interpol_Red
             - Interpol_UN
             - Product_Warning
+            # TODO: Add remaining "not map" types
         severity:
           type: string
           enum:
@@ -33,18 +96,62 @@ components:
           type: string
         since:
           type: integer
+    dashboardItemDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - Interpol_Red
+            - Interpol_UN
+            - Product_Warning
+            # TODO: Add remaining "not map" types
+        details:
+          type: object
+    mapItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - weather
+            - flooding
+            - street_warning
+            - street_closed
+            # TODO: Add remaining "map" types
+        title:
+          type: string
+        position:
+          type: object
+          properties:
+            lat:
+              type: number
+            lon:
+              type: number
+        area:
+          oneOf:
+            - type: number
+              description: 'Radius in meters.'
+            - type: array
+              description: 'Array for polygon.'
+              items:
+                type: number
+    countryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - Interpol_Red
+            - Interpol_UN
+            - Country_Warning
+        country:
+          type: string
 
-paths:
-  /dashboard:
-    get:
-      description: ''
-      parameters: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/dashboardItem'
+
