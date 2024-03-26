@@ -259,10 +259,12 @@ components:
         type:
           type: string
           enum:
-            - Interpol_Red
-            - Interpol_UN
-            - Product_Warning
-            # TODO: Add remaining "not map" types
+            - interpol_red
+            - interpol_un
+            - food_warning
+            - product_warning
+            - travel_warning
+            - country_representetive
         details:
           type: object
           description: 'Details of the event. Depending of the type of event.'
@@ -347,11 +349,10 @@ components:
         type:
           type: string
           enum:
-            - Interpol_Red
-            - Interpol_UN
-            - Travel_Warning
+            - interpol_red
+            - interpol_un
+            - travel_warning
+            - country_representetive
         details:
           type: object
           description: 'Details of the event. Depending of the type of event.'
-
-
