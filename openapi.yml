@@ -4,10 +4,10 @@ info:
   description: | 
     Collection of all security related APIs for Germany.
     Supplying the information to anxiety frontend.
-  version: '0.1'
+  version: '0.2'
 servers:
-  - url: https://localhost:8000
-    description: Local server
+  - url: http://212.132.100.147/
+    description: Main server
 
 tags:
   - name: dashboard
@@ -69,6 +69,23 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  add:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dashboardItem'
+                  delete:
+                    type: array
+                    items:
+                      type: integer
+                    description: 'List of IDs to delete.'
+        '204':
+          description: No Content
+
   /map:
     get:
       tags:
@@ -120,6 +137,22 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  add:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dashboardItem'
+                  delete:
+                    type: array
+                    items:
+                      type: integer
+                    description: 'List of IDs to delete.'
+        '204':
+          description: No Content
   /world-map:
     get:
       tags:
@@ -171,6 +204,22 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  add:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dashboardItem'
+                  delete:
+                    type: array
+                    items:
+                      type: integer
+                    description: 'List of IDs to delete.'
+        '204':
+          description: No Content
 
 components:
   schemas:
@@ -201,6 +250,7 @@ components:
           type: string
         since:
           type: integer
+          description: 'Timestamp of the registration of the event.'
     dashboardItemDetails:
       type: object
       properties:
@@ -215,6 +265,7 @@ components:
             # TODO: Add remaining "not map" types
         details:
           type: object
+          description: 'Details of the event. Depending of the type of event.'
     mapItem:
       type: object
       properties:
@@ -248,6 +299,9 @@ components:
               description: 'Array for polygon.'
               items:
                 type: number
+        since:
+          type: integer
+          description: 'Timestamp of the registration of the event.'
     mapItemDetails:
       type: object
       properties:
@@ -266,6 +320,8 @@ components:
             - radiation
         details:
           type: object
+          description: 'Details of the event. Depending of the type of event.'
+
     countryItem:
       type: object
       properties:
@@ -280,6 +336,9 @@ components:
             - country_representetive
         country:
           type: string
+        since:
+          type: integer
+          description: 'Timestamp of the registration of the event.'
     countryItemDetails:
       type: object
       properties:
@@ -293,4 +352,6 @@ components:
             - Travel_Warning
         details:
           type: object
+          description: 'Details of the event. Depending of the type of event.'
+
 
