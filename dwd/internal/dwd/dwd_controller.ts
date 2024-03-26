@@ -13,4 +13,14 @@ export class DwDController {
     const types = await this.dwdService.getGemeindeWarnings();
     return reply.send(types);
   }
+
+  async getCoastWarnings(req: FastifyRequest, reply: FastifyReply) {
+    const types = await this.dwdService.getCoastWarnings();
+    return reply.send(types);
+  }
+
+  async getAll(req: FastifyRequest, reply: FastifyReply) {
+    const types = await this.dwdService.getAll();
+    return reply.send(types);
+  }
 }
