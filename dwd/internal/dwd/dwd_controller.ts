@@ -8,4 +8,9 @@ export class DwDController {
     const types = await this.dwdService.getNowcastWarnings();
     return reply.send(types);
   }
+
+  async getGemeindeWarnings(req: FastifyRequest, reply: FastifyReply) {
+    const types = await this.dwdService.getGemeindeWarnings();
+    return reply.send(types);
+  }
 }

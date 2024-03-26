@@ -52,6 +52,7 @@ const setupLog = async (server: FastifyInstance) => {
 const addTypeRoutes = (controller: DwDController): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/nowcast", controller.getNowcastWarnings.bind(controller));
+    instance.get("/gemeinde", controller.getGemeindeWarnings.bind(controller));
     done();
   };
 };

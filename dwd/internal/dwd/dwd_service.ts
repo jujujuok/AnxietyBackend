@@ -23,4 +23,10 @@ export class DwDService {
     const data = await this.callApi(url);
     return data;
   }
+
+  async getGemeindeWarnings(){
+    const url = 'https://s3.eu-central-1.amazonaws.com/app-prod-static.warnwetter.de/v16/gemeinde_warnings_v2.json';
+    const data = await this.callApi(url);
+    return data;
+  }
 }
