@@ -19,6 +19,11 @@ export class DwDController {
     return reply.send(types);
   }
 
+  async getSeaWarnings(req: FastifyRequest, reply: FastifyReply) {
+    const types = await this.dwdService.getSeaWarnings();
+    return reply.send(types);
+  }
+
   async getAll(req: FastifyRequest, reply: FastifyReply) {
     const types = await this.dwdService.getAll();
     return reply.send(types);
