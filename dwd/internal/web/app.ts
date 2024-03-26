@@ -37,7 +37,7 @@ const setupServices = async () => {
 const setupRoutes = async (server: FastifyInstance, service: DwDService) => {
   const dwdController = new DwDController(service);
 
-  server.register(addTypeRoutes(dwdController), { prefix: "/types" });
+  server.register(addTypeRoutes(dwdController), { prefix: "/dwd" });
 };
 
 const setupLog = async (server: FastifyInstance) => {
@@ -51,7 +51,7 @@ const setupLog = async (server: FastifyInstance) => {
 
 const addTypeRoutes = (controller: DwDController): FastifyPluginCallback => {
   return (instance, options, done) => {
-    instance.get("/type", controller.getTypes.bind(controller));
+    instance.get("/nowcast", controller.getNowcastWarnings.bind(controller));
     done();
   };
 };

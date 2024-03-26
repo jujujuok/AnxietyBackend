@@ -5,22 +5,22 @@ import axios from 'axios';
 export class DwDService {
   constructor(private readonly dwdRepository: DwDRepository) {}
 
-  async callApi(body: object) {
-    const url = 'https://s3.eu-central-1.amazonaws.com/app-prod-static.warnwetter.de/v16/warnings_nowcast.json';
+  async callApi(url: string) {
     const headers = {
       'accept': 'application/json'
     };
 
     try {
-      const response = await axios.post(url, body, { headers });
+      const response = await axios.get(url, { headers });
       return response.data;
     } catch (error) {
       console.error(error);
     }
   }
 
-  async getTypes(): Promise<ITypeModel[]> {
-    // Business logic here
-    return this.dwdRepository.getTypes();
+  async getNowcastWarnings(){
+    const url = 'https://s3.eu-central-1.amazonaws.com/app-prod-static.warnwetter.de/v16/warnings_nowcast.json';
+    const data = await this.callApi(url);
+    return data;
   }
 }
