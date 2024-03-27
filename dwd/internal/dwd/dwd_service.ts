@@ -50,22 +50,35 @@ export class DwDService {
     const url = 'https://s3.eu-central-1.amazonaws.com/app-prod-static.warnwetter.de/v16/sea_warning_text.json';
     const data = await this.callApi(url);
 
+    if(data.includes("Vorhersage gültig bis") == false) {
+      return [];
+    }
     let warning = data.split("Vorhersage gültig bis")[0];
+
+    if(warning.includes("Warnhinweise") == false) {
+      return [];
+    }
     warning = warning.split("Warnhinweise")[1];
 
     let warnings: string[] = [];
 
     warning.split('<p><span role="text">').forEach((element: string) => {
+      console.log(element);
       if(element != "</h4>") {
         element.split("<h4>").forEach((element2: string) => {
+          console.log(element2);
           if(element2 != "") {
             if (element2.includes("<b>")) {
               warnings.push(element2.split("<b>")[1].split("</b>")[0]);
-              warnings.push(element2.split("<b>")[2].split("</b>")[0]);
+              if (element2.split("<b>")[2] != undefined){
+                warnings.push(element2.split("<b>")[2].split("</b>")[0]);
+              }
             }
             else if (element2.includes("</h4>")) {
               warnings.push(element2.split("</h4>")[0]);
-              warnings.push(element2.split("</h4>")[1].split("</span>")[0]);
+              if(element2.split("</h4>")[1].split("</span>")[0] != undefined) {
+                warnings.push(element2.split("</h4>")[1].split("</span>")[0]);
+              }
             }
           }
         });
