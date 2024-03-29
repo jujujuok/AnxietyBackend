@@ -2,9 +2,9 @@ import { IDashboardItemModel } from "../models/dashboard";
 import { faker } from "@faker-js/faker";
 
 export class DashboardRepository {
-  async getDashboards(): Promise<IDashboardItemModel[]> {
+  async getDashboard(): Promise<IDashboardItemModel[]> {
     // Example Data:
-    const dashboards: IDashboardItemModel[] = [];
+    const dashboardItems: IDashboardItemModel[] = [];
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const dashboardItem: IDashboardItemModel = {
@@ -21,10 +21,10 @@ export class DashboardRepository {
         since: faker.date.past().getTime(),
       };
 
-      dashboards.push(dashboardItem);
+      dashboardItems.push(dashboardItem);
     }
 
-    return dashboards;
+    return dashboardItems;
   }
 
   async getDashboardDetails(dashboardId: number) {

@@ -5,9 +5,9 @@ import { detailsRequest, updateRequest } from "../utils/fastifyRequests";
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
-  async getDashboards(req: FastifyRequest, reply: FastifyReply) {
-    const dashboards = await this.dashboardService.getDashboards();
-    return reply.send(dashboards);
+  async getDashboard(req: FastifyRequest, reply: FastifyReply) {
+    const dashboardData = await this.dashboardService.getDashboard();
+    return reply.send(dashboardData);
   }
 
   async getDashboardDetails(req: detailsRequest, reply: FastifyReply) {

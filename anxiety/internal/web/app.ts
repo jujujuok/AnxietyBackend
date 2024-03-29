@@ -2,6 +2,9 @@ import fastify, { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { DashboardController } from "../dashboard/dashboard_controller";
 import { DashboardService } from "../dashboard/dashboard_service";
 import { DashboardRepository } from "../dashboard/dashboard_repository";
+import { MapRepository } from "../map/map_repository";
+import { MapController } from "../map/map_controller";
+import { MapService } from "../map/map_service";
 
 const start = async () => {
   //TODO: Add getting of env variables
@@ -10,8 +13,12 @@ const start = async () => {
 
   //TODO: Add middleware
 
-  const service = await setupServices();
-  await setupRoutes(server, service);
+  const [dashboardService, mapService] = await setupServices();
+  await setupRoutes(
+    server,
+    dashboardService as DashboardService,
+    mapService as MapService
+  );
 
   await setupLog(server);
 
@@ -24,20 +31,31 @@ const start = async () => {
 };
 
 const setupServices = async () => {
-  const repository: DashboardRepository = new DashboardRepository();
-  const service: DashboardService = new DashboardService(repository);
+  const dashboardRepository: DashboardRepository = new DashboardRepository();
+  const dashboardService: DashboardService = new DashboardService(
+    dashboardRepository
+  );
 
-  return service;
+  const mapRepository: MapRepository = new MapRepository();
+  const mapService: MapService = new MapService(mapRepository);
+
+  return [dashboardService, mapService];
 };
 
 const setupRoutes = async (
   server: FastifyInstance,
-  service: DashboardService
+  dashboardService: DashboardService,
+  mapService: MapService
 ) => {
-  const controller = new DashboardController(service);
+  const dashboardController = new DashboardController(dashboardService);
+  const mapController = new MapController(mapService);
 
-  server.register(addDashboardRoutes(controller), {
+  server.register(addDashboardRoutes(dashboardController), {
     prefix: "/dashboard",
+  });
+
+  server.register(addMapRoutes(mapController), {
+    prefix: "/map",
   });
 };
 
@@ -51,12 +69,30 @@ const setupLog = async (server: FastifyInstance) => {
 };
 
 const addDashboardRoutes = (
-  controller: DashboardController
+  dashboardController: DashboardController
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
-    instance.get("/", controller.getDashboards.bind(controller));
-    instance.get("/:id", controller.getDashboardDetails.bind(controller));
-    instance.get("/update", controller.getDashboardUpdate.bind(controller));
+    instance.get(
+      "/",
+      dashboardController.getDashboard.bind(dashboardController)
+    );
+    instance.get(
+      "/:id",
+      dashboardController.getDashboardDetails.bind(dashboardController)
+    );
+    instance.get(
+      "/update",
+      dashboardController.getDashboardUpdate.bind(dashboardController)
+    );
+    done();
+  };
+};
+
+const addMapRoutes = (mapController: MapController): FastifyPluginCallback => {
+  return (instance, options, done) => {
+    instance.get("/", mapController.getMap.bind(mapController));
+    instance.get("/:id", mapController.getMapDetails.bind(mapController));
+    instance.get("/update", mapController.getMapUpdate.bind(mapController));
     done();
   };
 };

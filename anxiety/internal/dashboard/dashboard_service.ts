@@ -4,8 +4,8 @@ import { DashboardRepository } from "./dashboard_repository";
 export class DashboardService {
   constructor(private readonly dashboardRepository: DashboardRepository) {}
 
-  async getDashboards(): Promise<IDashboardItemModel[]> {
-    return this.dashboardRepository.getDashboards();
+  async getDashboard(): Promise<IDashboardItemModel[]> {
+    return this.dashboardRepository.getDashboard();
   }
 
   async getDashboardDetails(dashboardId: number) {

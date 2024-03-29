@@ -284,6 +284,13 @@ components:
             - police
             - air_quality
             - radiation
+        severity:
+          type: string
+          enum:
+            - information
+            - warning
+            - danger
+            - extreme_danger
         title:
           type: string
         position:
