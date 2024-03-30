@@ -9,8 +9,20 @@ export class DashboardRepository {
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const dashboardItem: IDashboardItemModel = {
         id: faker.number.int({ min: 1, max: 1000 }),
-        type: "interpol_red",
-        severity: "extreme_danger",
+        type: faker.helpers.arrayElement([
+          "interpol_red",
+          "interpol_un",
+          "food_waring",
+          "product_warning",
+          "travel_warning",
+          "country_representative",
+        ]),
+        severity: faker.helpers.arrayElement([
+          "information",
+          "warning",
+          "danger",
+          "extreme_danger",
+        ]),
         title:
           faker.hacker.adjective() +
           " " +
@@ -31,7 +43,14 @@ export class DashboardRepository {
     // Example Data:
     const dashboardDetails = {
       id: dashboardId,
-      type: "interpol_red",
+      type: faker.helpers.arrayElement([
+        "interpol_red",
+        "interpol_un",
+        "food_waring",
+        "product_warning",
+        "travel_warning",
+        "country_representative",
+      ]),
       details: {
         first_name: faker.person.firstName(),
         last_name: faker.person.lastName(),
@@ -53,8 +72,20 @@ export class DashboardRepository {
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const dashboardItem: IDashboardItemModel = {
         id: faker.number.int({ min: 1, max: 1000 }),
-        type: "interpol_red",
-        severity: "extreme_danger",
+        type: faker.helpers.arrayElement([
+          "interpol_red",
+          "interpol_un",
+          "food_waring",
+          "product_warning",
+          "travel_warning",
+          "country_representative",
+        ]),
+        severity: faker.helpers.arrayElement([
+          "information",
+          "warning",
+          "danger",
+          "extreme_danger",
+        ]),
         title:
           faker.hacker.adjective() +
           " " +

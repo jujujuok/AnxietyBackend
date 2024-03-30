@@ -9,8 +9,22 @@ export class MapRepository {
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const mapItem: IMapItemModel = {
         id: faker.number.int({ min: 1, max: 1000 }),
-        type: "weather_flood",
-        severity: "extreme_danger",
+        type: faker.helpers.arrayElement([
+          "weather_flood",
+          "weather_storm",
+          "weather_disaster",
+          "street_closure",
+          "street_report",
+          "police",
+          "air_quality",
+          "radiation",
+        ]),
+        severity: faker.helpers.arrayElement([
+          "information",
+          "warning",
+          "danger",
+          "extreme_danger",
+        ]),
         title:
           faker.hacker.adjective() +
           " " +
@@ -46,7 +60,16 @@ export class MapRepository {
     // Example Data:
     const mapDetails = {
       id: mapId,
-      type: "street_closure",
+      type: faker.helpers.arrayElement([
+        "weather_flood",
+        "weather_storm",
+        "weather_disaster",
+        "street_closure",
+        "street_report",
+        "police",
+        "air_quality",
+        "radiation",
+      ]),
       details: {
         since: faker.date.past().getTime(),
         until: faker.date.future().getTime(),
@@ -68,8 +91,22 @@ export class MapRepository {
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const mapItem: IMapItemModel = {
         id: faker.number.int({ min: 1, max: 1000 }),
-        type: "weather_flood",
-        severity: "extreme_danger",
+        type: faker.helpers.arrayElement([
+          "weather_flood",
+          "weather_storm",
+          "weather_disaster",
+          "street_closure",
+          "street_report",
+          "police",
+          "air_quality",
+          "radiation",
+        ]),
+        severity: faker.helpers.arrayElement([
+          "information",
+          "warning",
+          "danger",
+          "extreme_danger",
+        ]),
         title:
           faker.hacker.adjective() +
           " " +
