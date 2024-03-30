@@ -1,3 +1,6 @@
+/**
+ * Dashboard model.
+ */
 export interface IDashboardItem {
   id: number;
   type:
@@ -13,6 +16,9 @@ export interface IDashboardItem {
   since: number;
 }
 
+/**
+ * Dashboard details model.
+ */
 export interface IDashboardItemDetails {
   id: number;
   type:

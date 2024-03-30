@@ -1,3 +1,6 @@
+/**
+ * MapItem model
+ */
 export interface IMapItem {
   id: number;
   type:
@@ -19,6 +22,9 @@ export interface IMapItem {
   since: number;
 }
 
+/**
+ * MapItem details model
+ */
 export interface IMapItemDetails {
   id: number;
   type:

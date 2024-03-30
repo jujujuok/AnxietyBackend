@@ -1,7 +1,14 @@
 import { IDashboardItem } from "../models/dashboard";
 import { faker } from "@faker-js/faker";
 
+/**
+ * Repository for the dashboard module
+ */
 export class DashboardRepository {
+  /**
+   * Get list of dashboard items
+   * @returns List of dashboard items
+   */
   async getDashboard(): Promise<IDashboardItem[]> {
     // Example Data:
     const dashboardItems: IDashboardItem[] = [];
@@ -39,6 +46,11 @@ export class DashboardRepository {
     return dashboardItems;
   }
 
+  /**
+   * Get details of a dashboard item
+   * @param dashboardId ID of the dashboard item
+   * @returns Details of a dashboard item
+   */
   async getDashboardDetails(dashboardId: number) {
     // Example Data:
     const dashboardDetails = {
@@ -62,6 +74,11 @@ export class DashboardRepository {
     return dashboardDetails;
   }
 
+  /**
+   * Get update of the dashboard list
+   * @param timestamp Timestamp of the last update
+   * @returns Update of the dashboard list containing ids to remove and objects to add
+   */
   async getDashboardUpdate(timestamp: number) {
     // Example Data:
     const dashboardUpdate = {

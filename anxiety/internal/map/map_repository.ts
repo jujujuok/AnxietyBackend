@@ -1,7 +1,14 @@
 import { faker } from "@faker-js/faker";
 import { IMapItem } from "../models/map";
 
+/**
+ * Repository for the map module
+ */
 export class MapRepository {
+  /**
+   * Get list of map items
+   * @returns List of map items
+   */
   async getMap(): Promise<IMapItem[]> {
     // Example Data:
     const mapItems: IMapItem[] = [];
@@ -56,6 +63,11 @@ export class MapRepository {
     return mapItems;
   }
 
+  /**
+   * Get details of a map item
+   * @param mapId ID of the map item
+   * @returns Details of a map item
+   */
   async getMapDetails(mapId: number) {
     // Example Data:
     const mapDetails = {
@@ -81,6 +93,11 @@ export class MapRepository {
     return mapDetails;
   }
 
+  /**
+   * Get update of the map list
+   * @param timestamp Timestamp
+   * @returns Update of the map list containing ids to remove and objects to add
+   */
   async getMapUpdate(timestamp: number) {
     // Example Data:
     const mapUpdate = {
