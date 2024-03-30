@@ -1,13 +1,13 @@
-import { IDashboardItemModel } from "../models/dashboard";
+import { IDashboardItem } from "../models/dashboard";
 import { faker } from "@faker-js/faker";
 
 export class DashboardRepository {
-  async getDashboard(): Promise<IDashboardItemModel[]> {
+  async getDashboard(): Promise<IDashboardItem[]> {
     // Example Data:
-    const dashboardItems: IDashboardItemModel[] = [];
+    const dashboardItems: IDashboardItem[] = [];
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const dashboardItem: IDashboardItemModel = {
+      const dashboardItem: IDashboardItem = {
         id: faker.number.int({ min: 1, max: 1000 }),
         type: faker.helpers.arrayElement([
           "interpol_red",
@@ -65,12 +65,12 @@ export class DashboardRepository {
   async getDashboardUpdate(timestamp: number) {
     // Example Data:
     const dashboardUpdate = {
-      add: [] as IDashboardItemModel[],
+      add: [] as IDashboardItem[],
       delete: [] as number[],
     };
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const dashboardItem: IDashboardItemModel = {
+      const dashboardItem: IDashboardItem = {
         id: faker.number.int({ min: 1, max: 1000 }),
         type: faker.helpers.arrayElement([
           "interpol_red",

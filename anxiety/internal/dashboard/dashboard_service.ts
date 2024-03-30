@@ -1,10 +1,10 @@
-import { IDashboardItemModel } from "../models/dashboard";
+import { IDashboardItem } from "../models/dashboard";
 import { DashboardRepository } from "./dashboard_repository";
 
 export class DashboardService {
   constructor(private readonly dashboardRepository: DashboardRepository) {}
 
-  async getDashboard(): Promise<IDashboardItemModel[]> {
+  async getDashboard(): Promise<IDashboardItem[]> {
     return this.dashboardRepository.getDashboard();
   }
 

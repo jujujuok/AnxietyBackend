@@ -1,13 +1,13 @@
 import { faker } from "@faker-js/faker";
-import { IMapItemModel } from "../models/map";
+import { IMapItem } from "../models/map";
 
 export class MapRepository {
-  async getMap(): Promise<IMapItemModel[]> {
+  async getMap(): Promise<IMapItem[]> {
     // Example Data:
-    const mapItems: IMapItemModel[] = [];
+    const mapItems: IMapItem[] = [];
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const mapItem: IMapItemModel = {
+      const mapItem: IMapItem = {
         id: faker.number.int({ min: 1, max: 1000 }),
         type: faker.helpers.arrayElement([
           "weather_flood",
@@ -84,12 +84,12 @@ export class MapRepository {
   async getMapUpdate(timestamp: number) {
     // Example Data:
     const mapUpdate = {
-      add: [] as IMapItemModel[],
+      add: [] as IMapItem[],
       delete: [] as number[],
     };
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const mapItem: IMapItemModel = {
+      const mapItem: IMapItem = {
         id: faker.number.int({ min: 1, max: 1000 }),
         type: faker.helpers.arrayElement([
           "weather_flood",

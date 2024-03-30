@@ -1,4 +1,4 @@
-export interface IDashboardItemModel {
+export interface IDashboardItem {
   id: number;
   type:
     | "interpol_red"
@@ -13,7 +13,7 @@ export interface IDashboardItemModel {
   since: number;
 }
 
-export interface IDashboardItemDetailsModel {
+export interface IDashboardItemDetails {
   id: number;
   type:
     | "interpol_red"

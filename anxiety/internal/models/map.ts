@@ -1,4 +1,4 @@
-export interface IMapItemModel {
+export interface IMapItem {
   id: number;
   type:
     | "weather_flood"
@@ -19,7 +19,7 @@ export interface IMapItemModel {
   since: number;
 }
 
-export interface IMapItemDetailsModel {
+export interface IMapItemDetails {
   id: number;
   type:
     | "weather_flood"
