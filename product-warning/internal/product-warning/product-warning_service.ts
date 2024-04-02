@@ -50,9 +50,15 @@ export class ProductWarningService {
       }
       else if (warning._type === '.FoodWarning') {
         const foodWarning: IFoodWarningModel = {
-          type: warning._type,
+          warning_id: warning.id,
+          warning_type: "f",
+          warning_link: warning.link,
+          publishedDate: warning.publishedDate.toString(),
           title: warning.title,
-          affectedStates: warning.affectedStates
+          description: warning.warning,
+          affectedStates: warning.affectedStates,
+          designation: warning.product ? warning.product.designation : null,
+          manufacturer: warning.product ? warning.product.manufacturer : null
         }
         warnings.foods.push(foodWarning);
       }
