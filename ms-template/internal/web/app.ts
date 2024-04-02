@@ -2,9 +2,11 @@ import fastify, { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { TypeController } from "../type/type_controller";
 import { TypeService } from "../type/type_service";
 import { TypeRepository } from "../type/type_repository";
+import dotenv from "dotenv";
 
 const start = async () => {
-  //TODO: Add getting of env variables
+  // Load environment variables from .env
+  dotenv.config();
 
   //TODO: Add database connection
 
