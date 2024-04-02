@@ -26,6 +26,44 @@ export class ProductWarningService {
     }
   }
 
+  getWarnings(data: any){
+    var warnings: IWarningsModel = { foods: [], products: [] };
+    data.response.docs.forEach((warning: any) => {
+      if (warning._type === '.ProductWarning') {
+        if (warning.product.model === "unbekannt") {
+          warning.product.model = undefined;
+        }
+        const productWarning: IProductWarningModel = {
+          warning_id: warning.id,
+          warning_type: "p",
+          warning_link: warning.link,
+          publishedDate: warning.publishedDate.toString(),
+          title: warning.title,
+          description: warning.warning,
+          designation: warning.product ? warning.product.designation : null,
+          manufacturer: warning.product ? warning.product.manufacturer : null,
+          catergory: warning.product ? warning.product.category : null,
+          model: warning.product ? warning.product.model : null,
+          hazard: warning.safetyInformation ? warning.safetyInformation.hazard : null,
+          injury: warning.safetyInformation ? warning.safetyInformation.injury : null,
+          affectedProducts: warning.affectedProducts
+        }
+
+        warnings.products.push(productWarning);
+      }
+      else if (warning._type === '.FoodWarning') {
+        const foodWarning: IFoodWarningModel = {
+          type: warning._type,
+          title: warning.title,
+          affectedStates: warning.affectedStates
+        }
+        warnings.foods.push(foodWarning);
+      }
+    });
+
+    return warnings;
+  }
+
   async getAll(){
 
     const body = {
@@ -38,24 +76,7 @@ export class ProductWarningService {
     };
     
     const data = await this.callApi(body);
-    var warnings: IWarningsModel = { foods: [], products: [] };
-    data.response.docs.forEach((warning: any) => {
-      if (warning._type === '.ProductWarning') {
-        const productWarning: IProductWarningModel = {
-          type: warning._type,
-          title: warning.title,
-        }
-        warnings.products.push(productWarning);
-      }
-      else if (warning._type === '.FoodWarning') {
-        const foodWarning: IFoodWarningModel = {
-          type: warning._type,
-          title: warning.title,
-          affectedStates: warning.affectedStates
-        }
-        warnings.foods.push(foodWarning);
-      }
-    });
+    const warnings = this.getWarnings(data);
 
     return warnings;
   }
@@ -80,24 +101,7 @@ export class ProductWarningService {
     };
     
     var data = await this.callApi(body);
-    var warnings: IWarningsModel = { foods: [], products: [] };
-    data.response.docs.forEach((warning: any) => {
-      if (warning._type === '.ProductWarning') {
-        const productWarning: IProductWarningModel = {
-          type: warning._type,
-          title: warning.title
-        }
-        warnings.products.push(productWarning);
-      }
-      else if (warning._type === '.FoodWarning') {
-        const foodWarning: IFoodWarningModel = {
-          type: warning._type,
-          title: warning.title,
-          affectedStates: warning.affectedStates
-        }
-        warnings.foods.push(foodWarning);
-      }
-    });
+    var warnings = this.getWarnings(data);
     
     if (warnings.foods.length === 0 && warnings.products.length === 0) {
       return "No new warnings found!";
