@@ -30,9 +30,6 @@ export class ProductWarningService {
     var warnings: IWarningsModel = { foods: [], products: [] };
     data.response.docs.forEach((warning: any) => {
       if (warning._type === '.ProductWarning') {
-        if (warning.product.model === "unbekannt") {
-          warning.product.model = undefined;
-        }
         const productWarning: IProductWarningModel = {
           warning_id: warning.id,
           warning_type: "p",
@@ -43,7 +40,7 @@ export class ProductWarningService {
           designation: warning.product ? warning.product.designation : null,
           manufacturer: warning.product ? warning.product.manufacturer : null,
           catergory: warning.product ? warning.product.category : null,
-          model: warning.product ? warning.product.model : null,
+          model: warning.product ? (warning.product.model === "unbekannt" ? undefined: warning.product.model ) : null,
           hazard: warning.safetyInformation ? warning.safetyInformation.hazard : null,
           injury: warning.safetyInformation ? warning.safetyInformation.injury : null,
           affectedProducts: warning.affectedProducts
