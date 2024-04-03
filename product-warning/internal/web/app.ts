@@ -53,6 +53,7 @@ const addProductWarningRoutes = (controller: ProductWarningController): FastifyP
   return (instance, options, done) => {
     instance.get("/all", controller.getAll.bind(controller));
     instance.get("/update", controller.getUpdate.bind(controller));
+    instance.get("/updateAll", controller.getUpdateAll.bind(controller));
     instance.get("/getData", controller.getData.bind(controller));
     done();
   };

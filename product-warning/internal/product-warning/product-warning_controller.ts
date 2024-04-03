@@ -6,24 +6,28 @@ export class ProductWarningController {
   constructor(private readonly productWarningService: ProductWarningService) {}
 
   async getAll(req: FastifyRequest, reply: FastifyReply) {
-    const users = await this.productWarningService.getAll();
-    return reply.send(users);
+    const result = await this.productWarningService.getAll();
+    return reply.send(result);
   }
 
   async getUpdate(req: FastifyRequest, reply: FastifyReply) {
-    const users = await this.productWarningService.getUpdate();
-    return reply.send(users);
+    const result = await this.productWarningService.getUpdate();
+    return reply.send(result);
   }
+
+  async getUpdateAll(req: FastifyRequest, reply: FastifyReply) {
+    const result = await this.productWarningService.getUpdateAll();
+    return reply.send(result);
+  }
+
 
   async getData(req: updateRequest, reply: FastifyReply) {
     if (!req.query.timestamp) {
-      return reply.status(400).send({
-        message: "Timestamp is required",
-      });
+      const timestamp = null;
     }
 
     const timestamp = req.query.timestamp as number;
-    const users = await this.productWarningService.getData(timestamp);
-    return reply.send(users);
+    const data = await this.productWarningService.getData(timestamp);
+    return reply.send(data);
   }
 }

@@ -78,9 +78,7 @@ export class ProductWarningService {
     const data = await this.callApi(body);
     const warnings = this.getWarnings(data);
 
-    this.productWarningRepository.saveAll(warnings);
-
-    return warnings;
+    return this.productWarningRepository.saveAll(warnings);
   }
 
   async getUpdate(){
@@ -102,15 +100,30 @@ export class ProductWarningService {
       }
     };
     
-    var data = await this.callApi(body);
-    var warnings = this.getWarnings(data);
+    const data = await this.callApi(body);
+    const warnings = this.getWarnings(data);
     
-    this.productWarningRepository.saveUpdate(warnings);
+    return this.productWarningRepository.saveUpdate(warnings);
+  }
 
-    if (warnings.foods.length === 0 && warnings.products.length === 0) {
-      return "No new warnings found!";
-    }
+  async getData(timestamp: number){
+    const data = this.productWarningRepository.getData(timestamp);
+    return data;
+  }
 
-    return warnings;
+  async getUpdateAll(){
+    const body = {
+      "food": {
+        "sort": "publishedDate desc, title asc"
+      },
+      "products": {
+        "sort": "publishedDate desc, title asc"
+      }
+    };
+    
+    const data = await this.callApi(body);
+    const warnings = this.getWarnings(data);
+
+    return this.productWarningRepository.saveUpdate(warnings);
   }
 }

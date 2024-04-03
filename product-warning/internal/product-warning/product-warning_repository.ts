@@ -1,18 +1,20 @@
 import { IWarningsModel } from "../models/warnings";
 import { Pool } from 'pg';
+import { IReturnSchema } from "../models/return-schema";
 
 export class ProductWarningRepository {
   async saveAll(warnings: IWarningsModel) {
 
     if (warnings.products.length === 0 && warnings.foods.length === 0) {
+      console.log('No warnings to save');
       return;
     }
 
     const pool = new Pool({
-      user: 'username_db',
-      host: 'ip_db',
-      database: 'name_db',
-      password: 'password_db',
+      user: 'db_user',
+      host: 'db_ip',
+      database: 'db_name',
+      password: 'db_password',
     });
     
     const client = await pool.connect();
@@ -51,6 +53,7 @@ export class ProductWarningRepository {
       console.log(result_foodInformations.rowCount + ' rows inserted (foodInformations)');
     } finally {
     client.release();
+    return 200;
     }
   }
 
@@ -61,10 +64,10 @@ export class ProductWarningRepository {
     }
 
     const pool = new Pool({
-      user: 'username_db',
-      host: 'ip_db',
-      database: 'name_db',
-      password: 'password_db',
+      user: 'db_user',
+      host: 'db_ip',
+      database: 'db_name',
+      password: 'db_password',
     });
 
     const client = await pool.connect();
@@ -79,7 +82,80 @@ export class ProductWarningRepository {
       });
     }finally{
       client.release();
-      this.saveAll(warnings);
+      return this.saveAll(warnings);
+    }
+  }
+
+  async getData(timestamp: number) {
+    const pool = new Pool({
+      user: 'db_user',
+      host: 'db_ip',
+      database: 'db_name',
+      password: 'db_password',
+    });
+
+    const warnings: IReturnSchema[] = [];
+
+    const client = await pool.connect();
+    try {
+      var timestampstatement = '';
+      if (timestamp) {
+        timestampstatement = `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000);`;
+      }
+      const resultwarnings = await client.query(`SELECT * FROM productwarnings.warnings ${timestampstatement}`);
+
+      const values_warningids = resultwarnings.rows.map(row => row.warning_id).join(',');
+
+      const result_productInformations = await client.query(`SELECT * FROM productwarnings.productInformations WHERE warning_id in (${values_warningids});`);
+      const result_safetyInformations = await client.query(`SELECT * FROM productwarnings.safetyInformations WHERE warning_id in (${values_warningids});`);
+      const result_foodInformations = await client.query(`SELECT * FROM productwarnings.foodInformations WHERE warning_id in (${values_warningids});`);
+      resultwarnings.rows.forEach((row: any) => {
+        if (row.warning_id) {
+          if (row.warning_type === 'p') {
+            const productWarning: IReturnSchema ={
+              id: row.warning_id,
+              type: "product_warning",
+              title: row.title ?? undefined,
+              description: row.description ?? undefined,
+              since: row.publishedDate ?? undefined,
+              details:{
+                link: row.warning_link ?? undefined,
+                designation: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.designation ?? undefined,
+                manufacturer: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.manufacturer ?? undefined,
+                category: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.category ?? undefined,
+                hazard: result_safetyInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.hazard ?? undefined,
+                injury: result_safetyInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.injury ?? undefined,
+                affectedProducts: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedProducts ?? undefined,
+                affectedStates: undefined,
+              }
+            };
+            warnings.push(productWarning);
+          }
+          else if(row.warning_type === 'f'){
+            const foodWarning: IReturnSchema ={
+              id: row.warning_id,
+              type: "food_warning",
+              title: row.title ?? undefined,
+              description: row.description ?? undefined,
+              since: row.publishedDate ?? undefined,
+              details:{
+                link: row.warning_link ?? undefined,
+                designation: undefined,
+                manufacturer: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.manufacturer ?? undefined,
+                category: undefined,
+                hazard: undefined,
+                injury: undefined,
+                affectedProducts: undefined,
+                affectedStates: result_foodInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedStates ?? undefined,
+              }
+            };
+            warnings.push(foodWarning);
+          }
+        }
+      });
+    } finally {
+      client.release();
+      return warnings;
     }
   }
 }
