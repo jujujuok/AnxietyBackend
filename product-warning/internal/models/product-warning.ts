@@ -7,8 +7,7 @@ export interface IProductWarningModel {
     description: string;
     designation: string;
     manufacturer: string;
-    catergory: string;
-    model: string;
+    category: string;
     hazard: string;
     injury: string;
     affectedProducts: string;

@@ -6,6 +6,5 @@ export interface IFoodWarningModel {
     title: string;
     description: string;
     affectedStates: string[];
-    designation: string;
     manufacturer: string;
 }

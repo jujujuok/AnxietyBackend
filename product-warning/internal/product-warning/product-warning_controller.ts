@@ -13,4 +13,9 @@ export class ProductWarningController {
     const users = await this.productWarningService.getUpdate();
     return reply.send(users);
   }
+
+  async getData(req: FastifyRequest, reply: FastifyReply) {
+    const users = await this.productWarningService.getData();
+    return reply.send(users);
+  }
 }

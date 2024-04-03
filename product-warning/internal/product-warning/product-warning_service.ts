@@ -1,4 +1,3 @@
-import { ITypeModel } from "../models/type";
 import { IProductWarningModel } from "../models/product-warning";
 import { IFoodWarningModel } from "../models/food-warning";
 import { IWarningsModel } from "../models/warnings";
@@ -33,17 +32,16 @@ export class ProductWarningService {
         const productWarning: IProductWarningModel = {
           warning_id: warning.id,
           warning_type: "p",
-          warning_link: warning.link,
           publishedDate: warning.publishedDate.toString(),
-          title: warning.title,
-          description: warning.warning,
-          designation: warning.product ? warning.product.designation : null,
-          manufacturer: warning.product ? warning.product.manufacturer : null,
-          catergory: warning.product ? warning.product.category : null,
-          model: warning.product ? (warning.product.model === "unbekannt" ? undefined: warning.product.model ) : null,
-          hazard: warning.safetyInformation ? warning.safetyInformation.hazard : null,
-          injury: warning.safetyInformation ? warning.safetyInformation.injury : null,
-          affectedProducts: warning.affectedProducts
+          warning_link: warning.link ? warning.link.replaceAll("\'", "\"") : null,
+          title: warning.title ? warning.title.replaceAll("\'", "\"") : null,
+          description: warning.warning ? warning.warning.replaceAll("\'", "\"") : null,
+          designation: warning.product ? (warning.product.designation ? warning.product.designation.replaceAll("\'", "\"") : null) : null,
+          manufacturer: warning.product ? (warning.product.manufacturer ? warning.product.manufacturer.replaceAll("\'", "\"") : null) : null,
+          category: warning.product ? (warning.product.category ? warning.product.category.replaceAll("\'", "\"") : null) : null,
+          hazard: warning.safetyInformation ? (warning.safetyInformation.hazard ? warning.safetyInformation.hazard.replaceAll("\'", "\"") : null) : null,
+          injury: warning.safetyInformation ? (warning.safetyInformation.injury ? warning.safetyInformation.injury.replaceAll("\'", "\"") : null) : null,
+          affectedProducts: warning.product ? (warning.product.affectedProducts ? warning.product.affectedProducts.replaceAll("\'", "\"") : null) : null,
         }
 
         warnings.products.push(productWarning);
@@ -52,13 +50,12 @@ export class ProductWarningService {
         const foodWarning: IFoodWarningModel = {
           warning_id: warning.id,
           warning_type: "f",
-          warning_link: warning.link,
+          warning_link: warning.link.replaceAll("\'", "\""),
           publishedDate: warning.publishedDate.toString(),
-          title: warning.title,
-          description: warning.warning,
+          title: warning.title.replaceAll("\'", "\""),
+          description: warning.warning.replaceAll("\'", "\""),
           affectedStates: warning.affectedStates,
-          designation: warning.product ? warning.product.designation : null,
-          manufacturer: warning.product ? warning.product.manufacturer : null
+          manufacturer: warning.product ? warning.product.manufacturer.replaceAll("\'", "\"") : null
         }
         warnings.foods.push(foodWarning);
       }
@@ -80,6 +77,8 @@ export class ProductWarningService {
     
     const data = await this.callApi(body);
     const warnings = this.getWarnings(data);
+
+    this.productWarningRepository.saveAll(warnings);
 
     return warnings;
   }
@@ -106,6 +105,8 @@ export class ProductWarningService {
     var data = await this.callApi(body);
     var warnings = this.getWarnings(data);
     
+    this.productWarningRepository.saveUpdate(warnings);
+
     if (warnings.foods.length === 0 && warnings.products.length === 0) {
       return "No new warnings found!";
     }
