@@ -2,17 +2,19 @@ import fastify, { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { ProductWarningController } from "../product-warning/product-warning_controller";
 import { ProductWarningService } from "../product-warning/product-warning_service";
 import { ProductWarningRepository } from "../product-warning/product-warning_repository";
+import dotenv from "dotenv";
+import { Pool } from "pg";
 
 const start = async () => {
-  //TODO: Add getting of env variables
-
-  //TODO: Add database connection
+  dotenv.config();
 
   const server = await fastify({ logger: true });
 
+  const db_pool = await setupDB(server);
+
   //TODO: Add middleware
 
-  const productWarningService = await setupServices();
+  const productWarningService = await setupServices(db_pool);
   await setupRoutes(server, productWarningService);
 
   await setupLog(server);
@@ -24,24 +26,52 @@ const start = async () => {
     process.exit(1);
   }
 
-  //TODO: Add graceful shutdown including database connection
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("Server closed");
+    });
+  });
 };
 
-const setupServices = async () => {
-  const productWarningRepository = new ProductWarningRepository();
-  const productWarningService = new ProductWarningService(productWarningRepository);
+const setupDB = async (server: FastifyInstance) => {
+  const db_pool = new Pool({
+    host: process.env.HOST || "",
+    database: process.env.DATABASE || "",
+    user: process.env.PRODUCTWARNING_USER || "",
+    password: process.env.PRODUCTWARNING_PASSWORD || "",
+  });
+
+  server.addHook("onClose", async () => {
+    await db_pool.end();
+    console.log("DB connectionpool ended");
+  });
+
+  return db_pool;
+};
+
+const setupServices = async (db: Pool) => {
+  const productWarningRepository = new ProductWarningRepository(db);
+  const productWarningService = new ProductWarningService(
+    productWarningRepository
+  );
 
   return productWarningService;
 };
 
-const setupRoutes = async (server: FastifyInstance, service: ProductWarningService) => {
+const setupRoutes = async (
+  server: FastifyInstance,
+  service: ProductWarningService
+) => {
   const productWarningController = new ProductWarningController(service);
 
-  server.register(addProductWarningRoutes(productWarningController), { prefix: "/product-warning"});
+  server.register(addProductWarningRoutes(productWarningController), {
+    prefix: "/product-warning",
+  });
 };
 
 const setupLog = async (server: FastifyInstance) => {
-  server.log.info("### Type Service started ###");
+  server.log.info("### productwarning service started ###");
 
   server.addHook("onRequest", (request, reply, done) => {
     server.log.info({ req: request.raw });
@@ -49,7 +79,9 @@ const setupLog = async (server: FastifyInstance) => {
   });
 };
 
-const addProductWarningRoutes = (controller: ProductWarningController): FastifyPluginCallback => {
+const addProductWarningRoutes = (
+  controller: ProductWarningController
+): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/all", controller.getAll.bind(controller));
     instance.get("/update", controller.getUpdate.bind(controller));
@@ -57,6 +89,15 @@ const addProductWarningRoutes = (controller: ProductWarningController): FastifyP
     instance.get("/getData", controller.getData.bind(controller));
     done();
   };
+};
+
+const gracefulShutdown = async (server: FastifyInstance) => {
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service started ###");
+    });
+  });
 };
 
 start();
