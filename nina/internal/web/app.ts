@@ -39,7 +39,7 @@ const setupServices = async () => {
 const setupRoutes = async (server: FastifyInstance, service: NinaService) => {
   const ninaController = new NinaController(service);
 
-  server.register(addTypeRoutes(ninaController), { prefix: "/nina" });
+  server.register(addNinaRoutes(ninaController), { prefix: "/nina" });
 };
 
 const setupLog = async (server: FastifyInstance) => {
@@ -51,7 +51,7 @@ const setupLog = async (server: FastifyInstance) => {
   });
 };
 
-const addTypeRoutes = (controller: NinaController): FastifyPluginCallback => {
+const addNinaRoutes = (controller: NinaController): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/fetchData", controller.fetchData.bind(controller));
     done();
