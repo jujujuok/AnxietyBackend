@@ -94,7 +94,7 @@ export class ProductWarningService {
     return warnings;
   }
 
-  async getAll() {
+  async fetchAll() {
     const body = {
       food: {
         sort: "publishedDate desc, title asc",
@@ -110,7 +110,7 @@ export class ProductWarningService {
     return this.productWarningRepository.saveAll(warnings);
   }
 
-  async getUpdate() {
+  async fetchUpdate() {
     const now = new Date();
     const timestamp = now.getTime() - 6 * 60 * 1000;
 
@@ -136,7 +136,7 @@ export class ProductWarningService {
     return data;
   }
 
-  async getUpdateAll() {
+  async fetchUpdateAll() {
     const body = {
       food: {
         sort: "publishedDate desc, title asc",

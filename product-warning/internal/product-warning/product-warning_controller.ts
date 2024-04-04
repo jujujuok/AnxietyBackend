@@ -5,18 +5,18 @@ import { updateRequest } from "../utils/fastifyRequests";
 export class ProductWarningController {
   constructor(private readonly productWarningService: ProductWarningService) {}
 
-  async getAll(req: FastifyRequest, reply: FastifyReply) {
-    const result = await this.productWarningService.getAll();
+  async fetchAll(req: FastifyRequest, reply: FastifyReply) {
+    const result = await this.productWarningService.fetchAll();
     return reply.send(result);
   }
 
-  async getUpdate(req: FastifyRequest, reply: FastifyReply) {
-    const result = await this.productWarningService.getUpdate();
+  async fetchUpdate(req: FastifyRequest, reply: FastifyReply) {
+    const result = await this.productWarningService.fetchUpdate();
     return reply.send(result);
   }
 
-  async getUpdateAll(req: FastifyRequest, reply: FastifyReply) {
-    const result = await this.productWarningService.getUpdateAll();
+  async fetchUpdateAll(req: FastifyRequest, reply: FastifyReply) {
+    const result = await this.productWarningService.fetchUpdateAll();
     return reply.send(result);
   }
 

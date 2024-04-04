@@ -26,12 +26,7 @@ const start = async () => {
     process.exit(1);
   }
 
-  process.on("SIGINT", () => {
-    console.log("Received SIGINT. Shutting down gracefully...");
-    server.close().then(() => {
-      console.log("Server closed");
-    });
-  });
+  await gracefulShutdown(server);
 };
 
 const setupDB = async (server: FastifyInstance) => {
@@ -83,10 +78,10 @@ const addProductWarningRoutes = (
   controller: ProductWarningController
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
-    instance.get("/all", controller.getAll.bind(controller));
-    instance.get("/update", controller.getUpdate.bind(controller));
-    instance.get("/updateAll", controller.getUpdateAll.bind(controller));
-    instance.get("/getData", controller.getData.bind(controller));
+    instance.get("/fetchAll", controller.fetchAll.bind(controller)); // fetch all warnings from external API
+    instance.get("/fetchUpdate", controller.fetchUpdate.bind(controller)); // fetch only new warnings from external API (last 6min)
+    instance.get("/fetchUpdateAll", controller.fetchUpdateAll.bind(controller)); // fetch all warnings from external API, but don't override existing ones (last 6min)
+    instance.get("/getData", controller.getData.bind(controller)); // get warnings from DB
     done();
   };
 };
