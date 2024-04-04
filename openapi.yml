@@ -1,0 +1,367 @@
+openapi: '3.0.2'
+info:
+  title: Anxiety
+  description: | 
+    Collection of all security related APIs for Germany.
+    Supplying the information to anxiety frontend.
+  version: '0.2'
+servers:
+  - url: http://212.132.100.147/
+    description: Main server
+
+tags:
+  - name: dashboard
+    description: 'Retrieving information for the dashboard'
+  - name: map
+    description: "Retrieving information for the map of germany"
+  - name: world-map
+    description: "Retrieving information for the worldmap"
+
+paths:
+  /dashboard:
+    get:
+      tags:
+        - dashboard
+      description: 'Get all dashboard items.'
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/dashboardItem'
+  /dashboard/{id}:
+    get:
+      tags:
+        - dashboard
+      description: 'Get a dashboard item by id.'
+      parameters:
+        - name: id
+          in: path
+          description: 'ID of the dashboard item to get.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dashboardItemDetails'
+        '404':
+          description: Not Found
+  /dashboard/update:
+    get:
+      tags:
+        - dashboard
+      description: ''
+      parameters:
+        - name: timestamp
+          in: query
+          description: 'Timestamp of the last update.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  add:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dashboardItem'
+                  delete:
+                    type: array
+                    items:
+                      type: integer
+                    description: 'List of IDs to delete.'
+        '204':
+          description: No Content
+
+  /map:
+    get:
+      tags:
+        - map
+      description: 'Get all map items.'
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/mapItem'
+  /map/{id}:
+    get:
+      tags:
+        - map
+      description: 'Get a map item by id.'
+      parameters:
+        - name: id
+          in: path
+          description: 'ID of the map item to get.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mapItemDetails'
+        '404':
+          description: Not Found
+  /map/update:
+    get:
+      tags:
+        - map
+      description: ''
+      parameters:
+        - name: timestamp
+          in: query
+          description: 'Timestamp of the last update.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  add:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dashboardItem'
+                  delete:
+                    type: array
+                    items:
+                      type: integer
+                    description: 'List of IDs to delete.'
+        '204':
+          description: No Content
+  /world-map:
+    get:
+      tags:
+        - world-map
+      description: 'Get all country items.'
+      parameters: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/countryItem'
+  /world-map/{id}:
+    get:
+      tags:
+        - world-map
+      description: 'Get a country item by id.'
+      parameters:
+        - name: id
+          in: path
+          description: 'ID of the country item to get.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/countryItemDetails'
+        '404':
+          description: Not Found
+  /world-map/update:
+    get:
+      tags:
+        - world-map
+      description: ''
+      parameters:
+        - name: timestamp
+          in: query
+          description: 'Timestamp of the last update.'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  add:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/dashboardItem'
+                  delete:
+                    type: array
+                    items:
+                      type: integer
+                    description: 'List of IDs to delete.'
+        '204':
+          description: No Content
+
+components:
+  schemas:
+    dashboardItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - interpol_red
+            - interpol_un
+            - food_warning
+            - product_warning
+            - travel_warning
+            - country_representetive
+        severity:
+          type: string
+          enum:
+            - information
+            - warning
+            - danger
+            - extreme_danger
+        title:
+          type: string
+        description:
+          type: string
+        since:
+          type: integer
+          description: 'Timestamp of the registration of the event.'
+    dashboardItemDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - interpol_red
+            - interpol_un
+            - food_warning
+            - product_warning
+            - travel_warning
+            - country_representetive
+        details:
+          type: object
+          description: 'Details of the event. Depending of the type of event.'
+    mapItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - weather_flood
+            - weather_storm
+            - weather_disaster
+            - street_closure
+            - street_report
+            - police
+            - air_quality
+            - radiation
+        severity:
+          type: string
+          enum:
+            - information
+            - warning
+            - danger
+            - extreme_danger
+        title:
+          type: string
+        position:
+          type: object
+          properties:
+            lat:
+              type: number
+            lon:
+              type: number
+        area:
+          oneOf:
+            - type: number
+              description: 'Radius in meters.'
+            - type: array
+              description: 'Array for polygon.'
+              items:
+                type: number
+        since:
+          type: integer
+          description: 'Timestamp of the registration of the event.'
+    mapItemDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - weather_flood
+            - weather_storm
+            - weather_disaster
+            - street_closure
+            - street_report
+            - police
+            - air_quality
+            - radiation
+        details:
+          type: object
+          description: 'Details of the event. Depending of the type of event.'
+
+    countryItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - interpol_red
+            - interpol_un
+            - travel_warning
+            - country_representetive
+        title:
+          type: string
+        country:
+          type: string
+        since:
+          type: integer
+          description: 'Timestamp of the registration of the event.'
+    countryItemDetails:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum:
+            - interpol_red
+            - interpol_un
+            - travel_warning
+            - country_representetive
+        details:
+          type: object
+          description: 'Details of the event. Depending of the type of event.'

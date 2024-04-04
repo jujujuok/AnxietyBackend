@@ -2,9 +2,11 @@ import fastify, { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { TypeController } from "../type/type_controller";
 import { TypeService } from "../type/type_service";
 import { TypeRepository } from "../type/type_repository";
+import dotenv from "dotenv";
 
 const start = async () => {
-  //TODO: Add getting of env variables
+  // Load environment variables from .env
+  dotenv.config();
 
   //TODO: Add database connection
 
@@ -18,7 +20,7 @@ const start = async () => {
   await setupLog(server);
 
   try {
-    await server.listen({ port: 8000 });
+    await server.listen({ port: 8000, host: "0.0.0.0" });
   } catch (err) {
     server.log.error(err);
     process.exit(1);

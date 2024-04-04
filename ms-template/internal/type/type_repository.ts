@@ -7,6 +7,8 @@ export class TypeRepository {
     const types: ITypeModel[] = [
       { id: 1, type: "warning" },
       { id: 2, type: "danger" },
+      { id: 3, type: "info" },
+      { id: 4, type: "success" },
     ];
 
     return types;
