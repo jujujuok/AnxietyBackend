@@ -20,7 +20,7 @@ const start = async () => {
   await setupLog(server);
 
   try {
-    await server.listen({ port: 8000 });
+    await server.listen({ port: 8000, host: "0.0.0.0" });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
@@ -90,7 +90,7 @@ const gracefulShutdown = async (server: FastifyInstance) => {
   process.on("SIGINT", () => {
     console.log("Received SIGINT. Shutting down gracefully...");
     server.close().then(() => {
-      console.log("### productwarning service started ###");
+      console.log("### productwarning service stopped ###");
     });
   });
 };
