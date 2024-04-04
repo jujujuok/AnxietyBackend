@@ -1,0 +1,28 @@
+# Exclude dependencies
+node_modules
+
+# Logs, temporary files
+*.log
+npm-debug.log*
+
+# IDE configurations, local settings
+.vscode
+.idea
+
+# Test coverage reports
+coverage
+
+# Operating system files
+.DS_Store  # macOS-specific
+Thumbs.db  # Windows-specific
+
+# Build artifacts
+dist
+build
+out
+
+# Environment files (containing secrets)
+.env 
+
+# Docker Images
+*.tar
