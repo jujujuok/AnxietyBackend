@@ -29,11 +29,11 @@ Add the `-d` flag to run in detached mode.
 
 ```bash
 docker build -t anxiety-api anxietyBackend/anxiety
-docker save anxiety-api > anxiety-api.tar
+docker save anxiety-api:latest > anxiety-api.tar
 scp anxiety-api.tar root@212.132.100.147:/root/anxiety/dockerImages
 
 docker build -t product-warning-api anxietyBackend/product-warning
-docker save product-warning-api > product-warning-api.tar
+docker save product-warning-api:latest > product-warning-api.tar
 scp product-warning-api.tar root@212.132.100.147:/root/anxiety/dockerImages
 
 ...
