@@ -1,9 +1,15 @@
 #clear all deprecated images
+##local
 echo "###Clearing deprecated images###"
 mkdir dockerImages
 rm ./dockerImages/*
 ssh root@212.132.100.147 "rm /root/anxiety/dockerImages/*"
 cd dockerImages
+
+##remote
+ssh root@212.132.100.147 "cd /root/anxiety && docker compose down"
+ssh root@212.132.100.147 "docker image remove anxiety-api:latest"
+ssh root@212.132.100.147 "docker image remove product-warning-api:latest"
 
 #build and save images
 echo "\n###Building and saving images###\n"
@@ -22,13 +28,6 @@ scp dockerImages/* root@212.132.100.147:/root/anxiety/dockerImages
 
 #load images on server
 echo "\n###Loading images on server###\n"
-
-## Shutdown and remove old images
-ssh root@212.132.100.147 "cd /root/anxiety && docker compose down"
-ssh root@212.132.100.147 "docker image remove anxiety-api:latest"
-ssh root@212.132.100.147 "docker image remove product-warning-api:latest"
-
-## Load new images
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/anxiety-api.tar"
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/product-warning-api.tar"
 
