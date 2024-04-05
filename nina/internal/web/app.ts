@@ -1,7 +1,7 @@
 import fastify, { FastifyInstance, FastifyPluginCallback } from "fastify";
-import { NinaController } from "../type/nina_controller";
-import { NinaService } from "../type/nina_service";
-import { NinaRepository } from "../type/nina_repository";
+import { NinaController } from "../nina/nina_controller";
+import { NinaService } from "../nina/nina_service";
+import { NinaRepository } from "../nina/nina_repository";
 import dotenv from "dotenv";
 
 const start = async () => {
