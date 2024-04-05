@@ -77,6 +77,31 @@ export class NinaRepository {
     }
   }
 
+  async getClosedData(timestamp: number){
+    if (!timestamp){
+      return '';
+    }
+
+    var warningids = [];
+
+    const db = new Pool({
+      user: "dbuser",
+      host: "dbhost",
+      database: "dbname",
+      password: "dbpassword",
+    });
+
+    const client = await db.connect();
+    try{
+      const result = await client.query(`SELECT warning_id FROM nina.warnings WHERE loadenddate > TO_TIMESTAMP(${timestamp}/1000)`);
+      warningids = result.rows;
+      console.log(result.rows.length + ' rows closed since last request');
+    }finally{
+      client.release();
+      return warningids;
+    }
+  }
+
   async getData(timestamp: number){
     const warnings: IReturnSchema[] = [];
 
@@ -87,17 +112,15 @@ export class NinaRepository {
       password: "dbpassword",
     });
 
-    
-
     const client = await db.connect();
     try {
-      var timestampstatement = "";
+      var timestampstatement = "WHERE";
       if (timestamp) {
-        timestampstatement = `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000);`;
+        timestampstatement = `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000) AND`;
       }
-
+      
       const resultwarnings = await client.query(
-        `SELECT * FROM nina.warnings ${timestampstatement} WHERE loadenddate IS NULL`
+        `SELECT * FROM nina.warnings ${timestampstatement} loadenddate IS NULL`
       );
 
       console.log(resultwarnings.rows.length + ' rows selected');
@@ -119,7 +142,9 @@ export class NinaRepository {
       });
     } finally {
       client.release();
-      return warnings;
+      const closedWarningIds = await this.getClosedData(timestamp);
+      const result = [warnings, closedWarningIds];
+      return result;
     }
   }
 }
