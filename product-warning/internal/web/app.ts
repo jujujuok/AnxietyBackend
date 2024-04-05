@@ -87,8 +87,17 @@ const addProductWarningRoutes = (
 };
 
 const gracefulShutdown = async (server: FastifyInstance) => {
+  // For stopping server running locally
   process.on("SIGINT", () => {
     console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service stopped ###");
+    });
+  });
+
+  // For docker compose down
+  process.on("SIGTERM", () => {
+    console.log("Received SIGTERM. Shutting down gracefully...");
     server.close().then(() => {
       console.log("### productwarning service stopped ###");
     });
