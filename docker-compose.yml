@@ -5,12 +5,14 @@ services:
     env_file:
       - .env
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 
   anxiety:
     image: anxiety-api
+    depends_on:
+      - db
     restart: unless-stopped
     env_file:
       - .env
@@ -19,6 +21,8 @@ services:
 
   product-warning:
     image: product-warning-api
+    depends_on:
+      - db
     restart: unless-stopped
     env_file:
       - .env
