@@ -3,15 +3,10 @@ import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
 
 export class NinaRepository {
-  async closeData(warningids: any) {
-    const db = new Pool({
-      user: "dbuser",
-      host: "dbhost",
-      database: "dbname",
-      password: "dbpassword",
-    });
+  constructor(private db: Pool) {}
 
-    const client = await db.connect();
+  async closeData(warningids: any) {
+    const client = await this.db.connect();
     try {
       const result = await client.query(
         `Update nina.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN (${warningids}) AND loadenddate IS NULL`
@@ -32,14 +27,7 @@ export class NinaRepository {
       .join(",");
     const closeresult = await this.closeData(values);
 
-    const db = new Pool({
-      user: "dbuser",
-      host: "dbhost",
-      database: "dbname",
-      password: "dbpassword",
-    });
-
-    const client = await db.connect();
+    const client = await this.db.connect();
     try {
       const result = await client.query(
         `SELECT warning_id FROM nina.warnings WHERE warning_id IN (${values})`
@@ -101,14 +89,7 @@ export class NinaRepository {
       .filter((part: string) => part.trim().length > 0)
       .join(",");
 
-    const db = new Pool({
-      user: "dbuser",
-      host: "dbhost",
-      database: "dbname",
-      password: "dbpassword",
-    });
-
-    const client = await db.connect();
+    const client = await this.db.connect();
 
     try {
       const result = await client.query(
@@ -128,14 +109,7 @@ export class NinaRepository {
 
     var warningids = [];
 
-    const db = new Pool({
-      user: "dbuser",
-      host: "dbhost",
-      database: "dbname",
-      password: "dbpassword",
-    });
-
-    const client = await db.connect();
+    const client = await this.db.connect();
     try {
       const result = await client.query(
         `SELECT warning_id FROM nina.warnings WHERE loadenddate > TO_TIMESTAMP(${timestamp}/1000)`
@@ -151,14 +125,7 @@ export class NinaRepository {
   async getData(timestamp: number) {
     const warnings: IReturnSchema[] = [];
 
-    const db = new Pool({
-      user: "dbuser",
-      host: "dbhost",
-      database: "dbname",
-      password: "dbpassword",
-    });
-
-    const client = await db.connect();
+    const client = await this.db.connect();
     try {
       var timestampstatement = "WHERE";
       if (timestamp) {
