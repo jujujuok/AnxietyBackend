@@ -3,18 +3,19 @@ import { TypeController } from "../type/type_controller";
 import { TypeService } from "../type/type_service";
 import { TypeRepository } from "../type/type_repository";
 import dotenv from "dotenv";
+import { Pool } from "pg";
 
 const start = async () => {
   // Load environment variables from .env
   dotenv.config();
 
-  //TODO: Add database connection
-
   const server = await fastify({ logger: true });
+
+  const db_pool = await setupDB(server);
 
   //TODO: Add middleware
 
-  const typeService = await setupServices();
+  const typeService = await setupServices(db_pool);
   await setupRoutes(server, typeService);
 
   await setupLog(server);
@@ -26,11 +27,27 @@ const start = async () => {
     process.exit(1);
   }
 
-  //TODO: Add graceful shutdown including database connection
+  await gracefulShutdown(server);
 };
 
-const setupServices = async () => {
-  const typeRepository = new TypeRepository();
+const setupDB = async (server: FastifyInstance) => {
+  const db_pool = new Pool({
+    host: process.env.HOST || "",
+    database: process.env.DATABASE || "",
+    user: process.env.TEMPLATE_USER || "",
+    password: process.env.TEMPLATE_PASSWORD || "",
+  });
+
+  server.addHook("onClose", async () => {
+    await db_pool.end();
+    console.log("DB connectionpool ended");
+  });
+
+  return db_pool;
+};
+
+const setupServices = async (db: Pool) => {
+  const typeRepository = new TypeRepository(db);
   const typeService = new TypeService(typeRepository);
 
   return typeService;
@@ -56,6 +73,24 @@ const addTypeRoutes = (controller: TypeController): FastifyPluginCallback => {
     instance.get("/type", controller.getTypes.bind(controller));
     done();
   };
+};
+
+const gracefulShutdown = async (server: FastifyInstance) => {
+  // For stopping server running locally
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### template service stopped ###");
+    });
+  });
+
+  // For docker compose down
+  process.on("SIGTERM", () => {
+    console.log("Received SIGTERM. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### template service stopped ###");
+    });
+  });
 };
 
 start();

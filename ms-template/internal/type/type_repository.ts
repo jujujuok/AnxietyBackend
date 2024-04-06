@@ -1,6 +1,9 @@
+import { Pool } from "pg";
 import { ITypeModel } from "../models/type";
 
 export class TypeRepository {
+  constructor(private readonly db: Pool) {}
+
   async getTypes(): Promise<ITypeModel[]> {
     // Fetch Data from Database
     // Example Data:
