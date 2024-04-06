@@ -28,3 +28,13 @@ services:
       - .env
     ports:
       - "8080:8080"
+
+  nina:
+    image: nina-api
+    depends_on:
+      - db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8081:8081"
