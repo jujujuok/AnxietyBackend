@@ -25,7 +25,15 @@ Add the `-d` flag to run in detached mode.
 
 ## Update Images on Server
 
-### Build and save images locally
+To do this, you will need to have your ssh key added to the server.
+
+### Via the script
+
+execute the bashscript`./updateImages.sh`
+
+### Manually:
+
+#### Build and save images locally
 
 ```bash
 docker build -t anxiety-api anxietyBackend/anxiety
@@ -39,7 +47,7 @@ scp product-warning-api.tar root@212.132.100.147:/root/anxiety/dockerImages
 ...
 ```
 
-### Load images on server
+#### Load images on server
 
 `ssh 212.132.100.147 -l root`
 
