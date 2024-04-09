@@ -7,6 +7,6 @@ export interface IReturnSchema {
   details: {
     description: string;
     instruction: string;
-    title: string;
+    type: string;
   };
 }

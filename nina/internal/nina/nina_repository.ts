@@ -141,14 +141,14 @@ export class NinaRepository {
       resultwarnings.rows.forEach((row: any) => {
         const warning: IReturnSchema = {
           id: row.warning_id,
-          type: row.warning_type,
-          title: "nina",
+          type: "nina",
+          title: row.title,
           area: row.coordinates,
           since: null,
           details: {
             description: row.description,
             instruction: row.instruction,
-            title: row.title,
+            type: row.warning_type,
           },
         };
         warnings.push(warning);
