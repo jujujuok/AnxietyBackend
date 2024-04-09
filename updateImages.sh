@@ -11,6 +11,7 @@ ssh root@212.132.100.147 "cd /root/anxiety && docker compose down"
 ssh root@212.132.100.147 "docker image remove anxiety-api:latest"
 ssh root@212.132.100.147 "docker image remove product-warning-api:latest"
 ssh root@212.132.100.147 "docker image remove nina-api:latest"
+ssh root@212.132.100.147 "docker image remove autobahn-api:latest"
 
 #build and save images
 echo "\n###Building and saving images###\n"
@@ -26,6 +27,10 @@ rm nina-api.tar
 docker build -t nina-api ../nina
 docker save nina-api:latest > nina-api.tar
 
+rm autobahn-api.tar
+docker build -t autobahn-api ../autobahn
+docker save autobahn-api:latest > autobahn-api.tar
+
 #copy images to server
 echo "\n###Copying images to server###\n"
 cd ..
@@ -36,6 +41,7 @@ echo "\n###Loading images on server###\n"
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/anxiety-api.tar"
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/product-warning-api.tar"
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/nina-api.tar"
+ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/autobahn-api.tar"
 
 #run images on server
 echo "\n###Running images on server###\n"
