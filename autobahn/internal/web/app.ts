@@ -9,13 +9,13 @@ const start = async () => {
   // Load environment variables from .env
   dotenv.config();
 
-  //TODO: Add database connection
-
   const server = await fastify({ logger: true });
+
+  const db_pool = await setupDB(server);
 
   //TODO: Add middleware
 
-  const autobahnService = await setupServices();
+  const autobahnService = await setupServices(db_pool);
   await setupRoutes(server, autobahnService);
 
   await setupLog(server);
@@ -27,25 +27,41 @@ const start = async () => {
     process.exit(1);
   }
 
-  //TODO: Add graceful shutdown including database connection
+  await gracefulShutdown(server);
 };
 
-const setupServices = async () => {
-
-  const db = new Pool({
-    
+const setupDB = async (server: FastifyInstance) => {
+  const db_pool = new Pool({
+    host: process.env.HOST || "",
+    database: process.env.DATABASE || "",
+    user: process.env.AUTOBAHN_USER || "",
+    password: process.env.AUTOBAHN_PASSWORD || "",
   });
 
+  server.addHook("onClose", async () => {
+    await db_pool.end();
+    console.log("DB connectionpool ended");
+  });
+
+  return db_pool;
+};
+
+const setupServices = async (db: Pool) => {
   const autobahnRepository = new AutobahnRepository(db);
   const autobahnService = new AutobahnService(autobahnRepository);
 
   return autobahnService;
 };
 
-const setupRoutes = async (server: FastifyInstance, service: AutobahnService) => {
+const setupRoutes = async (
+  server: FastifyInstance,
+  service: AutobahnService
+) => {
   const autobahnController = new AutobahnController(service);
 
-  server.register(addAutobahnRoutes(autobahnController), { prefix: "/autobahn" });
+  server.register(addAutobahnRoutes(autobahnController), {
+    prefix: "/autobahn",
+  });
 };
 
 const setupLog = async (server: FastifyInstance) => {
@@ -57,12 +73,32 @@ const setupLog = async (server: FastifyInstance) => {
   });
 };
 
-const addAutobahnRoutes = (controller: AutobahnController): FastifyPluginCallback => {
+const addAutobahnRoutes = (
+  controller: AutobahnController
+): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/fetchData", controller.fetchData.bind(controller));
     instance.get("/getData", controller.getData.bind(controller));
     done();
   };
+};
+
+const gracefulShutdown = async (server: FastifyInstance) => {
+  // For stopping server running locally
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### autobahn service stopped ###");
+    });
+  });
+
+  // For docker compose down
+  process.on("SIGTERM", () => {
+    console.log("Received SIGTERM. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### autobahn service stopped ###");
+    });
+  });
 };
 
 start();
