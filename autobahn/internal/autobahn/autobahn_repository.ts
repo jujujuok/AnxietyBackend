@@ -19,7 +19,9 @@ export class AutobahnRepository {
   }
 
   async checkData(warnings: any) {
-    const values = warnings.map((warning: IWarningModel) => `'${warning.warning_id}'`).join(",");
+    const values = warnings
+      .map((warning: IWarningModel) => `'${warning.warning_id}'`)
+      .join(",");
     const closeresult = await this.closeData(values);
 
     const client = await this.db.connect();
@@ -28,8 +30,9 @@ export class AutobahnRepository {
         `SELECT warning_id FROM autobahn.warnings WHERE warning_id IN (${values})`
       );
       result.rows.forEach((row: any) => {
-        warnings = warnings.filter((warning: IWarningModel) => warning.warning_id != row.warning_id
-      );
+        warnings = warnings.filter(
+          (warning: IWarningModel) => warning.warning_id != row.warning_id
+        );
       });
     } finally {
       client.release();
@@ -46,7 +49,17 @@ export class AutobahnRepository {
       return 200;
     }
 
-    const values_warnings = newwarnings.map((warning: IWarningModel) => {const coordinatesArray = warning.coordinates != null ? warning.coordinates.map((coordinate: any) => `'${coordinate}'`).join(","): null; return `('${warning.warning_id}', '${warning.title}', '${warning.publisheddate}', '${warning.description}', ARRAY[${coordinatesArray}])`;}).join(",")
+    const values_warnings = newwarnings
+      .map((warning: IWarningModel) => {
+        const coordinatesArray =
+          warning.coordinates != null
+            ? warning.coordinates
+                .map((coordinate: any) => `'${coordinate}'`)
+                .join(",")
+            : null;
+        return `('${warning.warning_id}', '${warning.title}', '${warning.publisheddate}', '${warning.description}', ARRAY[${coordinatesArray}])`;
+      })
+      .join(",");
 
     const client = await this.db.connect();
 
@@ -117,5 +130,4 @@ export class AutobahnRepository {
       return result;
     }
   }
-  
 }

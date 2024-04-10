@@ -24,27 +24,38 @@ export class AutobahnService {
     }
   }
 
-  async fetchAutobahnWarnings(autobahnArray: []){
+  async fetchAutobahnWarnings(autobahnArray: []) {
     const autobahnWarnings: IWarningModel[] = [];
-    const bannedWarnings = ["STATIONARY_TRAFFIC", "SLOW_TRAFFIC", "QUEUING_TRAFFIC"];
+    const bannedWarnings = [
+      "STATIONARY_TRAFFIC",
+      "SLOW_TRAFFIC",
+      "QUEUING_TRAFFIC",
+    ];
 
-    for (const autobahn of autobahnArray){
-      const autobahnWarningResult = await this.callApi(`https://verkehr.autobahn.de/o/autobahn/${autobahn}/services/warning`);
+    for (const autobahn of autobahnArray) {
+      const autobahnWarningResult = await this.callApi(
+        `https://verkehr.autobahn.de/o/autobahn/${autobahn}/services/warning`
+      );
       autobahnWarningResult.warning.forEach((warning: any) => {
-        if (!bannedWarnings.includes(warning.abnormalTrafficType)){
+        if (!bannedWarnings.includes(warning.abnormalTrafficType)) {
           const description_index = warning.description.indexOf("");
-          const temp_description = warning.description.slice(description_index + 3);
-          let description = warning.description[description_index + 2].replaceAll("\n", " ");
+          const temp_description = warning.description.slice(
+            description_index + 3
+          );
+          let description = warning.description[
+            description_index + 2
+          ].replaceAll("\n", " ");
 
           temp_description.forEach((description_part: string) => {
-            const indexOfdescription_part = temp_description.indexOf(description_part);
-            if (indexOfdescription_part != 0){
+            const indexOfdescription_part =
+              temp_description.indexOf(description_part);
+            if (indexOfdescription_part != 0) {
               description += ", ";
-            }else{
-              description += ": "
+            } else {
+              description += ": ";
             }
             description += description_part.replaceAll("\n", " ");
-          });          
+          });
 
           const warning_in_model: IWarningModel = {
             warning_id: warning.identifier,
@@ -59,27 +70,29 @@ export class AutobahnService {
       });
     }
 
-    if (autobahnWarnings.length === 0){
+    if (autobahnWarnings.length === 0) {
       return null;
     }
 
     return autobahnWarnings;
   }
 
-  async fetchData(){
-    const autobahnApiResult = await this.callApi("https://verkehr.autobahn.de/o/autobahn/");
-    if (autobahnApiResult === null){
+  async fetchData() {
+    const autobahnApiResult = await this.callApi(
+      "https://verkehr.autobahn.de/o/autobahn/"
+    );
+    if (autobahnApiResult === null) {
       return 500;
     }
     const autobahnArray = autobahnApiResult.roads;
 
     const autobahnWarnings = await this.fetchAutobahnWarnings(autobahnArray);
 
-    if (autobahnWarnings === null){
+    if (autobahnWarnings === null) {
       return 200;
     }
     this.autobahnRepository.fetchData(autobahnWarnings);
-    
+
     return autobahnWarnings;
   }
 

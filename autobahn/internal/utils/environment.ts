@@ -1,15 +1,15 @@
 interface EnvironmentVariables {
   HOST: string;
   DATABASE: string;
-  TEMPLATE_USER: string;
-  TEMPLATE_PASSWORD: string;
+  AUTOBAHN_USER: string;
+  AUTOBAHN_PASSWORD: string;
 }
 
 function getEnvironmentVariables(): EnvironmentVariables {
   return {
     HOST: process.env.HOST || "",
     DATABASE: process.env.DATABASE || "",
-    TEMPLATE_USER: process.env.TEMPLATE_USER || "",
-    TEMPLATE_PASSWORD: process.env.TEMPLATE_PASSWORD || "",
+    AUTOBAHN_USER: process.env.AUTOBAHN_USER || "",
+    AUTOBAHN_PASSWORD: process.env.AUTOBAHN_PASSWORD || "",
   };
 }
