@@ -27,7 +27,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:8080"
+      - "8080:8000"
 
   nina:
     image: nina-api
@@ -37,7 +37,7 @@ services:
     env_file:
       - .env
     ports:
-      - "8081:8081"
+      - "8081:8000"
 
   autobahn:
     image: autobahn-api
@@ -47,4 +47,4 @@ services:
     env_file:
       - .env
     ports:
-      - "8082:8082"
+      - "8082:8000"
