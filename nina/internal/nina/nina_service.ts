@@ -37,14 +37,23 @@ export class NinaService {
         const geojson = await this.callApi(
           `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.geojson`
         );
-        const description = details.info[0].description.replaceAll(
-          "<br/>",
-          " "
-        );
-        const instruction = details.info[0].instruction.replaceAll(
-          "<br/>",
-          " "
-        );
+
+        let description = null;
+        if (details.info[0].description !== undefined){
+          description = details.info[0].description.replaceAll(
+            "<br/>",
+            " "
+          );
+        }
+
+        let instruction = null;
+        if (details.info[0].instruction !== undefined) {
+          instruction = details.info[0].instruction.replaceAll(
+            "<br/>",
+            " "
+          );
+        }
+        
         const coordinates: any = [];
 
         for (const feature of geojson.features) {
