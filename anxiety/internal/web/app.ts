@@ -18,7 +18,7 @@ const start = async () => {
   // setup fastify instance
   const server = await fastify({ logger: true });
 
-  //TODO: Add middleware
+  setupCors(server);
 
   // setup services and routes for the different modules
   const [dashboardService, mapService, countryService] = await setupServices();
@@ -39,6 +39,13 @@ const start = async () => {
     server.log.error(err);
     process.exit(1);
   }
+};
+
+const setupCors = (server: FastifyInstance) => {
+  server.register(require("@fastify/cors"), {
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  });
 };
 
 /**
