@@ -5,9 +5,9 @@ import { DashboardRepository } from "../dashboard/dashboard_repository";
 import { MapRepository } from "../map/map_repository";
 import { MapController } from "../map/map_controller";
 import { MapService } from "../map/map_service";
-import { CountryController } from "../country/country_controller";
-import { CountryRepository } from "../country/country_repository";
-import { CountryService } from "../country/country_service";
+import { WorldMapController } from "../world-map/world-map_controller";
+import { WorldMapRepository } from "../world-map/world-map_repository";
+import { WorldMapService } from "../world-map/world-map_service";
 
 /**
  * Start routine of the application
@@ -21,12 +21,12 @@ const start = async () => {
   setupCors(server);
 
   // setup services and routes for the different modules
-  const [dashboardService, mapService, countryService] = await setupServices();
+  const [dashboardService, mapService, worldMapService] = await setupServices();
   await setupRoutes(
     server,
     dashboardService as DashboardService,
     mapService as MapService,
-    countryService as CountryService
+    worldMapService as WorldMapService
   );
 
   // setup logging
@@ -61,10 +61,12 @@ const setupServices = async () => {
   const mapRepository: MapRepository = new MapRepository();
   const mapService: MapService = new MapService(mapRepository);
 
-  const countryRepository: CountryRepository = new CountryRepository();
-  const countryService: CountryService = new CountryService(countryRepository);
+  const worldMapRepository: WorldMapRepository = new WorldMapRepository();
+  const worldMapService: WorldMapService = new WorldMapService(
+    worldMapRepository
+  );
 
-  return [dashboardService, mapService, countryService];
+  return [dashboardService, mapService, worldMapService];
 };
 
 /**
@@ -72,17 +74,17 @@ const setupServices = async () => {
  * @param server Instance of Fastify
  * @param dashboardService Service for dashboard module
  * @param mapService Service for map module
- * @param countryService Service for country module
+ * @param worldMapService Service for WorldMap module
  */
 const setupRoutes = async (
   server: FastifyInstance,
   dashboardService: DashboardService,
   mapService: MapService,
-  countryService: CountryService
+  worldMapService: WorldMapService
 ) => {
   const dashboardController = new DashboardController(dashboardService);
   const mapController = new MapController(mapService);
-  const countryController = new CountryController(countryService);
+  const worldMapController = new WorldMapController(worldMapService);
 
   server.register(addDashboardRoutes(dashboardController), {
     prefix: "/dashboard",
@@ -92,7 +94,7 @@ const setupRoutes = async (
     prefix: "/map",
   });
 
-  server.register(addCountryRoutes(countryController), {
+  server.register(addWorldMapRoutes(worldMapController), {
     prefix: "/world-map",
   });
 };
@@ -151,22 +153,22 @@ const addMapRoutes = (mapController: MapController): FastifyPluginCallback => {
 };
 
 /**
- * Add routes for the country module
- * @param countryController Controller for the country module
+ * Add routes for the WorldMap module
+ * @param WorldMapController Controller for the WorldMap module
  * @returns FastifyPluginCallback for registering the routes
  */
-const addCountryRoutes = (
-  countryController: CountryController
+const addWorldMapRoutes = (
+  WorldMapController: WorldMapController
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
-    instance.get("/", countryController.getCountry.bind(countryController));
+    instance.get("/", WorldMapController.getWorldMap.bind(WorldMapController));
     instance.get(
       "/:id",
-      countryController.getCountryDetails.bind(countryController)
+      WorldMapController.getWorldMapDetails.bind(WorldMapController)
     );
     instance.get(
       "/update",
-      countryController.getCountryUpdate.bind(countryController)
+      WorldMapController.getWorldMapUpdate.bind(WorldMapController)
     );
     done();
   };

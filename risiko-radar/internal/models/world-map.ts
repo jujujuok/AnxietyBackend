@@ -1,7 +1,7 @@
 /**
- * Country model
+ * WorldMap model
  */
-export interface ICountryItem {
+export interface IWorldMapItem {
   id: number;
   type:
     | "interpol_red"
@@ -14,9 +14,9 @@ export interface ICountryItem {
 }
 
 /**
- * Country details model
+ * WorldMap details model
  */
-export interface ICountryItemDetails {
+export interface IWorldMapItemDetails {
   id: number;
   type:
     | "interpol_red"
