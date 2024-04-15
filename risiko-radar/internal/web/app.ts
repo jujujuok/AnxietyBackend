@@ -102,7 +102,7 @@ const setupRoutes = async (
  * @param server Instance of Fastify
  */
 const setupLog = async (server: FastifyInstance) => {
-  server.log.info("### Anxiety started ###");
+  server.log.info("### risiko-radar started ###");
 
   // log all requests
   server.addHook("onRequest", (request, reply, done) => {

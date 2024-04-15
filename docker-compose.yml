@@ -21,8 +21,8 @@ services:
       - ./redis.conf:/usr/local/etc/redis/redis.conf
     command: redis-server /usr/local/etc/redis/redis.conf
 
-  anxiety:
-    image: anxiety-api
+  risiko-radar:
+    image: risiko-radar-api
     depends_on:
       - db
       - redis

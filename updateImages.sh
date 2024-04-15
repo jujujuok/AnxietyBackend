@@ -8,16 +8,16 @@ cd dockerImages
 
 ##remote
 ssh root@212.132.100.147 "cd /root/anxiety && docker compose down"
-ssh root@212.132.100.147 "docker image remove anxiety-api:latest"
+ssh root@212.132.100.147 "docker image remove risiko-radar-api:latest"
 ssh root@212.132.100.147 "docker image remove product-warning-api:latest"
 ssh root@212.132.100.147 "docker image remove nina-api:latest"
 ssh root@212.132.100.147 "docker image remove autobahn-api:latest"
 
 #build and save images
 echo "\n###Building and saving images###\n"
-rm anxiety-api.tar
-docker build -t anxiety-api ../anxiety
-docker save anxiety-api:latest > anxiety-api.tar
+rm risiko-radar-api.tar
+docker build -t risiko-radar-api ../risiko-radar
+docker save risiko-radar-api:latest > risiko-radar-api.tar
 
 rm product-warning-api.tar
 docker build -t product-warning-api ../product-warning
@@ -38,7 +38,7 @@ scp dockerImages/* root@212.132.100.147:/root/anxiety/dockerImages
 
 #load images on server
 echo "\n###Loading images on server###\n"
-ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/anxiety-api.tar"
+ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/risiko-radar-api.tar"
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/product-warning-api.tar"
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/nina-api.tar"
 ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/autobahn-api.tar"
