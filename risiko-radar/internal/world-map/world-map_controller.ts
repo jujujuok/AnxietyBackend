@@ -3,7 +3,7 @@ import { WorldMapService } from "./world-map_service";
 import { detailsRequest, updateRequest } from "../utils/fastifyRequests";
 
 /**
- * Controller for the country module
+ * Controller for the WorldMap module
  */
 export class WorldMapController {
   constructor(private readonly worldMapService: WorldMapService) {}
