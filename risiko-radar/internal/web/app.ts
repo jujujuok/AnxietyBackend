@@ -41,7 +41,7 @@ const start = async () => {
 
   // start the server
   try {
-    await server.listen({ port: 8000, host: "0.0.0.0" });
+    await server.listen({ port: 8083, host: "0.0.0.0" });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
@@ -49,14 +49,12 @@ const start = async () => {
 };
 
 const setupCache = (server: FastifyInstance): Cache => {
+  const host = process.env.REDIS_HOST;
+  const port = process.env.REDIS_PORT;
+  const password = process.env.REDIS_PASSWORD;
+
   const client = createClient({
-    url:
-      "redis://default@" +
-      process.env.REDIS_PASSWORD +
-      "@" +
-      process.env.REDIS_HOST +
-      ":" +
-      process.env.REDIS_PORT,
+    url: "redis://default:" + password + "@" + host + ":" + port,
   });
 
   const redis = new Cache(client as RedisClientType);
