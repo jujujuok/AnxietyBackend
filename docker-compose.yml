@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres
+    image: postgis/postgis
     restart: unless-stopped
     env_file:
       - .env

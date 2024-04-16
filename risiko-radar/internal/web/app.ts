@@ -8,20 +8,27 @@ import { MapService } from "../map/map_service";
 import { WorldMapController } from "../world-map/world-map_controller";
 import { WorldMapRepository } from "../world-map/world-map_repository";
 import { WorldMapService } from "../world-map/world-map_service";
+import dotenv from "dotenv";
+import { RedisClientType, createClient } from "redis";
+import { Cache } from "../utils/cache";
 
 /**
  * Start routine of the application
  */
 const start = async () => {
-  //TODO: Add getting of env variables
+  dotenv.config();
 
   // setup fastify instance
   const server = await fastify({ logger: true });
 
+  const redis = setupCache(server);
+
   setupCors(server);
 
   // setup services and routes for the different modules
-  const [dashboardService, mapService, worldMapService] = await setupServices();
+  const [dashboardService, mapService, worldMapService] = await setupServices(
+    redis
+  );
   await setupRoutes(
     server,
     dashboardService as DashboardService,
@@ -41,6 +48,27 @@ const start = async () => {
   }
 };
 
+const setupCache = (server: FastifyInstance): Cache => {
+  const client = createClient({
+    url:
+      "redis://default@" +
+      process.env.REDIS_PASSWORD +
+      "@" +
+      process.env.REDIS_HOST +
+      ":" +
+      process.env.REDIS_PORT,
+  });
+
+  const redis = new Cache(client as RedisClientType);
+
+  server.addHook("onClose", async () => {
+    await redis.close();
+    console.log("Redis connection closed");
+  });
+
+  return redis;
+};
+
 const setupCors = (server: FastifyInstance) => {
   server.register(require("@fastify/cors"), {
     origin: "*",
@@ -52,8 +80,10 @@ const setupCors = (server: FastifyInstance) => {
  * Initialize the services, including their repositories, for the different modules
  * @returns Array of the services for the different modules
  */
-const setupServices = async () => {
-  const dashboardRepository: DashboardRepository = new DashboardRepository();
+const setupServices = async (redis: Cache) => {
+  const dashboardRepository: DashboardRepository = new DashboardRepository(
+    redis
+  );
   const dashboardService: DashboardService = new DashboardService(
     dashboardRepository
   );
@@ -172,6 +202,24 @@ const addWorldMapRoutes = (
     );
     done();
   };
+};
+
+const gracefulShutdown = async (server: FastifyInstance) => {
+  // For stopping server running locally
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service stopped ###");
+    });
+  });
+
+  // For docker compose down
+  process.on("SIGTERM", () => {
+    console.log("Received SIGTERM. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service stopped ###");
+    });
+  });
 };
 
 // Initial start call

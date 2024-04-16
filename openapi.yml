@@ -157,7 +157,7 @@ paths:
     get:
       tags:
         - world-map
-      description: 'Get all country items.'
+      description: 'Get all world-map items.'
       parameters: []
       responses:
         '200':
@@ -167,16 +167,16 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/countryItem'
+                  $ref: '#/components/schemas/worldMapItem'
   /world-map/{id}:
     get:
       tags:
         - world-map
-      description: 'Get a country item by id.'
+      description: 'Get a WorldMap item by id.'
       parameters:
         - name: id
           in: path
-          description: 'ID of the country item to get.'
+          description: 'ID of the WorldMap item to get.'
           required: true
           schema:
             type: integer
@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/countryItemDetails'
+                $ref: '#/components/schemas/worldMapItemDetails'
         '404':
           description: Not Found
   /world-map/update:
@@ -331,7 +331,7 @@ components:
           type: object
           description: 'Details of the event. Depending of the type of event.'
 
-    countryItem:
+    worldMapItem:
       type: object
       properties:
         id:
@@ -350,7 +350,7 @@ components:
         since:
           type: integer
           description: 'Timestamp of the registration of the event.'
-    countryItemDetails:
+    worldMapItemDetails:
       type: object
       properties:
         id:

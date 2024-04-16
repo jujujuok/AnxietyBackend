@@ -14,6 +14,7 @@ export interface IDashboardItem {
   title: string;
   description: string;
   since: number;
+  details?: IDashboardItemDetails;
 }
 
 /**
@@ -29,4 +30,9 @@ export interface IDashboardItemDetails {
     | "traverl_warning"
     | "country_representative";
   details: object;
+}
+
+export interface IDashboardUpdate {
+  add: IDashboardItem[];
+  delete: number[];
 }

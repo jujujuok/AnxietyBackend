@@ -1,49 +1,44 @@
-import { IDashboardItem } from "../models/dashboard";
+import { get } from "axios";
+import {
+  IDashboardItem,
+  IDashboardItemDetails,
+  IDashboardUpdate,
+} from "../models/dashboard";
 import { faker } from "@faker-js/faker";
+import { getDataFromApi } from "../utils/apiCalls";
+import { RedisClientType } from "redis";
+import { Cache } from "../utils/cache";
 
 /**
  * Repository for the dashboard module
  */
 export class DashboardRepository {
+  constructor(private readonly redis: Cache) {}
+
   /**
-   * Get list of dashboard items
+   * Get list of productwarnings
    * @returns List of dashboard items
    */
-  async getDashboard(): Promise<IDashboardItem[]> {
-    // Example Data:
-    const dashboardItems: IDashboardItem[] = [];
+  async getProductWarnings(): Promise<Array<IDashboardItem>> {
+    const productWarningData = await getDataFromApi(
+      "product-warning:8080/getData"
+    );
 
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const dashboardItem: IDashboardItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
-        type: faker.helpers.arrayElement([
-          "interpol_red",
-          "interpol_un",
-          "food_waring",
-          "product_warning",
-          "travel_warning",
-          "country_representative",
-        ]),
-        severity: faker.helpers.arrayElement([
-          "information",
-          "warning",
-          "danger",
-          "extreme_danger",
-        ]),
-        title:
-          faker.hacker.adjective() +
-          " " +
-          faker.hacker.ingverb() +
-          " " +
-          faker.hacker.noun(),
-        description: faker.hacker.phrase(),
-        since: faker.date.past().getTime(),
-      };
+    return productWarningData;
+  }
 
-      dashboardItems.push(dashboardItem);
-    }
+  /**
+   * Get list of nina warnings
+   * @returns DashboardUpdate Object
+   */
+  async getNinaWarnings(): Promise<IDashboardUpdate> {
+    const ninaWarningData = await getDataFromApi("nina:8081/getData");
 
-    return dashboardItems;
+    return ninaWarningData;
+  }
+
+  async setCacheItem(id: string, value: IDashboardItemDetails) {
+    this.redis.set(id, value);
   }
 
   /**

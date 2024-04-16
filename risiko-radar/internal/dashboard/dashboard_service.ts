@@ -1,4 +1,4 @@
-import { IDashboardItem } from "../models/dashboard";
+import { IDashboardItem, IDashboardUpdate } from "../models/dashboard";
 import { DashboardRepository } from "./dashboard_repository";
 
 /**
@@ -8,11 +8,31 @@ export class DashboardService {
   constructor(private readonly dashboardRepository: DashboardRepository) {}
 
   /**
-   * Get list of dashboard items
-   * @returns List of dashboard items
+   * Get object containing dashboard items to add and ids to delete
+   * @returns DashboardUpdate Object
    */
-  async getDashboard(): Promise<IDashboardItem[]> {
-    return this.dashboardRepository.getDashboard();
+  async getDashboard(): Promise<IDashboardUpdate> {
+    let dashboardItems: IDashboardUpdate = { add: [], delete: [] };
+
+    dashboardItems.add.concat(
+      await this.dashboardRepository.getProductWarnings()
+    );
+
+    const ninaData = await this.dashboardRepository.getNinaWarnings();
+    ninaData.add.forEach((item) => {
+      if (item.details) {
+        this.dashboardRepository.setCacheItem(
+          item.id.toString(item.id),
+          item.details
+        );
+        ninaData.add.find((ninaItem) => ninaItem.id === item.id)!.details =
+          undefined;
+      }
+    });
+    dashboardItems.add.concat(ninaData.add);
+    dashboardItems.delete.concat(ninaData.delete);
+
+    return dashboardItems;
   }
 
   /**
