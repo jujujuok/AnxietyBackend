@@ -231,10 +231,7 @@ export class ProductWarningRepository {
                   result_safetyInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
                   )?.injury ?? undefined,
-                affectedProducts:
-                  result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedproducts ?? undefined,
+                affectedProducts: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "null" || result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "Nicht bekannt" ? undefined : result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts ?? undefined,
                 affectedStates: undefined,
               },
             };
