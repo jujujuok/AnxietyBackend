@@ -2,17 +2,17 @@ import fastify, { FastifyInstance, FastifyPluginCallback } from "fastify";
 import { DwDController } from "../dwd/dwd_controller";
 import { DwDService } from "../dwd/dwd_service";
 import { DwDRepository } from "../dwd/dwd_repository";
+import dotenv from "dotenv";
+import { Pool } from "pg";
 
 const start = async () => {
-  //TODO: Add getting of env variables
-
-  //TODO: Add database connection
+  dotenv.config();
 
   const server = await fastify({ logger: true });
 
-  //TODO: Add middleware
+  const db_pool = await setupDB(server);
 
-  const typeService = await setupServices();
+  const typeService = await setupServices(db_pool);
   await setupRoutes(server, typeService);
 
   await setupLog(server);
@@ -24,11 +24,27 @@ const start = async () => {
     process.exit(1);
   }
 
-  //TODO: Add graceful shutdown including database connection
+  gracefulShutdown(server);
 };
 
-const setupServices = async () => {
-  const dwdRepository = new DwDRepository();
+const setupDB = async (server: FastifyInstance) => {
+  const db_pool = new Pool({
+    host: process.env.HOST || "",
+    database: process.env.DATABASE || "",
+    user: process.env.PRODUCTWARNING_USER || "",
+    password: process.env.PRODUCTWARNING_PASSWORD || "",
+  });
+
+  server.addHook("onClose", async () => {
+    await db_pool.end();
+    console.log("DB connectionpool ended");
+  });
+
+  return db_pool;
+};
+
+const setupServices = async (db: Pool) => {
+  const dwdRepository = new DwDRepository(db);
   const dwdService = new DwDService(dwdRepository);
 
   return dwdService;
@@ -57,6 +73,24 @@ const addTypeRoutes = (controller: DwDController): FastifyPluginCallback => {
     instance.get("/getData", controller.getData.bind(controller));
     done();
   };
+};
+
+const gracefulShutdown = async (server: FastifyInstance) => {
+  // For stopping server running locally
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service stopped ###");
+    });
+  });
+
+  // For docker compose down
+  process.on("SIGTERM", () => {
+    console.log("Received SIGTERM. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service stopped ###");
+    });
+  });
 };
 
 start();

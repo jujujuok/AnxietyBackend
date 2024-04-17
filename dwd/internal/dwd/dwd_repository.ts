@@ -3,9 +3,7 @@ import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
 
 export class DwDRepository {
-  private db = new Pool({
-    
-  });
+  constructor(private readonly db: Pool) {}
 
   async closeData(warningids: any) {
     const client = await this.db.connect();
@@ -21,7 +19,9 @@ export class DwDRepository {
   }
 
   async checkData(warnings: any) {
-    const values = warnings.map((warning: IWarningModel) => `'${warning.id}'`).join(",");
+    const values = warnings
+      .map((warning: IWarningModel) => `'${warning.id}'`)
+      .join(",");
     const closeresult = await this.closeData(values);
 
     const client = await this.db.connect();
@@ -29,13 +29,14 @@ export class DwDRepository {
       const result = await client.query(
         `SELECT warning_id FROM dwd.warnings WHERE warning_id IN (${values})`
       );
-      result.rows.forEach((row: any) => {warnings = warnings.filter((warning: IWarningModel) => warning.id != row.warning_id);});
+      result.rows.forEach((row: any) => {
+        warnings = warnings.filter(
+          (warning: IWarningModel) => warning.id != row.warning_id
+        );
+      });
     } finally {
       client.release();
-      console.log(
-        "New Data: " +
-          (warnings.length)
-      );
+      console.log("New Data: " + warnings.length);
       return warnings;
     }
   }
@@ -48,16 +49,19 @@ export class DwDRepository {
       return 200;
     }
 
-    const values_warnings = newwarnings.map((warning: IWarningModel) => {
-      const geojson = {
-        "type": "Polygon",
-        "coordinates": warning.coordinates
-      };
-      
-      const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(geojson)}'), 4326)`;
-            return `('${warning.id}', '${warning.type}', '${warning.title}', '${warning.description}', '${warning.instruction}', ${coordinates})`;
-          })
-          .join(",");
+    const values_warnings = newwarnings
+      .map((warning: IWarningModel) => {
+        const geojson = {
+          type: "Polygon",
+          coordinates: warning.coordinates,
+        };
+
+        const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
+          geojson
+        )}'), 4326)`;
+        return `('${warning.id}', '${warning.type}', '${warning.title}', '${warning.description}', '${warning.instruction}', ${coordinates})`;
+      })
+      .join(",");
     const client = await this.db.connect();
 
     try {
