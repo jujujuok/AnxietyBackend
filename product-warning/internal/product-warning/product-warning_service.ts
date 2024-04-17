@@ -41,11 +41,6 @@ export class ProductWarningService {
           description: warning.warning
             ? warning.warning.replaceAll("'", '"')
             : null,
-          designation: warning.product
-            ? warning.product.designation
-              ? warning.product.designation.replaceAll("'", '"')
-              : null
-            : null,
           manufacturer: warning.product
             ? warning.product.manufacturer
               ? warning.product.manufacturer.replaceAll("'", '"')

@@ -44,14 +44,13 @@ export class ProductWarningRepository {
       const values_productInformations = warnings.products
         .filter(
           (warning) =>
-            warning.designation != null ||
             warning.manufacturer != null ||
             warning.category != null ||
             warning.affectedProducts != null
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.designation}', '${warning.manufacturer}', '${warning.category}', '${warning.affectedProducts}')`
+            `(${warning.warning_id}, '${warning.manufacturer}', '${warning.category}', '${warning.affectedProducts}')`
         )
         .join(",");
       if (
@@ -60,7 +59,7 @@ export class ProductWarningRepository {
         values_productInformations !== "()"
       ) {
         const result_productInformations = await client.query(
-          `INSERT INTO productwarnings.productInformations (warning_id, designation, manufacturer, category, affectedProducts) VALUES ${values_productInformations};`
+          `INSERT INTO productwarnings.productInformations (warning_id, manufacturer, category, affectedProducts) VALUES ${values_productInformations};`
         );
         console.log(
           result_productInformations.rowCount +
@@ -214,13 +213,8 @@ export class ProductWarningRepository {
               type: "product_warning",
               title: row.title ?? undefined,
               description: row.description ?? undefined,
-              since: row.publishedDate ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
-                designation:
-                  result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.designation ?? undefined,
                 manufacturer:
                   result_productInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
@@ -251,10 +245,8 @@ export class ProductWarningRepository {
               type: "food_warning",
               title: row.title ?? undefined,
               description: row.description ?? undefined,
-              since: row.publishedDate ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
-                designation: undefined,
                 manufacturer:
                   result_productInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
