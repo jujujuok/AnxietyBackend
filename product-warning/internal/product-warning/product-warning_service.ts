@@ -110,8 +110,7 @@ export class ProductWarningService {
   async fetchUpdate() {
     const now = new Date();
     const timezone = now.getTimezoneOffset();
-    const timestamp = now.getTime() - 6 * 60 * 1000 + timezone * 60 * 1000;
-    console.log(timestamp);
+    const timestamp = now.getTime() - 30 * 60 * 1000 + timezone * 60 * 1000;
 
     const body = {
       food: {
