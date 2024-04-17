@@ -248,7 +248,7 @@ export class ProductWarningRepository {
               details: {
                 link: row.warning_link ?? undefined,
                 manufacturer:
-                  result_productInformations.rows.find(
+                  result_foodInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
                   )?.manufacturer ?? undefined,
                 category: undefined,
@@ -258,7 +258,7 @@ export class ProductWarningRepository {
                 affectedStates:
                   result_foodInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedStates ?? undefined,
+                  )?.affectedstates ?? undefined,
               },
             };
             warnings.push(foodWarning);
