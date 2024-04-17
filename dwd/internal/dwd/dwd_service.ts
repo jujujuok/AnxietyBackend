@@ -124,15 +124,13 @@ export class DwDService {
     return warnings;
   }
 
-  async getAll(){
+  async fetchData(){
     let results: Object[] = [];
 
     await (await this.getNowcastWarnings()).forEach((element: any) => {results.push(element);});
     await (await this.getGemeindeWarnings()).forEach((element: any) => {results.push(element);});
 
-    this.dwdRepository.fetchData(results);
-
-    return results;
+    return this.dwdRepository.fetchData(results);
   }
 
   async getData(timestamp: number) {

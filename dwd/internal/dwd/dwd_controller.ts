@@ -5,16 +5,6 @@ import { updateRequest } from "../utils/fastifyRequests";
 export class DwDController {
   constructor(private readonly dwdService: DwDService) {}
 
-  async getNowcastWarnings(req: FastifyRequest, reply: FastifyReply) {
-    const types = await this.dwdService.getNowcastWarnings();
-    return reply.send(types);
-  }
-
-  async getGemeindeWarnings(req: FastifyRequest, reply: FastifyReply) {
-    const types = await this.dwdService.getGemeindeWarnings();
-    return reply.send(types);
-  }
-
   async getCoastWarnings(req: FastifyRequest, reply: FastifyReply) {
     const types = await this.dwdService.getCoastWarnings();
     return reply.send(types);
@@ -25,9 +15,9 @@ export class DwDController {
     return reply.send(types);
   }
 
-  async getAll(req: FastifyRequest, reply: FastifyReply) {
-    const types = await this.dwdService.getAll();
-    return reply.send(types);
+  async fetchData(req: FastifyRequest, reply: FastifyReply) {
+    const response = await this.dwdService.fetchData();
+    return reply.send(response);
   }
 
   async getData(req: updateRequest, reply: FastifyReply) {
