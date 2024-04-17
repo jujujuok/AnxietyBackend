@@ -74,5 +74,17 @@ services:
     networks:
       - backend
 
+  dwd:
+    image: dwd-api
+    depends_on:
+      - db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8083:8000"
+    networks:
+      - backend
+
 networks:
   backend:
