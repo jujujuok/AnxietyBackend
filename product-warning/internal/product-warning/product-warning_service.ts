@@ -135,6 +135,11 @@ export class ProductWarningService {
     return data;
   }
 
+  async getDetails(id: number) {
+    const data = this.productWarningRepository.getDetails(id);
+    return data;
+  }
+
   async fetchUpdateAll() {
     const body = {
       food: {

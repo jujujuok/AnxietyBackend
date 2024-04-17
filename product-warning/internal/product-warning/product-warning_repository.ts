@@ -1,6 +1,7 @@
 import { IWarningsModel } from "../models/warnings";
 import { Pool } from "pg";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class ProductWarningRepository {
   constructor(private readonly db: Pool) {}
@@ -267,6 +268,48 @@ export class ProductWarningRepository {
     } finally {
       client.release();
       return warnings;
+    }
+  }
+
+  async getDetails(id: number) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try{
+      const result_warnings = await client.query('SELECT * FROM productwarnings.warnings WHERE warning_id = $1;', [id]);
+      console.log("Details selected");
+      if(result_warnings.rows[0].warning_type === "p"){
+        const result_productInformations = await client.query('SELECT * FROM productwarnings.productInformations WHERE warning_id = $1;', [id]);
+        const result_safetyInformations = await client.query('SELECT * FROM productwarnings.safetyInformations WHERE warning_id = $1;', [id]);
+        console.log("Productdetails selected");
+        details = {
+          link: result_warnings.rows[0].warning_link,
+          manufacturer: result_productInformations.rows[0].manufacturer,
+          category: result_productInformations.rows[0].category,
+          hazard: result_safetyInformations.rows[0].hazard,
+          injury: result_safetyInformations.rows[0].injury,
+          affectedProducts: result_productInformations.rows[0].affectedProducts,
+          image: result_warnings.rows[0].image,
+        }
+      }else if(result_warnings.rows[0].warning_type === "f"){
+        const result_foodInformations = await client.query('SELECT * FROM productwarnings.foodInformations WHERE warning_id = $1;', [id]);
+        console.log("Fooddetails selected");
+        details = {
+          link: result_warnings.rows[0].warning_link,
+          manufacturer: result_foodInformations.rows[0].manufacturer,
+          category: undefined,
+          hazard: undefined,
+          injury: undefined,
+          affectedProducts: undefined,
+          image: result_warnings.rows[0].image,
+        }
+      }
+    }finally{
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
     }
   }
 }
