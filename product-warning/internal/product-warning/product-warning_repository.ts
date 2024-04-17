@@ -213,6 +213,7 @@ export class ProductWarningRepository {
               type: "product_warning",
               title: row.title ?? undefined,
               description: row.description === "null" ? undefined : row.description ?? undefined,
+              area: undefined,
               details: {
                 link: row.warning_link ?? undefined,
                 manufacturer:
@@ -232,7 +233,6 @@ export class ProductWarningRepository {
                     (row2: any) => row2.warning_id === row.warning_id
                   )?.injury ?? undefined,
                 affectedProducts: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "null" || result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "Nicht bekannt" ? undefined : result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts ?? undefined,
-                affectedStates: undefined,
                 image: row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };
@@ -243,6 +243,10 @@ export class ProductWarningRepository {
               type: "food_warning",
               title: row.title ?? undefined,
               description: row.description === "null" ? undefined : row.description ?? undefined,
+              area:
+                  result_foodInformations.rows.find(
+                    (row2: any) => row2.warning_id === row.warning_id
+                  )?.affectedstates ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
                 manufacturer:
@@ -253,10 +257,6 @@ export class ProductWarningRepository {
                 hazard: undefined,
                 injury: undefined,
                 affectedProducts: undefined,
-                affectedStates:
-                  result_foodInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedstates ?? undefined,
                 image: row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };

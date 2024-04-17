@@ -3,6 +3,7 @@ export interface IReturnSchema {
   type: string;
   title: string | undefined;
   description: string | undefined;
+  area: string[] | undefined;
   details: {
     link: string | undefined;
     manufacturer: string | undefined;
@@ -10,7 +11,6 @@ export interface IReturnSchema {
     hazard: string | undefined;
     injury: string | undefined;
     affectedProducts: string | undefined;
-    affectedStates: string[] | undefined;
     image: string | undefined;
   };
 }
