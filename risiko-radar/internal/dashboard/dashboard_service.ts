@@ -1,8 +1,4 @@
-import {
-  IDashboardItem,
-  IDashboardItemDetails,
-  IDashboardUpdate,
-} from "../models/dashboard";
+import { IDashboardItemDetails, IDashboardUpdate } from "../models/dashboard";
 import { DashboardRepository } from "./dashboard_repository";
 
 /**
@@ -31,22 +27,6 @@ export class DashboardService {
     });
     dashboardItems.add = dashboardItems.add.concat(productWarningData);
 
-    const ninaData = await this.dashboardRepository.getNinaWarnings();
-    // Save details of nina warnings to cache and remove from object
-    ninaData.add.forEach((item) => {
-      if (item.details) {
-        this.dashboardRepository.setCacheItem(item.id.toString(), item.details);
-        ninaData.add.find((ninaItem) => ninaItem.id === item.id)!.details =
-          undefined;
-      }
-    });
-    // Remove cache items of deleted nina warnings
-    ninaData.delete.forEach((id: String) => {
-      this.dashboardRepository.delCacheItem(id.toString());
-    });
-    dashboardItems.add = dashboardItems.add.concat(ninaData.add);
-    dashboardItems.delete = dashboardItems.delete.concat(ninaData.delete);
-
     return dashboardItems;
   }
 
@@ -58,6 +38,7 @@ export class DashboardService {
   async getDashboardDetails(
     dashboardId: string
   ): Promise<IDashboardItemDetails> {
+    console.log("test");
     const details = await this.dashboardRepository.getCacheItem(dashboardId);
 
     if (details === null) {
@@ -73,6 +54,13 @@ export class DashboardService {
    * @returns Update of the dashboard list containing ids to remove and objects to add
    */
   async getDashboardUpdate(timestamp: number) {
-    return this.dashboardRepository.getDashboardUpdate(timestamp);
+    let update: IDashboardUpdate = { add: [], delete: [] };
+
+    const productWarningData =
+      await this.dashboardRepository.getProductWarningUpdate(timestamp);
+
+    update.add = update.add.concat(productWarningData);
+
+    return update;
   }
 }

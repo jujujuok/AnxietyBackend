@@ -46,6 +46,8 @@ const start = async () => {
     server.log.error(err);
     process.exit(1);
   }
+
+  gracefulShutdown(server);
 };
 
 const setupCache = (server: FastifyInstance): Cache => {

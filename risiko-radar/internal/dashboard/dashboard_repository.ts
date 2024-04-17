@@ -24,6 +24,11 @@ export class DashboardRepository {
     this.redis.set(id, value);
   }
 
+  /**
+   * Retrieve a cache item by key
+   * @param id Key of the cache item
+   * @returns Cache item
+   */
   async getCacheItem(id: string): Promise<IDashboardItemDetails | null> {
     const cacheItem = await this.redis.get(id);
 
@@ -54,96 +59,33 @@ export class DashboardRepository {
   }
 
   /**
-   * Get list of nina warnings
-   * @returns DashboardUpdate Object
+   * Get details of a product warning from the API
+   * @param dashboardId ID of the product warning
+   * @returns Details of a product warning
    */
-  async getNinaWarnings(): Promise<IDashboardUpdate> {
-    const ninaWarningResponseData = await getDataFromApi(
-      "http://212.132.100.147:8081/nina/getData"
+  async getProductWarningDetails(
+    warningId: string
+  ): Promise<IDashboardItemDetails> {
+    const productWarningDetails = await getDataFromApi(
+      `http://212.132.100.147:8080/product-warning/getDetails/${warningId}`
     );
 
-    const ninaWarningData: IDashboardUpdate = {
-      add: ninaWarningResponseData[0],
-      delete: ninaWarningResponseData[1],
-    };
+    this.setCacheItem(warningId, productWarningDetails);
 
-    return ninaWarningData;
+    return productWarningDetails;
   }
 
   /**
-   * Get details of a dashboard item
-   * @param dashboardId ID of the dashboard item
-   * @returns Details of a dashboard item
+   * Get update of the product warning list
+   * @param timestamp Unix timestamp of the last update
+   * @returns Update of the product warning list
    */
-  async getDashboardDetails(dashboardId: number) {
-    // Example Data:
-    const dashboardDetails = {
-      id: dashboardId,
-      type: faker.helpers.arrayElement([
-        "interpol_red",
-        "interpol_un",
-        "food_waring",
-        "product_warning",
-        "travel_warning",
-        "country_representative",
-      ]),
-      details: {
-        first_name: faker.person.firstName(),
-        last_name: faker.person.lastName(),
-        country: faker.location.country(),
-        image: faker.image.avatar(),
-      },
-    };
+  async getProductWarningUpdate(timestamp: number) {
+    const productWarningData = await getDataFromApi(
+      "http://212.132.100.147:8080/product-warning/getData?timestamp=" +
+        timestamp
+    );
 
-    return dashboardDetails;
-  }
-
-  /**
-   * Get update of the dashboard list
-   * @param timestamp Timestamp of the last update
-   * @returns Update of the dashboard list containing ids to remove and objects to add
-   */
-  async getDashboardUpdate(timestamp: number) {
-    // Example Data:
-    const dashboardUpdate = {
-      add: [] as IDashboardItem[],
-      delete: [] as number[],
-    };
-
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const dashboardItem: IDashboardItem = {
-        id: faker.internet.ip(),
-        type: faker.helpers.arrayElement([
-          "interpol_red",
-          "interpol_un",
-          "food_waring",
-          "product_warning",
-          "travel_warning",
-          "country_representative",
-        ]),
-        severity: faker.helpers.arrayElement([
-          "information",
-          "warning",
-          "danger",
-          "extreme_danger",
-        ]),
-        title:
-          faker.hacker.adjective() +
-          " " +
-          faker.hacker.ingverb() +
-          " " +
-          faker.hacker.noun(),
-        description: faker.hacker.phrase(),
-        since: faker.date.past().getTime(),
-      };
-
-      dashboardUpdate.add.push(dashboardItem);
-    }
-
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      dashboardUpdate.delete.push(faker.number.int({ min: 1, max: 1000 }));
-    }
-
-    return dashboardUpdate;
+    return productWarningData;
   }
 }
