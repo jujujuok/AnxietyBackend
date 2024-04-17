@@ -281,26 +281,29 @@ export class ProductWarningRepository {
         const result_productInformations = await client.query('SELECT * FROM productwarnings.productInformations WHERE warning_id = $1;', [id]);
         const result_safetyInformations = await client.query('SELECT * FROM productwarnings.safetyInformations WHERE warning_id = $1;', [id]);
         console.log("Productdetails selected");
+        console.log(result_productInformations.rows[0]);
+        console.log(result_safetyInformations.rows[0]);
         details = {
-          link: result_warnings.rows[0].warning_link,
-          manufacturer: result_productInformations.rows[0].manufacturer,
-          category: result_productInformations.rows[0].category,
-          hazard: result_safetyInformations.rows[0].hazard,
-          injury: result_safetyInformations.rows[0].injury,
-          affectedProducts: result_productInformations.rows[0].affectedProducts,
-          image: result_warnings.rows[0].image,
+          link: result_warnings.rows[0].warning_link ?? undefined,
+          manufacturer: result_productInformations.rows[0].manufacturer ?? undefined,
+          category: result_productInformations.rows[0].category ?? undefined,
+          hazard: result_safetyInformations.rows[0] ? result_safetyInformations.rows[0].hazard : undefined,
+          injury: result_safetyInformations.rows[0] ? result_safetyInformations.rows[0].injury : undefined,
+          affectedProducts: result_productInformations.rows[0].affectedproducts === "null" || result_productInformations.rows[0].affectedproducts === "Nicht bekannt" ? undefined : result_productInformations.rows[0].affectedproducts ?? undefined,
+          image: result_productInformations.rows[0].image == "undefined" ? undefined : result_productInformations.rows[0].image ?? undefined,
         }
+        console.log(details);
       }else if(result_warnings.rows[0].warning_type === "f"){
         const result_foodInformations = await client.query('SELECT * FROM productwarnings.foodInformations WHERE warning_id = $1;', [id]);
         console.log("Fooddetails selected");
         details = {
-          link: result_warnings.rows[0].warning_link,
-          manufacturer: result_foodInformations.rows[0].manufacturer,
+          link: result_warnings.rows[0].warning_link ?? undefined,
+          manufacturer: result_foodInformations.rows[0].manufacturer ?? undefined,
           category: undefined,
           hazard: undefined,
           injury: undefined,
           affectedProducts: undefined,
-          image: result_warnings.rows[0].image,
+          image: result_foodInformations.rows[0].image == "undefined" ? undefined : result_foodInformations.rows[0].image ?? undefined,
         }
       }
     }finally{
