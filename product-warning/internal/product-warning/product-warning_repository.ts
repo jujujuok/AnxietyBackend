@@ -212,7 +212,7 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "product_warning",
               title: row.title ?? undefined,
-              description: row.description ?? undefined,
+              description: row.description === "null" ? undefined : row.description ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
                 manufacturer:
@@ -241,7 +241,7 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "food_warning",
               title: row.title ?? undefined,
-              description: row.description ?? undefined,
+              description: row.description === "null" ? undefined : row.description ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
                 manufacturer:
