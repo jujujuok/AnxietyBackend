@@ -234,7 +234,7 @@ export class ProductWarningRepository {
                 affectedProducts:
                   result_productInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedProducts ?? undefined,
+                  )?.affectedproducts ?? undefined,
                 affectedStates: undefined,
               },
             };
