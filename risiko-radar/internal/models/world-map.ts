@@ -2,7 +2,7 @@
  * WorldMap model
  */
 export interface IWorldMapItem {
-  id: number;
+  id: string;
   type:
     | "interpol_red"
     | "interpol_un"
@@ -17,7 +17,7 @@ export interface IWorldMapItem {
  * WorldMap details model
  */
 export interface IWorldMapItemDetails {
-  id: number;
+  id: string;
   type:
     | "interpol_red"
     | "interpol_un"

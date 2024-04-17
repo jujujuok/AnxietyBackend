@@ -20,7 +20,7 @@ export class MapService {
    * @param mapId Map ID
    * @returns Details of a map item
    */
-  async getMapDetails(mapId: number) {
+  async getMapDetails(mapId: string) {
     return this.mapRepository.getMapDetails(mapId);
   }
 

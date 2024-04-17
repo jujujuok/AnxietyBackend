@@ -2,7 +2,7 @@
  * Dashboard model.
  */
 export interface IDashboardItem {
-  id: number;
+  id: string;
   type:
     | "interpol_red"
     | "interpol_un"
@@ -21,18 +21,11 @@ export interface IDashboardItem {
  * Dashboard details model.
  */
 export interface IDashboardItemDetails {
-  id: number;
-  type:
-    | "interpol_red"
-    | "interpol_un"
-    | "food_waring"
-    | "product_warning"
-    | "traverl_warning"
-    | "country_representative";
+  id: string;
   details: object;
 }
 
 export interface IDashboardUpdate {
   add: IDashboardItem[];
-  delete: number[];
+  delete: string[];
 }

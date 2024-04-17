@@ -2,7 +2,7 @@
  * MapItem model
  */
 export interface IMapItem {
-  id: number;
+  id: string;
   type:
     | "weather_flood"
     | "weather_storm"
@@ -26,7 +26,7 @@ export interface IMapItem {
  * MapItem details model
  */
 export interface IMapItemDetails {
-  id: number;
+  id: string;
   type:
     | "weather_flood"
     | "weather_storm"

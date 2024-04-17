@@ -20,7 +20,7 @@ export class WorldMapService {
    * @param WorldMapId WorldMap ID
    * @returns Details of a WorldMap item
    */
-  async getWorldMapDetails(WorldMapId: number) {
+  async getWorldMapDetails(WorldMapId: string) {
     return this.worldMapRepository.getWorldMapDetails(WorldMapId);
   }
 

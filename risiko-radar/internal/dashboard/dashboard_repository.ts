@@ -16,12 +16,38 @@ export class DashboardRepository {
   constructor(private readonly redis: Cache) {}
 
   /**
+   * Add a key-value pair to the cache
+   * @param id Key of the cache item
+   * @param value Value of the cache item
+   */
+  async setCacheItem(id: string, value: IDashboardItemDetails) {
+    this.redis.set(id, value);
+  }
+
+  async getCacheItem(id: string): Promise<IDashboardItemDetails | null> {
+    const cacheItem = await this.redis.get(id);
+
+    if (cacheItem) {
+      return cacheItem;
+    }
+    return null;
+  }
+
+  /**
+   * Delete a cache item by key
+   * @param id Key of the cache item
+   */
+  async delCacheItem(id: string) {
+    this.redis.del(id);
+  }
+
+  /**
    * Get list of productwarnings
    * @returns List of dashboard items
    */
   async getProductWarnings(): Promise<Array<IDashboardItem>> {
     const productWarningData = await getDataFromApi(
-      "product-warning:8080/getData"
+      "http://212.132.100.147:8080/product-warning/getData"
     );
 
     return productWarningData;
@@ -32,13 +58,16 @@ export class DashboardRepository {
    * @returns DashboardUpdate Object
    */
   async getNinaWarnings(): Promise<IDashboardUpdate> {
-    const ninaWarningData = await getDataFromApi("nina:8081/getData");
+    const ninaWarningResponseData = await getDataFromApi(
+      "http://212.132.100.147:8081/nina/getData"
+    );
+
+    const ninaWarningData: IDashboardUpdate = {
+      add: ninaWarningResponseData[0],
+      delete: ninaWarningResponseData[1],
+    };
 
     return ninaWarningData;
-  }
-
-  async setCacheItem(id: string, value: IDashboardItemDetails) {
-    this.redis.set(id, value);
   }
 
   /**
@@ -83,7 +112,7 @@ export class DashboardRepository {
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const dashboardItem: IDashboardItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
+        id: faker.internet.ip(),
         type: faker.helpers.arrayElement([
           "interpol_red",
           "interpol_un",

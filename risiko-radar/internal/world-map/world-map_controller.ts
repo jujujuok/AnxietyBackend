@@ -32,7 +32,7 @@ export class WorldMapController {
       });
     }
 
-    const worldMapId = req.params.id as number;
+    const worldMapId = req.params.id;
     const worldMapDetails = await this.worldMapService.getWorldMapDetails(
       worldMapId
     );

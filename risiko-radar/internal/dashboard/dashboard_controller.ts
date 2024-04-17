@@ -32,7 +32,7 @@ export class DashboardController {
       });
     }
 
-    const dashboardId = req.params.id as number;
+    const dashboardId = req.params.id;
     const dashboardDetails = await this.dashboardService.getDashboardDetails(
       dashboardId
     );

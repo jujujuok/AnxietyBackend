@@ -32,7 +32,7 @@ export class MapController {
       });
     }
 
-    const mapId = req.params.id as number;
+    const mapId = req.params.id;
     const mapDetails = await this.mapService.getMapDetails(mapId);
 
     return reply.send(mapDetails);

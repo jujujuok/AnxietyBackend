@@ -15,7 +15,7 @@ export class WorldMapRepository {
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const worldMapItem: IWorldMapItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
+        id: faker.internet.ip(),
         type: faker.helpers.arrayElement([
           "interpol_red",
           "interpol_un",
@@ -43,7 +43,7 @@ export class WorldMapRepository {
    * @param worldMapId WorldMap ID
    * @returns Details of a WorldMap item
    */
-  async getWorldMapDetails(worldMapId: number) {
+  async getWorldMapDetails(worldMapId: string) {
     // Example Data:
     const worldMapDetails = {
       id: worldMapId,
@@ -81,7 +81,7 @@ export class WorldMapRepository {
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const worldMapItem: IWorldMapItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
+        id: faker.internet.ip(),
         type: faker.helpers.arrayElement([
           "interpol_red",
           "interpol_un",

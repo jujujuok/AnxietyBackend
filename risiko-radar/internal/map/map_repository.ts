@@ -15,7 +15,7 @@ export class MapRepository {
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const mapItem: IMapItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
+        id: faker.internet.ip(),
         type: faker.helpers.arrayElement([
           "weather_flood",
           "weather_storm",
@@ -68,7 +68,7 @@ export class MapRepository {
    * @param mapId ID of the map item
    * @returns Details of a map item
    */
-  async getMapDetails(mapId: number) {
+  async getMapDetails(mapId: string) {
     // Example Data:
     const mapDetails = {
       id: mapId,
@@ -107,7 +107,7 @@ export class MapRepository {
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
       const mapItem: IMapItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
+        id: faker.internet.ip(),
         type: faker.helpers.arrayElement([
           "weather_flood",
           "weather_storm",

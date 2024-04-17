@@ -8,9 +8,9 @@ import { MapService } from "../map/map_service";
 import { WorldMapController } from "../world-map/world-map_controller";
 import { WorldMapRepository } from "../world-map/world-map_repository";
 import { WorldMapService } from "../world-map/world-map_service";
-import dotenv from "dotenv";
 import { RedisClientType, createClient } from "redis";
 import { Cache } from "../utils/cache";
+import dotenv from "dotenv";
 
 /**
  * Start routine of the application
@@ -41,7 +41,7 @@ const start = async () => {
 
   // start the server
   try {
-    await server.listen({ port: 8083, host: "0.0.0.0" });
+    await server.listen({ port: 8000, host: "0.0.0.0" });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
@@ -50,7 +50,7 @@ const start = async () => {
 
 const setupCache = (server: FastifyInstance): Cache => {
   const host = process.env.REDIS_HOST;
-  const port = process.env.REDIS_PORT;
+  const port = process.env.REDIS_PORT || "6379";
   const password = process.env.REDIS_PASSWORD;
 
   const client = createClient({
