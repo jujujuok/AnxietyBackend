@@ -10,4 +10,5 @@ export interface IProductWarningModel {
   hazard: string;
   injury: string;
   affectedProducts: string;
+  image: string;
 }

@@ -24,17 +24,17 @@ export class ProductWarningRepository {
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}')`
+            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}', '${warning.image}')`
         )
         .join(",");
-
+        
       if (
         values_warningsproduct !== "" &&
         values_warningsproduct !== null &&
         values_warningsproduct !== "()"
       ) {
         const result_warningsproduct = await client.query(
-          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description) VALUES ${values_warningsproduct};`
+          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ${values_warningsproduct};`
         );
         console.log(
           result_warningsproduct.rowCount + " rows inserted (warningsproduct)"
@@ -98,7 +98,7 @@ export class ProductWarningRepository {
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}')`
+            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}', '${warning.image}')`
         )
         .join(",");
 
@@ -108,7 +108,7 @@ export class ProductWarningRepository {
         values_warningsfood !== "()"
       ) {
         const result_warningsfood = await client.query(
-          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description) VALUES ${values_warningsfood};`
+          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ${values_warningsfood};`
         );
         console.log(
           result_warningsfood.rowCount + " rows inserted (warningsfood)"
@@ -233,6 +233,7 @@ export class ProductWarningRepository {
                   )?.injury ?? undefined,
                 affectedProducts: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "null" || result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "Nicht bekannt" ? undefined : result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts ?? undefined,
                 affectedStates: undefined,
+                image: row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };
             warnings.push(productWarning);
@@ -256,6 +257,7 @@ export class ProductWarningRepository {
                   result_foodInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
                   )?.affectedstates ?? undefined,
+                image: row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };
             warnings.push(foodWarning);

@@ -11,5 +11,6 @@ export interface IReturnSchema {
     injury: string | undefined;
     affectedProducts: string | undefined;
     affectedStates: string[] | undefined;
+    image: string | undefined;
   };
 }

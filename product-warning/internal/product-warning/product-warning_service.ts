@@ -66,6 +66,7 @@ export class ProductWarningService {
               ? warning.product.affectedProducts.replaceAll("'", '"')
               : null
             : null,
+          image: warning.product ? warning.product.imageUrls[0] : null,
         };
 
         warnings.products.push(productWarning);
@@ -81,6 +82,7 @@ export class ProductWarningService {
           manufacturer: warning.product
             ? warning.product.manufacturer.replaceAll("'", '"')
             : null,
+          image: warning.product ? warning.product.imageUrls[0] : null,
         };
         warnings.foods.push(foodWarning);
       }
