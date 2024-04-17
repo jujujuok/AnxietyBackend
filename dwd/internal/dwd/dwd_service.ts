@@ -1,8 +1,6 @@
-import { Axios } from "axios";
-import { ITypeModel } from "../models/type";
 import { DwDRepository } from "./dwd_repository";
 import axios from 'axios';
-import { AxiosHeaders } from "axios";
+import { IWarningModel } from "../models/warning";
 
 export class DwDService {
   constructor(private readonly dwdRepository: DwDRepository) {}
@@ -23,12 +21,49 @@ export class DwDService {
     }
   }
 
+  dataInModel(data: any): IWarningModel[]{
+    let warnings: IWarningModel[] = [];
+    data.warnings.forEach((element: any) => {
+      let description = undefined;
+      let instruction = undefined;
+
+      if(element.description != undefined) {
+        description = element.description.replaceAll('\n', '');
+      }
+      if(element.instruction != undefined) {
+        instruction = element.instruction.replaceAll('\n', '');
+      }
+
+      let coordinates: any = [];
+      if(element.regions != undefined) {
+        element.regions.forEach((region: any) => {
+          region.polygonGeometry.coordinates.forEach((polygon: any) => {
+            coordinates.push(polygon);
+          });
+        });
+      }
+      
+      if(coordinates.length == 0) {
+        coordinates = undefined;
+      }
+
+      warnings.push({
+        id: element.warnId,
+        type: element.event,
+        title: element.headLine,
+        description: description,
+        instruction: instruction,
+        coordinates: coordinates,
+      });
+    });
+    return warnings;
+  }
+
   async getNowcastWarnings(){
     const url = 'https://s3.eu-central-1.amazonaws.com/app-prod-static.warnwetter.de/v16/warnings_nowcast.json';
     const data = await this.callApi(url);
-    const time = new Date(data.time);
-    console.log("timestamp: ", time)
-    return data;
+    const warnings = this.dataInModel(data);
+    return warnings;
   }
 
   async getGemeindeWarnings(){
@@ -37,7 +72,8 @@ export class DwDService {
       'accept': 'application/text'
     };
     const data = await this.callApi(url);
-    return data;
+    const warnings = this.dataInModel(data);
+    return warnings;
   }
 
   async getCoastWarnings(){
@@ -90,9 +126,17 @@ export class DwDService {
 
   async getAll(){
     let results: Object[] = [];
-    results.push(await this.getNowcastWarnings());
-    results.push(await this.getGemeindeWarnings());
-    results.push(await this.getCoastWarnings());
+
+    await (await this.getNowcastWarnings()).forEach((element: any) => {results.push(element);});
+    await (await this.getGemeindeWarnings()).forEach((element: any) => {results.push(element);});
+
+    this.dwdRepository.fetchData(results);
+
     return results;
+  }
+
+  async getData(timestamp: number) {
+    const data = this.dwdRepository.getData(timestamp);
+    return data;
   }
 }

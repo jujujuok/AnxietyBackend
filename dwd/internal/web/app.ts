@@ -41,7 +41,7 @@ const setupRoutes = async (server: FastifyInstance, service: DwDService) => {
 };
 
 const setupLog = async (server: FastifyInstance) => {
-  server.log.info("### Type Service started ###");
+  server.log.info("### DWD Service started ###");
 
   server.addHook("onRequest", (request, reply, done) => {
     server.log.info({ req: request.raw });
@@ -56,6 +56,7 @@ const addTypeRoutes = (controller: DwDController): FastifyPluginCallback => {
     instance.get("/gemeinde", controller.getGemeindeWarnings.bind(controller));
     instance.get("/coast", controller.getCoastWarnings.bind(controller));
     instance.get("/sea", controller.getSeaWarnings.bind(controller));
+    instance.get("/getData", controller.getData.bind(controller));
     done();
   };
 };
