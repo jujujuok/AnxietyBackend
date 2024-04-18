@@ -1,12 +1,5 @@
-import { get } from "axios";
-import {
-  IDashboardItem,
-  IDashboardItemDetails,
-  IDashboardUpdate,
-} from "../models/dashboard";
-import { faker } from "@faker-js/faker";
+import { IDashboardItem, IDashboardItemDetails } from "../models/dashboard";
 import { getDataFromApi } from "../utils/apiCalls";
-import { RedisClientType } from "redis";
 import { Cache } from "../utils/cache";
 
 /**

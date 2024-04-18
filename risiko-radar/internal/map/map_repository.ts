@@ -1,161 +1,71 @@
-import { faker } from "@faker-js/faker";
-import { IMapItem } from "../models/map";
+import { IMapItemDetails, IMapUpdate } from "../models/map";
+import { getDataFromApi } from "../utils/apiCalls";
+import { Cache } from "../utils/cache";
 
 /**
  * Repository for the map module
  */
 export class MapRepository {
+  constructor(private readonly redis: Cache) {}
+
   /**
-   * Get list of map items
-   * @returns List of map items
+   * Add a key-value pair to the cache
+   * @param id Key of the cache item
+   * @param value Value of the cache item
    */
-  async getMap(): Promise<IMapItem[]> {
-    // Example Data:
-    const mapItems: IMapItem[] = [];
-
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const mapItem: IMapItem = {
-        id: faker.internet.ip(),
-        type: faker.helpers.arrayElement([
-          "weather_flood",
-          "weather_storm",
-          "weather_disaster",
-          "street_closure",
-          "street_report",
-          "police",
-          "air_quality",
-          "radiation",
-        ]),
-        severity: faker.helpers.arrayElement([
-          "information",
-          "warning",
-          "danger",
-          "extreme_danger",
-        ]),
-        title:
-          faker.hacker.adjective() +
-          " " +
-          faker.hacker.ingverb() +
-          " " +
-          faker.hacker.noun(),
-        position: {
-          lat: faker.location.latitude(),
-          lon: faker.location.longitude(),
-        },
-        area: faker.datatype.boolean() // either array for polygon or number for radius
-          ? [
-              // array for polygon
-              faker.location.latitude(),
-              faker.location.longitude(),
-              faker.location.latitude(),
-              faker.location.longitude(),
-              faker.location.latitude(),
-              faker.location.longitude(),
-            ]
-          : // number for radius
-            faker.number.int({ min: 1, max: 1000 }),
-        since: faker.date.past().getTime(),
-      };
-
-      mapItems.push(mapItem);
-    }
-
-    return mapItems;
+  async setCacheItem(id: string, value: IMapItemDetails) {
+    this.redis.set(id, value);
   }
 
   /**
-   * Get details of a map item
-   * @param mapId ID of the map item
-   * @returns Details of a map item
+   * Retrieve a cache item by key
+   * @param id Key of the cache item
+   * @returns Cache item
    */
-  async getMapDetails(mapId: string) {
-    // Example Data:
-    const mapDetails = {
-      id: mapId,
-      type: faker.helpers.arrayElement([
-        "weather_flood",
-        "weather_storm",
-        "weather_disaster",
-        "street_closure",
-        "street_report",
-        "police",
-        "air_quality",
-        "radiation",
-      ]),
-      details: {
-        since: faker.date.past().getTime(),
-        until: faker.date.future().getTime(),
-        reason: faker.hacker.phrase(),
-        street: faker.location.street(),
-      },
-    };
+  async getCacheItem(id: string): Promise<IMapItemDetails | null> {
+    const cacheItem = await this.redis.get(id);
 
-    return mapDetails;
+    if (cacheItem) {
+      return cacheItem as IMapItemDetails;
+    }
+    return null;
   }
 
   /**
-   * Get update of the map list
-   * @param timestamp Timestamp
-   * @returns Update of the map list containing ids to remove and objects to add
+   * Delete a cache item by key
+   * @param id Key of the cache item
    */
-  async getMapUpdate(timestamp: number) {
-    // Example Data:
-    const mapUpdate = {
-      add: [] as IMapItem[],
-      delete: [] as number[],
+  async delCacheItem(id: string) {
+    this.redis.del(id);
+  }
+
+  /**
+   * Get list of nina warnings
+   * @returns DashboardUpdate Object
+   */
+  async getWarnings(api: string): Promise<IMapUpdate> {
+    const warningResponseData = await getDataFromApi(
+      `http://212.132.100.147:8081/${api}/getData`
+    );
+
+    const warningData: IMapUpdate = {
+      add: warningResponseData[0],
+      delete: [],
     };
 
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const mapItem: IMapItem = {
-        id: faker.internet.ip(),
-        type: faker.helpers.arrayElement([
-          "weather_flood",
-          "weather_storm",
-          "weather_disaster",
-          "street_closure",
-          "street_report",
-          "police",
-          "air_quality",
-          "radiation",
-        ]),
-        severity: faker.helpers.arrayElement([
-          "information",
-          "warning",
-          "danger",
-          "extreme_danger",
-        ]),
-        title:
-          faker.hacker.adjective() +
-          " " +
-          faker.hacker.ingverb() +
-          " " +
-          faker.hacker.noun(),
-        position: {
-          lat: faker.location.latitude(),
-          lon: faker.location.longitude(),
-        },
-        area: faker.datatype.boolean() // either array for polygon or number for radius
-          ? [
-              // array for polygon
-              faker.location.latitude(),
-              faker.location.longitude(),
-              faker.location.latitude(),
-              faker.location.longitude(),
-              faker.location.latitude(),
-              faker.location.longitude(),
-            ]
-          : // number for radius
-            faker.number.int({ min: 1, max: 1000 }),
-        since: faker.date.past().getTime(),
-      };
+    return warningData;
+  }
 
-      mapUpdate.add.push(mapItem);
-    }
+  async getWarningUpdate(api: string, timestamp: number): Promise<IMapUpdate> {
+    const warningResponseData = await getDataFromApi(
+      `http://212.132.100.147:8081/${api}/getData?timestamp=${timestamp}`
+    );
 
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      mapUpdate.delete.push(faker.number.int({ min: 1, max: 1000 }));
-    }
+    const warningData: IMapUpdate = {
+      add: warningResponseData[0],
+      delete: warningResponseData[1],
+    };
 
-    return mapUpdate;
+    return warningData;
   }
 }

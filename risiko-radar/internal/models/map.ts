@@ -20,6 +20,7 @@ export interface IMapItem {
   };
   area: number[] | number;
   since: number;
+  details?: IMapItemDetails;
 }
 
 /**
@@ -37,4 +38,9 @@ export interface IMapItemDetails {
     | "air_quality"
     | "radiation";
   details: object;
+}
+
+export interface IMapUpdate {
+  add: IMapItem[];
+  delete: string[];
 }

@@ -88,7 +88,7 @@ const setupServices = async (redis: Cache) => {
     dashboardRepository
   );
 
-  const mapRepository: MapRepository = new MapRepository();
+  const mapRepository: MapRepository = new MapRepository(redis);
   const mapService: MapService = new MapService(mapRepository);
 
   const worldMapRepository: WorldMapRepository = new WorldMapRepository();
