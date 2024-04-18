@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { NinaService } from "./nina_service";
-import { updateRequest } from "../utils/fastifyRequests";
+import { updateRequest, detailsRequest } from "../utils/fastifyRequests";
 
 export class NinaController {
   constructor(private readonly ninaService: NinaService) {}
@@ -17,6 +17,17 @@ export class NinaController {
 
     const timestamp = req.query.timestamp as number;
     const data = await this.ninaService.getData(timestamp);
+    return reply.send(data);
+  }
+
+  async getDetails(req: detailsRequest, reply: FastifyReply) {
+    if (!req.params.id) {
+      console.log("No id provided");
+      return reply.status(400).send();
+    }
+
+    const id = req.params.id as string;
+    const data = await this.ninaService.getDetails(id);
     return reply.send(data);
   }
 }

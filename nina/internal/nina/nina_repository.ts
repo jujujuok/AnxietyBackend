@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class NinaRepository {
   constructor(private db: Pool) {}
@@ -146,8 +147,8 @@ export class NinaRepository {
           title: row.title,
           area: row.coordinates,
           details: {
-            description: row.description,
-            instruction: row.instruction,
+            description: row.description === "null" ? undefined : row.description,
+            instruction: row.instruction === "null" ? undefined : row.instruction,
           },
         };
         warnings.push(warning);
@@ -159,6 +160,29 @@ export class NinaRepository {
         return [warnings];
       }
       return [warnings, closedWarningIds];
+    }
+  }
+
+  async getDetails(id: string) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try{
+      const result_warnings = await client.query('SELECT * FROM nina.warnings WHERE warning_id = $1;', [id]);
+      console.log("Details selected");
+      if (result_warnings.rows.length > 0) {
+        const row = result_warnings.rows[0];
+        details = {
+            description: row.description === "null" ? undefined : row.description,
+            instruction: row.instruction === "null" ? undefined : row.instruction,
+          };
+        };
+    }finally{
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
     }
   }
 }
