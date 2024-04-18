@@ -114,9 +114,9 @@ export class AutobahnRepository {
         const warning: IReturnSchema = {
           id: row.warning_id,
           type: "street_report",
+          warning: "Autobahnwarnung",
           title: row.title,
           area: row.coordinates,
-          since: row.publisheddate,
           details: {
             description: row.description,
           },
