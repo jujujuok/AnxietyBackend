@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { AutobahnService } from "./autobahn_service";
-import { updateRequest } from "../utils/fastifyRequests";
+import { updateRequest, detailsRequest } from "../utils/fastifyRequests";
 
 export class AutobahnController {
   constructor(private readonly autobahnService: AutobahnService) {}
@@ -17,6 +17,17 @@ export class AutobahnController {
 
     const timestamp = req.query.timestamp as number;
     const data = await this.autobahnService.getData(timestamp);
+    return reply.send(data);
+  }
+
+  async getDetails(req: detailsRequest, reply: FastifyReply) {
+    if (!req.params.id) {
+      console.log("No id provided");
+      return reply.status(400).send();
+    }
+
+    const id = req.params.id as string;
+    const data = await this.autobahnService.getDetails(id);
     return reply.send(data);
   }
 }

@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class AutobahnRepository {
   constructor(private db: Pool) {}
@@ -130,6 +131,28 @@ export class AutobahnRepository {
         return [warnings];
       }
       return [warnings, closedWarningIds];
+    }
+  }
+
+  async getDetails(id: string) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try{
+      const result_warnings = await client.query('SELECT * FROM autobahn.warnings WHERE warning_id = $1;', [id]);
+      console.log("Details selected");
+      if (result_warnings.rows.length > 0) {
+        const row = result_warnings.rows[0];
+        details = {
+            description: row.description === "null" ? undefined : row.description,
+          };
+        };
+    }finally{
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
     }
   }
 }

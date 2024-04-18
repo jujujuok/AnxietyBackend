@@ -100,4 +100,9 @@ export class AutobahnService {
     const data = this.autobahnRepository.getData(timestamp);
     return data;
   }
+
+  async getDetails(id: string) {
+    const data = this.autobahnRepository.getDetails(id);
+    return data;
+  }
 }
