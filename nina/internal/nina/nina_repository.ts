@@ -77,13 +77,15 @@ export class NinaRepository {
       .map((part: any) =>
         part
           .map((warning: IWarningModel) => {
-            const coordinatesArray =
-              warning.coordinates != null
-                ? warning.coordinates
-                    .map((coordinate: any) => `'${coordinate}'`)
-                    .join(",")
-                : null;
-            return `('${warning.id}', '${warning.type}', '${warning.title}', '${warning.description}', '${warning.instruction}', ARRAY[${coordinatesArray}])`;
+            const geojson = {
+              type: "Polygon",
+              coordinates: warning.coordinates,
+            };
+    
+            const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
+              geojson
+            )}'), 4326)`;
+            return `('${warning.id}', '${warning.type}', '${warning.title}', '${warning.description}', '${warning.instruction}', ${coordinates})`;
           })
           .join(",")
       )
@@ -134,18 +136,20 @@ export class NinaRepository {
       }
 
       const resultwarnings = await client.query(
-        `SELECT * FROM nina.warnings ${timestampstatement} loadenddate IS NULL`
+        `SELECT warning_id, warning_type, title, ST_AsGeoJSON(coordinates) AS coordinates, description, instruction FROM nina.warnings ${timestampstatement} loadenddate IS NULL`
       );
 
       console.log(resultwarnings.rows.length + " rows selected");
 
       resultwarnings.rows.forEach((row: any) => {
+        const coordinates = JSON.parse(row.coordinates).coordinates;
+
         const warning: IReturnSchema = {
           id: row.warning_id,
           type: "nina",
           warning: row.warning_type,
           title: row.title,
-          area: row.coordinates,
+          area: coordinates,
           details: {
             description: row.description === "null" ? undefined : row.description,
             instruction: row.instruction === "null" ? undefined : row.instruction,
