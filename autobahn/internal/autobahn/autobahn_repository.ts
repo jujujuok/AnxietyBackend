@@ -76,7 +76,7 @@ export class AutobahnRepository {
 
   async getClosedData(timestamp: number) {
     if (!timestamp) {
-      return "";
+      return [];
     }
 
     var warningids = [];
@@ -126,8 +126,10 @@ export class AutobahnRepository {
     } finally {
       client.release();
       const closedWarningIds = await this.getClosedData(timestamp);
-      const result = [warnings, closedWarningIds];
-      return result;
+      if (closedWarningIds.length == 0) {
+        return [warnings];
+      }
+      return [warnings, closedWarningIds];
     }
   }
 }
