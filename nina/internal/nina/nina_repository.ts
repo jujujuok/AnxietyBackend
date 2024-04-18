@@ -142,13 +142,12 @@ export class NinaRepository {
         const warning: IReturnSchema = {
           id: row.warning_id,
           type: "nina",
+          warning: row.warning_type,
           title: row.title,
           area: row.coordinates,
-          since: null,
           details: {
             description: row.description,
             instruction: row.instruction,
-            type: row.warning_type,
           },
         };
         warnings.push(warning);
