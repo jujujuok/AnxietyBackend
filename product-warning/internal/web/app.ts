@@ -79,9 +79,10 @@ const addProductWarningRoutes = (
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/fetchAll", controller.fetchAll.bind(controller)); // fetch all warnings from external API
-    instance.get("/fetchUpdate", controller.fetchUpdate.bind(controller)); // fetch only new warnings from external API (last 6min)
+    instance.get("/fetchUpdate", controller.fetchUpdate.bind(controller)); // fetch only new warnings from external API (last 30min)
     instance.get("/fetchUpdateAll", controller.fetchUpdateAll.bind(controller)); // fetch all warnings from external API, but don't override existing ones (last 6min)
     instance.get("/getData", controller.getData.bind(controller)); // get warnings from DB
+    instance.get("/getDetails/:id", controller.getDetails.bind(controller)); // get warning by ID from DB
     done();
   };
 };

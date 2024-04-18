@@ -1,10 +1,4 @@
-export interface IReturnSchema {
-  id: number;
-  type: string;
-  title: string | undefined;
-  description: string | undefined;
-  area: string[] | undefined;
-  details: {
+export interface IDetailsReturnSchema {
     link: string | undefined;
     manufacturer: string | undefined;
     category: string | undefined;
@@ -12,5 +6,4 @@ export interface IReturnSchema {
     injury: string | undefined;
     affectedProducts: string | undefined;
     image: string | undefined;
-  };
 }

@@ -5,10 +5,10 @@ export interface IProductWarningModel {
   publishedDate: string;
   title: string;
   description: string;
-  designation: string;
   manufacturer: string;
   category: string;
   hazard: string;
   injury: string;
   affectedProducts: string;
+  image: string;
 }

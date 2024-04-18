@@ -41,11 +41,6 @@ export class ProductWarningService {
           description: warning.warning
             ? warning.warning.replaceAll("'", '"')
             : null,
-          designation: warning.product
-            ? warning.product.designation
-              ? warning.product.designation.replaceAll("'", '"')
-              : null
-            : null,
           manufacturer: warning.product
             ? warning.product.manufacturer
               ? warning.product.manufacturer.replaceAll("'", '"')
@@ -71,6 +66,7 @@ export class ProductWarningService {
               ? warning.product.affectedProducts.replaceAll("'", '"')
               : null
             : null,
+          image: warning.product ? warning.product.imageUrls[0] : null,
         };
 
         warnings.products.push(productWarning);
@@ -86,6 +82,7 @@ export class ProductWarningService {
           manufacturer: warning.product
             ? warning.product.manufacturer.replaceAll("'", '"')
             : null,
+          image: warning.product ? warning.product.imageUrls[0] : null,
         };
         warnings.foods.push(foodWarning);
       }
@@ -113,8 +110,7 @@ export class ProductWarningService {
   async fetchUpdate() {
     const now = new Date();
     const timezone = now.getTimezoneOffset();
-    const timestamp = now.getTime() - 6 * 60 * 1000 + timezone * 60 * 1000;
-    console.log(timestamp);
+    const timestamp = now.getTime() - 30 * 60 * 1000 + timezone * 60 * 1000;
 
     const body = {
       food: {
@@ -135,6 +131,11 @@ export class ProductWarningService {
 
   async getData(timestamp: number) {
     const data = this.productWarningRepository.getData(timestamp);
+    return data;
+  }
+
+  async getDetails(id: number) {
+    const data = this.productWarningRepository.getDetails(id);
     return data;
   }
 

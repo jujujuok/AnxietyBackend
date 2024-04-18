@@ -1,6 +1,7 @@
 import { IWarningsModel } from "../models/warnings";
 import { Pool } from "pg";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class ProductWarningRepository {
   constructor(private readonly db: Pool) {}
@@ -24,17 +25,17 @@ export class ProductWarningRepository {
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}')`
+            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}', '${warning.image}')`
         )
         .join(",");
-
+        
       if (
         values_warningsproduct !== "" &&
         values_warningsproduct !== null &&
         values_warningsproduct !== "()"
       ) {
         const result_warningsproduct = await client.query(
-          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description) VALUES ${values_warningsproduct};`
+          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ${values_warningsproduct};`
         );
         console.log(
           result_warningsproduct.rowCount + " rows inserted (warningsproduct)"
@@ -44,14 +45,13 @@ export class ProductWarningRepository {
       const values_productInformations = warnings.products
         .filter(
           (warning) =>
-            warning.designation != null ||
             warning.manufacturer != null ||
             warning.category != null ||
             warning.affectedProducts != null
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.designation}', '${warning.manufacturer}', '${warning.category}', '${warning.affectedProducts}')`
+            `(${warning.warning_id}, '${warning.manufacturer}', '${warning.category}', '${warning.affectedProducts}')`
         )
         .join(",");
       if (
@@ -60,7 +60,7 @@ export class ProductWarningRepository {
         values_productInformations !== "()"
       ) {
         const result_productInformations = await client.query(
-          `INSERT INTO productwarnings.productInformations (warning_id, designation, manufacturer, category, affectedProducts) VALUES ${values_productInformations};`
+          `INSERT INTO productwarnings.productInformations (warning_id, manufacturer, category, affectedProducts) VALUES ${values_productInformations};`
         );
         console.log(
           result_productInformations.rowCount +
@@ -99,7 +99,7 @@ export class ProductWarningRepository {
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}')`
+            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}', '${warning.image}')`
         )
         .join(",");
 
@@ -109,7 +109,7 @@ export class ProductWarningRepository {
         values_warningsfood !== "()"
       ) {
         const result_warningsfood = await client.query(
-          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description) VALUES ${values_warningsfood};`
+          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ${values_warningsfood};`
         );
         console.log(
           result_warningsfood.rowCount + " rows inserted (warningsfood)"
@@ -213,14 +213,10 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "product_warning",
               title: row.title ?? undefined,
-              description: row.description ?? undefined,
-              since: row.publishedDate ?? undefined,
+              description: row.description === "null" ? undefined : row.description ?? undefined,
+              area: undefined,
               details: {
                 link: row.warning_link ?? undefined,
-                designation:
-                  result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.designation ?? undefined,
                 manufacturer:
                   result_productInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
@@ -237,11 +233,8 @@ export class ProductWarningRepository {
                   result_safetyInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
                   )?.injury ?? undefined,
-                affectedProducts:
-                  result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedProducts ?? undefined,
-                affectedStates: undefined,
+                affectedProducts: result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "null" || result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts === "Nicht bekannt" ? undefined : result_productInformations.rows.find((row2: any) => row2.warning_id === row.warning_id)?.affectedproducts ?? undefined,
+                image: row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };
             warnings.push(productWarning);
@@ -250,23 +243,22 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "food_warning",
               title: row.title ?? undefined,
-              description: row.description ?? undefined,
-              since: row.publishedDate ?? undefined,
+              description: row.description === "null" ? undefined : row.description ?? undefined,
+              area:
+                  result_foodInformations.rows.find(
+                    (row2: any) => row2.warning_id === row.warning_id
+                  )?.affectedstates ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
-                designation: undefined,
                 manufacturer:
-                  result_productInformations.rows.find(
+                  result_foodInformations.rows.find(
                     (row2: any) => row2.warning_id === row.warning_id
                   )?.manufacturer ?? undefined,
                 category: undefined,
                 hazard: undefined,
                 injury: undefined,
                 affectedProducts: undefined,
-                affectedStates:
-                  result_foodInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedStates ?? undefined,
+                image: row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };
             warnings.push(foodWarning);
@@ -276,6 +268,51 @@ export class ProductWarningRepository {
     } finally {
       client.release();
       return warnings;
+    }
+  }
+
+  async getDetails(id: number) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try{
+      const result_warnings = await client.query('SELECT * FROM productwarnings.warnings WHERE warning_id = $1;', [id]);
+      console.log("Details selected");
+      if(result_warnings.rows[0].warning_type === "p"){
+        const result_productInformations = await client.query('SELECT * FROM productwarnings.productInformations WHERE warning_id = $1;', [id]);
+        const result_safetyInformations = await client.query('SELECT * FROM productwarnings.safetyInformations WHERE warning_id = $1;', [id]);
+        console.log("Productdetails selected");
+        console.log(result_productInformations.rows[0]);
+        console.log(result_safetyInformations.rows[0]);
+        details = {
+          link: result_warnings.rows[0].warning_link ?? undefined,
+          manufacturer: result_productInformations.rows[0].manufacturer ?? undefined,
+          category: result_productInformations.rows[0].category ?? undefined,
+          hazard: result_safetyInformations.rows[0] ? result_safetyInformations.rows[0].hazard : undefined,
+          injury: result_safetyInformations.rows[0] ? result_safetyInformations.rows[0].injury : undefined,
+          affectedProducts: result_productInformations.rows[0].affectedproducts === "null" || result_productInformations.rows[0].affectedproducts === "Nicht bekannt" ? undefined : result_productInformations.rows[0].affectedproducts ?? undefined,
+          image: result_productInformations.rows[0].image == "undefined" ? undefined : result_productInformations.rows[0].image ?? undefined,
+        }
+        console.log(details);
+      }else if(result_warnings.rows[0].warning_type === "f"){
+        const result_foodInformations = await client.query('SELECT * FROM productwarnings.foodInformations WHERE warning_id = $1;', [id]);
+        console.log("Fooddetails selected");
+        details = {
+          link: result_warnings.rows[0].warning_link ?? undefined,
+          manufacturer: result_foodInformations.rows[0].manufacturer ?? undefined,
+          category: undefined,
+          hazard: undefined,
+          injury: undefined,
+          affectedProducts: undefined,
+          image: result_foodInformations.rows[0].image == "undefined" ? undefined : result_foodInformations.rows[0].image ?? undefined,
+        }
+      }
+    }finally{
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
     }
   }
 }
