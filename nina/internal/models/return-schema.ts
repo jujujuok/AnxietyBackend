@@ -1,12 +1,11 @@
 export interface IReturnSchema {
   id: string;
   type: string;
+  warning: string;
   title: string | undefined;
   area: any;
-  since: null;
   details: {
     description: string;
     instruction: string;
-    type: string;
   };
 }

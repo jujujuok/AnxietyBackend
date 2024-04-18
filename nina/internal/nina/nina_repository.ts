@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class NinaRepository {
   constructor(private db: Pool) {}
@@ -76,13 +77,15 @@ export class NinaRepository {
       .map((part: any) =>
         part
           .map((warning: IWarningModel) => {
-            const coordinatesArray =
-              warning.coordinates != null
-                ? warning.coordinates
-                    .map((coordinate: any) => `'${coordinate}'`)
-                    .join(",")
-                : null;
-            return `('${warning.id}', '${warning.type}', '${warning.title}', '${warning.description}', '${warning.instruction}', ARRAY[${coordinatesArray}])`;
+            const geojson = {
+              type: "Polygon",
+              coordinates: warning.coordinates,
+            };
+    
+            const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
+              geojson
+            )}'), 4326)`;
+            return `('${warning.id}', '${warning.type}', '${warning.title}', '${warning.description}', '${warning.instruction}', ${coordinates})`;
           })
           .join(",")
       )
@@ -104,7 +107,7 @@ export class NinaRepository {
 
   async getClosedData(timestamp: number) {
     if (!timestamp) {
-      return "";
+      return [];
     }
 
     var warningids = [];
@@ -133,22 +136,23 @@ export class NinaRepository {
       }
 
       const resultwarnings = await client.query(
-        `SELECT * FROM nina.warnings ${timestampstatement} loadenddate IS NULL`
+        `SELECT warning_id, warning_type, title, ST_AsGeoJSON(coordinates) AS coordinates, description, instruction FROM nina.warnings ${timestampstatement} loadenddate IS NULL`
       );
 
       console.log(resultwarnings.rows.length + " rows selected");
 
       resultwarnings.rows.forEach((row: any) => {
+        const coordinates = JSON.parse(row.coordinates).coordinates;
+
         const warning: IReturnSchema = {
           id: row.warning_id,
           type: "nina",
+          warning: row.warning_type,
           title: row.title,
-          area: row.coordinates,
-          since: null,
+          area: coordinates,
           details: {
-            description: row.description,
-            instruction: row.instruction,
-            type: row.warning_type,
+            description: row.description === "null" ? undefined : row.description,
+            instruction: row.instruction === "null" ? undefined : row.instruction,
           },
         };
         warnings.push(warning);
@@ -156,8 +160,33 @@ export class NinaRepository {
     } finally {
       client.release();
       const closedWarningIds = await this.getClosedData(timestamp);
-      const result = [warnings, closedWarningIds];
-      return result;
+      if (closedWarningIds.length == 0) {
+        return [warnings];
+      }
+      return [warnings, closedWarningIds];
+    }
+  }
+
+  async getDetails(id: string) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try{
+      const result_warnings = await client.query('SELECT * FROM nina.warnings WHERE warning_id = $1;', [id]);
+      console.log("Details selected");
+      if (result_warnings.rows.length > 0) {
+        const row = result_warnings.rows[0];
+        details = {
+            description: row.description === "null" ? undefined : row.description,
+            instruction: row.instruction === "null" ? undefined : row.instruction,
+          };
+        };
+    }finally{
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
     }
   }
 }

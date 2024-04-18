@@ -72,6 +72,7 @@ const addNinaRoutes = (controller: NinaController): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/fetchData", controller.fetchData.bind(controller));
     instance.get("/getData", controller.getData.bind(controller));
+    instance.get("/getDetails/:id", controller.getDetails.bind(controller)); // get warning by ID from DB
     done();
   };
 };

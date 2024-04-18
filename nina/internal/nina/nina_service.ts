@@ -106,4 +106,9 @@ export class NinaService {
     const data = this.ninaRepository.getData(timestamp);
     return data;
   }
+
+  async getDetails(id: string) {
+    const data = this.ninaRepository.getDetails(id);
+    return data;
+  }
 }
