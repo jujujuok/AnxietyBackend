@@ -71,6 +71,7 @@ const addTypeRoutes = (controller: DwDController): FastifyPluginCallback => {
     instance.get("/coast", controller.getCoastWarnings.bind(controller));
     instance.get("/sea", controller.getSeaWarnings.bind(controller));
     instance.get("/getData", controller.getData.bind(controller));
+    instance.get("/getDetails/:id", controller.getDetails.bind(controller));
     done();
   };
 };

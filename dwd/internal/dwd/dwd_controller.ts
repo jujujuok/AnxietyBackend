@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { DwDService } from "./dwd_service";
-import { updateRequest } from "../utils/fastifyRequests";
+import { updateRequest, detailsRequest } from "../utils/fastifyRequests";
 
 export class DwDController {
   constructor(private readonly dwdService: DwDService) {}
@@ -27,6 +27,17 @@ export class DwDController {
 
     const timestamp = req.query.timestamp as number;
     const data = await this.dwdService.getData(timestamp);
+    return reply.send(data);
+  }
+
+  async getDetails(req: detailsRequest, reply: FastifyReply) {
+    if (!req.params.id) {
+      console.log("No id provided");
+      return reply.status(400).send();
+    }
+
+    const id = req.params.id as string;
+    const data = await this.dwdService.getDetails(id);
     return reply.send(data);
   }
 }
