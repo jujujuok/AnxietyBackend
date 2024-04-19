@@ -137,4 +137,9 @@ export class DwDService {
     const data = this.dwdRepository.getData(timestamp);
     return data;
   }
+
+  async getDetails(id: string) {
+    const data = this.dwdRepository.getDetails(id);
+    return data;
+  }
 }
