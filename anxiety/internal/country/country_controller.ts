@@ -33,9 +33,8 @@ export class CountryController {
     }
 
     const countryId = req.params.id as number;
-    const countryDetails = await this.countryService.getCountryDetails(
-      countryId
-    );
+    const countryDetails =
+      await this.countryService.getCountryDetails(countryId);
 
     return reply.send(countryDetails);
   }

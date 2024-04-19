@@ -1,3 +1,3 @@
 export interface IDetailsReturnSchema {
-    description: string;
-  }
+  description: string;
+}

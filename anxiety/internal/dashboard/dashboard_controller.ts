@@ -33,9 +33,8 @@ export class DashboardController {
     }
 
     const dashboardId = req.params.id as number;
-    const dashboardDetails = await this.dashboardService.getDashboardDetails(
-      dashboardId
-    );
+    const dashboardDetails =
+      await this.dashboardService.getDashboardDetails(dashboardId);
 
     return reply.send(dashboardDetails);
   }
@@ -54,9 +53,8 @@ export class DashboardController {
     }
 
     const timestamp = req.query.timestamp as number;
-    const dashboardUpdate = await this.dashboardService.getDashboardUpdate(
-      timestamp
-    );
+    const dashboardUpdate =
+      await this.dashboardService.getDashboardUpdate(timestamp);
 
     return reply.send(dashboardUpdate);
   }

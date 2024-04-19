@@ -10,7 +10,7 @@ export class DwDRepository {
     const client = await this.db.connect();
     try {
       const result = await client.query(
-        `Update dwd.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN (${warningids}) AND loadenddate IS NULL`
+        `Update dwd.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN (${warningids}) AND loadenddate IS NULL`,
       );
       console.log(result.rowCount + " rows updated");
     } finally {
@@ -28,11 +28,11 @@ export class DwDRepository {
     const client = await this.db.connect();
     try {
       const result = await client.query(
-        `SELECT warning_id FROM dwd.warnings WHERE warning_id IN (${values})`
+        `SELECT warning_id FROM dwd.warnings WHERE warning_id IN (${values})`,
       );
       result.rows.forEach((row: any) => {
         warnings = warnings.filter(
-          (warning: IWarningModel) => warning.id != row.warning_id
+          (warning: IWarningModel) => warning.id != row.warning_id,
         );
       });
     } finally {
@@ -58,7 +58,7 @@ export class DwDRepository {
         };
 
         const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
-          geojson
+          geojson,
         )}'), 4326)`;
         return `('${warning.id}', '${warning.type}', '${warning.title}', '${warning.description}', '${warning.instruction}', ${coordinates})`;
       })
@@ -67,7 +67,7 @@ export class DwDRepository {
 
     try {
       const result = await client.query(
-        `INSERT INTO dwd.warnings (warning_id, warning_type, title, description, instruction, coordinates) VALUES ${values_warnings}`
+        `INSERT INTO dwd.warnings (warning_id, warning_type, title, description, instruction, coordinates) VALUES ${values_warnings}`,
       );
       console.log(result.rowCount + " rows inserted");
     } finally {
@@ -86,7 +86,7 @@ export class DwDRepository {
     const client = await this.db.connect();
     try {
       const result = await client.query(
-        `SELECT warning_id FROM dwd.warnings WHERE loadenddate > TO_TIMESTAMP(${timestamp}/1000)`
+        `SELECT warning_id FROM dwd.warnings WHERE loadenddate > TO_TIMESTAMP(${timestamp}/1000)`,
       );
       warningids = result.rows;
       console.log(result.rows.length + " rows closed since last request");
@@ -107,7 +107,7 @@ export class DwDRepository {
       }
 
       const resultwarnings = await client.query(
-        `SELECT warning_id, warning_type, title, description, instruction, ST_AsGeoJSON(coordinates) AS coordinates FROM dwd.warnings ${timestampstatement} loadenddate IS NULL`
+        `SELECT warning_id, warning_type, title, description, instruction, ST_AsGeoJSON(coordinates) AS coordinates FROM dwd.warnings ${timestampstatement} loadenddate IS NULL`,
       );
 
       console.log(resultwarnings.rows.length + " rows selected");
@@ -139,17 +139,20 @@ export class DwDRepository {
   async getDetails(id: string) {
     const client = await this.db.connect();
     let details: IDetailsReturnSchema | undefined = undefined;
-    try{
-      const result_warnings = await client.query('SELECT * FROM dwd.warnings WHERE warning_id = $1;', [id]);
+    try {
+      const result_warnings = await client.query(
+        "SELECT * FROM dwd.warnings WHERE warning_id = $1;",
+        [id],
+      );
       console.log("Details selected");
       if (result_warnings.rows.length > 0) {
         const row = result_warnings.rows[0];
         details = {
-            description: row.description === "null" ? undefined : row.description,
-            instruction: row.instruction === "null" ? undefined : row.instruction,
-          };
+          description: row.description === "null" ? undefined : row.description,
+          instruction: row.instruction === "null" ? undefined : row.instruction,
         };
-    }finally{
+      }
+    } finally {
       client.release();
       if (details !== undefined) {
         return details;

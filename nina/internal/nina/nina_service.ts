@@ -32,33 +32,27 @@ export class NinaService {
         new Date().getTime()
       ) {
         const details = await this.callApi(
-          `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.json`
+          `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.json`,
         );
         const geojson = await this.callApi(
-          `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.geojson`
+          `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.geojson`,
         );
 
         let description = null;
-        if (details.info[0].description !== undefined){
-          description = details.info[0].description.replaceAll(
-            "<br/>",
-            " "
-          );
+        if (details.info[0].description !== undefined) {
+          description = details.info[0].description.replaceAll("<br/>", " ");
         }
 
         let instruction = null;
         if (details.info[0].instruction !== undefined) {
-          instruction = details.info[0].instruction.replaceAll(
-            "<br/>",
-            " "
-          );
+          instruction = details.info[0].instruction.replaceAll("<br/>", " ");
         }
-        
+
         const coordinates: any = [];
 
         for (const feature of geojson.features) {
           feature.geometry.coordinates.forEach((coordinate: any) =>
-            coordinates.push(coordinate)
+            coordinates.push(coordinate),
           );
         }
 

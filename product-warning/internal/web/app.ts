@@ -48,7 +48,7 @@ const setupDB = async (server: FastifyInstance) => {
 const setupServices = async (db: Pool) => {
   const productWarningRepository = new ProductWarningRepository(db);
   const productWarningService = new ProductWarningService(
-    productWarningRepository
+    productWarningRepository,
   );
 
   return productWarningService;
@@ -56,7 +56,7 @@ const setupServices = async (db: Pool) => {
 
 const setupRoutes = async (
   server: FastifyInstance,
-  service: ProductWarningService
+  service: ProductWarningService,
 ) => {
   const productWarningController = new ProductWarningController(service);
 
@@ -75,7 +75,7 @@ const setupLog = async (server: FastifyInstance) => {
 };
 
 const addProductWarningRoutes = (
-  controller: ProductWarningController
+  controller: ProductWarningController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/fetchAll", controller.fetchAll.bind(controller)); // fetch all warnings from external API

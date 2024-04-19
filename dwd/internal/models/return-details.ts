@@ -1,4 +1,4 @@
 export interface IDetailsReturnSchema {
-    description: string;
-    instruction: string;
+  description: string;
+  instruction: string;
 }

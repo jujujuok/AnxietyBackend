@@ -55,7 +55,7 @@ const setupServices = async (db: Pool) => {
 
 const setupRoutes = async (
   server: FastifyInstance,
-  service: AutobahnService
+  service: AutobahnService,
 ) => {
   const autobahnController = new AutobahnController(service);
 
@@ -74,7 +74,7 @@ const setupLog = async (server: FastifyInstance) => {
 };
 
 const addAutobahnRoutes = (
-  controller: AutobahnController
+  controller: AutobahnController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/fetchData", controller.fetchData.bind(controller));

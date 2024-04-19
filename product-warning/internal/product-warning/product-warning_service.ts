@@ -7,7 +7,7 @@ import { time } from "console";
 
 export class ProductWarningService {
   constructor(
-    private readonly productWarningRepository: ProductWarningRepository
+    private readonly productWarningRepository: ProductWarningRepository,
   ) {}
 
   async callApi(body: object) {

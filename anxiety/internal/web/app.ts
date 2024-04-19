@@ -26,7 +26,7 @@ const start = async () => {
     server,
     dashboardService as DashboardService,
     mapService as MapService,
-    countryService as CountryService
+    countryService as CountryService,
   );
 
   // setup logging
@@ -55,7 +55,7 @@ const setupCors = (server: FastifyInstance) => {
 const setupServices = async () => {
   const dashboardRepository: DashboardRepository = new DashboardRepository();
   const dashboardService: DashboardService = new DashboardService(
-    dashboardRepository
+    dashboardRepository,
   );
 
   const mapRepository: MapRepository = new MapRepository();
@@ -78,7 +78,7 @@ const setupRoutes = async (
   server: FastifyInstance,
   dashboardService: DashboardService,
   mapService: MapService,
-  countryService: CountryService
+  countryService: CountryService,
 ) => {
   const dashboardController = new DashboardController(dashboardService);
   const mapController = new MapController(mapService);
@@ -117,20 +117,20 @@ const setupLog = async (server: FastifyInstance) => {
  * @returns FastifyPluginCallback for registering the routes
  */
 const addDashboardRoutes = (
-  dashboardController: DashboardController
+  dashboardController: DashboardController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get(
       "/",
-      dashboardController.getDashboard.bind(dashboardController)
+      dashboardController.getDashboard.bind(dashboardController),
     );
     instance.get(
       "/:id",
-      dashboardController.getDashboardDetails.bind(dashboardController)
+      dashboardController.getDashboardDetails.bind(dashboardController),
     );
     instance.get(
       "/update",
-      dashboardController.getDashboardUpdate.bind(dashboardController)
+      dashboardController.getDashboardUpdate.bind(dashboardController),
     );
     done();
   };
@@ -156,17 +156,17 @@ const addMapRoutes = (mapController: MapController): FastifyPluginCallback => {
  * @returns FastifyPluginCallback for registering the routes
  */
 const addCountryRoutes = (
-  countryController: CountryController
+  countryController: CountryController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/", countryController.getCountry.bind(countryController));
     instance.get(
       "/:id",
-      countryController.getCountryDetails.bind(countryController)
+      countryController.getCountryDetails.bind(countryController),
     );
     instance.get(
       "/update",
-      countryController.getCountryUpdate.bind(countryController)
+      countryController.getCountryUpdate.bind(countryController),
     );
     done();
   };
