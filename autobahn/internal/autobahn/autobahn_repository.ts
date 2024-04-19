@@ -52,13 +52,15 @@ export class AutobahnRepository {
 
     const values_warnings = newwarnings
       .map((warning: IWarningModel) => {
-        const coordinatesArray =
-          warning.coordinates != null
-            ? warning.coordinates
-                .map((coordinate: any) => `'${coordinate}'`)
-                .join(",")
-            : null;
-        return `('${warning.warning_id}', '${warning.title}', '${warning.publisheddate}', '${warning.description}', ARRAY[${coordinatesArray}])`;
+        const geojson = {
+          type: "Polygon",
+          coordinates: warning.coordinates,
+        };
+
+        const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
+          geojson
+        )}'), 4326)`;
+        return `('${warning.warning_id}', '${warning.title}', '${warning.publisheddate}', '${warning.description}', ${coordinates})`;
       })
       .join(",");
 
@@ -106,18 +108,20 @@ export class AutobahnRepository {
       }
 
       const resultwarnings = await client.query(
-        `SELECT * FROM autobahn.warnings ${timestampstatement} loadenddate IS NULL`
+        `SELECT warning_id, title, description, ST_AsGeoJSON(coordinates) AS coordinates FROM autobahn.warnings ${timestampstatement} loadenddate IS NULL`
       );
 
       console.log(resultwarnings.rows.length + " rows selected");
 
       resultwarnings.rows.forEach((row: any) => {
+        const coordinates = JSON.parse(row.coordinates).coordinates;
+
         const warning: IReturnSchema = {
           id: row.warning_id,
           type: "street_report",
           warning: "Autobahnwarnung",
           title: row.title,
-          area: row.coordinates,
+          area: coordinates,
           details: {
             description: row.description,
           },
