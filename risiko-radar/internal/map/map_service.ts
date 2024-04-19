@@ -74,6 +74,17 @@ export class MapService {
    * @returns Details of a map item
    */
   async getMapDetails(mapId: string) {
+    let detailsObject = await this.mapRepository.getCacheItem(mapId);
+    if (detailsObject) {
+      return detailsObject;
+    }
+
+    detailsObject = await this.mapRepository.getWarningDetails(mapId);
+    if (detailsObject) {
+      this.mapRepository.setCacheItem(mapId, detailsObject);
+      return detailsObject;
+    }
+
     return null;
   }
 

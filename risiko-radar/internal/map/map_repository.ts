@@ -1,3 +1,4 @@
+import { de } from "@faker-js/faker";
 import { IMapItemDetails, IMapUpdate } from "../models/map";
 import { getDataFromApi } from "../utils/apiCalls";
 import { Cache } from "../utils/cache";
@@ -45,7 +46,7 @@ export class MapRepository {
    */
   async getWarnings(api: string): Promise<IMapUpdate> {
     const warningResponseData = await getDataFromApi(
-      `http://212.132.100.147:8081/${api}/getData`
+      `http://${api}.risiko-radar.info/${api}/getData`
     );
 
     const warningData: IMapUpdate = {
@@ -58,7 +59,7 @@ export class MapRepository {
 
   async getWarningUpdate(api: string, timestamp: number): Promise<IMapUpdate> {
     const warningResponseData = await getDataFromApi(
-      `http://212.132.100.147:8081/${api}/getData?timestamp=${timestamp}`
+      `http://${api}.risiko-radar.info/${api}/getData?timestamp=${timestamp}`
     );
 
     const warningData: IMapUpdate = {
@@ -67,5 +68,43 @@ export class MapRepository {
     };
 
     return warningData;
+  }
+
+  findTypeById(id: string): string | undefined {
+    // Autobahn
+    if (id.includes("undefined--vi-hind")) {
+      return "autobahn";
+    }
+    // DWD
+    if (id.includes("DWD")) {
+      return "dwd";
+    }
+    // Nina
+    if (id.includes(".DE")) {
+      return "nina";
+    }
+
+    return undefined;
+  }
+
+  async getWarningDetails(id: string): Promise<IMapItemDetails | null> {
+    const warningType = this.findTypeById(id);
+    if (warningType) {
+      return await getDataFromApi(
+        `http://${warningType}.risiko-radar.info/${warningType}/getDetails/${id}`
+      );
+    }
+
+    // If the warning type is not found, try all types
+    for (let element of ["autobahn", "dwd", "nina"]) {
+      const detailsData = await getDataFromApi(
+        `http://${element}.risiko-radar.info/${element}/getDetails/${id}`
+      );
+      if (detailsData) {
+        return detailsData;
+      }
+    }
+
+    return null;
   }
 }
