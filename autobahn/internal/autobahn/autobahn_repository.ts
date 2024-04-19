@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class AutobahnRepository {
   constructor(private db: Pool) {}
@@ -51,13 +52,15 @@ export class AutobahnRepository {
 
     const values_warnings = newwarnings
       .map((warning: IWarningModel) => {
-        const coordinatesArray =
-          warning.coordinates != null
-            ? warning.coordinates
-                .map((coordinate: any) => `'${coordinate}'`)
-                .join(",")
-            : null;
-        return `('${warning.warning_id}', '${warning.title}', '${warning.publisheddate}', '${warning.description}', ARRAY[${coordinatesArray}])`;
+        const geojson = {
+          type: "Polygon",
+          coordinates: warning.coordinates,
+        };
+
+        const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
+          geojson
+        )}'), 4326)`;
+        return `('${warning.warning_id}', '${warning.title}', '${warning.publisheddate}', '${warning.description}', ${coordinates})`;
       })
       .join(",");
 
@@ -76,7 +79,7 @@ export class AutobahnRepository {
 
   async getClosedData(timestamp: number) {
     if (!timestamp) {
-      return "";
+      return [];
     }
 
     var warningids = [];
@@ -105,18 +108,20 @@ export class AutobahnRepository {
       }
 
       const resultwarnings = await client.query(
-        `SELECT * FROM autobahn.warnings ${timestampstatement} loadenddate IS NULL`
+        `SELECT warning_id, title, description, ST_AsGeoJSON(coordinates) AS coordinates FROM autobahn.warnings ${timestampstatement} loadenddate IS NULL`
       );
 
       console.log(resultwarnings.rows.length + " rows selected");
 
       resultwarnings.rows.forEach((row: any) => {
+        const coordinates = JSON.parse(row.coordinates).coordinates;
+
         const warning: IReturnSchema = {
           id: row.warning_id,
           type: "street_report",
+          warning: "Autobahnwarnung",
           title: row.title,
-          area: row.coordinates,
-          since: row.publisheddate,
+          area: coordinates,
           details: {
             description: row.description,
           },
@@ -126,8 +131,32 @@ export class AutobahnRepository {
     } finally {
       client.release();
       const closedWarningIds = await this.getClosedData(timestamp);
-      const result = [warnings, closedWarningIds];
-      return result;
+      if (closedWarningIds.length == 0) {
+        return [warnings];
+      }
+      return [warnings, closedWarningIds];
+    }
+  }
+
+  async getDetails(id: string) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try{
+      const result_warnings = await client.query('SELECT * FROM autobahn.warnings WHERE warning_id = $1;', [id]);
+      console.log("Details selected");
+      if (result_warnings.rows.length > 0) {
+        const row = result_warnings.rows[0];
+        details = {
+            description: row.description === "null" ? undefined : row.description,
+          };
+        };
+    }finally{
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
     }
   }
 }

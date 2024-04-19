@@ -57,12 +57,14 @@ export class AutobahnService {
             description += description_part.replaceAll("\n", " ");
           });
 
+          const coordinates = [warning.geometry.coordinates];
+
           const warning_in_model: IWarningModel = {
             warning_id: warning.identifier,
             title: warning.title,
             publisheddate: warning.startTimestamp,
             description: description,
-            coordinates: warning.geometry.coordinates,
+            coordinates: coordinates,
           };
 
           autobahnWarnings.push(warning_in_model);
@@ -91,13 +93,16 @@ export class AutobahnService {
     if (autobahnWarnings === null) {
       return 200;
     }
-    this.autobahnRepository.fetchData(autobahnWarnings);
-
-    return autobahnWarnings;
+    return this.autobahnRepository.fetchData(autobahnWarnings);
   }
 
   async getData(timestamp: number) {
     const data = this.autobahnRepository.getData(timestamp);
+    return data;
+  }
+
+  async getDetails(id: string) {
+    const data = this.autobahnRepository.getDetails(id);
     return data;
   }
 }
