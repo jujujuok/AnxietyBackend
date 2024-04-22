@@ -4,7 +4,7 @@ import { ITypeModel } from "../models/type";
 export class AwARepository {
   constructor(private readonly db: Pool) {}
 
-  async getTypes(): Promise<ITypeModel[]> {
+  async fetchData(): Promise<ITypeModel[]> {
     // Fetch Data from Database
     // Example Data:
     const types: ITypeModel[] = [

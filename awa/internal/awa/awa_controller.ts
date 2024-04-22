@@ -5,7 +5,7 @@ export class AwAController {
   constructor(private readonly awaService: AwAService) {}
 
   async fetchData(req: FastifyRequest, reply: FastifyReply) {
-    const result = await this.awaService.getTypes();
+    const result = await this.awaService.fetchData();
     return reply.send(result);
   }
 }
