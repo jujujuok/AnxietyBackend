@@ -1,3 +1,4 @@
+import { de } from "@faker-js/faker";
 import { IDashboardItemDetails, IDashboardUpdate } from "../models/dashboard";
 import { DashboardRepository } from "./dashboard_repository";
 
@@ -8,24 +9,53 @@ export class DashboardService {
   constructor(private readonly dashboardRepository: DashboardRepository) {}
 
   /**
+   * Strip details from map items and save them to cache
+   * @param dashboardItems Dashboard items to strip details from
+   * @returns Dashboard items without details
+   */
+  stripDetails(dashboardItems: IDashboardUpdate) {
+    dashboardItems.add.forEach((item) => {
+      if (item.details) {
+        this.dashboardRepository.setCacheItem(item.id.toString(), item.details);
+        dashboardItems.add.find((mapItem) => mapItem.id === item.id)!.details =
+          undefined;
+      }
+    });
+    return dashboardItems;
+  }
+
+  /**
+   * Remove cache items of deleted dashboard items
+   * @param dashboardItems Map items to delete
+   */
+  async cleanCache(dashboardItems: IDashboardUpdate) {
+    dashboardItems.delete.forEach((id: string) => {
+      this.dashboardRepository.delCacheItem(id);
+    });
+  }
+
+  /**
+   * Add data to dashboard items object
+   * @param dashboardItems Dashboard items
+   * @param data Data to add
+   */
+  concatData(dashboardItems: IDashboardUpdate, data: IDashboardUpdate) {
+    dashboardItems.add = dashboardItems.add.concat(data.add);
+    dashboardItems.delete = dashboardItems.delete.concat(data.delete);
+  }
+
+  /**
    * Get object containing dashboard items to add and ids to delete
    * @returns DashboardUpdate Object
    */
   async getDashboard(): Promise<IDashboardUpdate> {
     let dashboardItems: IDashboardUpdate = { add: [], delete: [] };
 
-    const productWarningData =
+    let productWarningData =
       await this.dashboardRepository.getProductWarnings();
     // Save details of product warnings to cache and remove from object
-    productWarningData.forEach((item) => {
-      if (item.details) {
-        this.dashboardRepository.setCacheItem(item.id.toString(), item.details);
-        productWarningData.find(
-          (productItem) => productItem.id === item.id
-        )!.details = undefined;
-      }
-    });
-    dashboardItems.add = dashboardItems.add.concat(productWarningData);
+    productWarningData = this.stripDetails(productWarningData);
+    this.concatData(dashboardItems, productWarningData);
 
     return dashboardItems;
   }
@@ -37,15 +67,19 @@ export class DashboardService {
    */
   async getDashboardDetails(
     dashboardId: string
-  ): Promise<IDashboardItemDetails> {
-    console.log("test");
-    const details = await this.dashboardRepository.getCacheItem(dashboardId);
-
-    if (details === null) {
-      throw new Error("No details found for dashboard item: " + dashboardId);
+  ): Promise<IDashboardItemDetails | null> {
+    let details = await this.dashboardRepository.getCacheItem(dashboardId);
+    if (details) {
+      return details;
     }
 
-    return details;
+    details = await this.dashboardRepository.getWarningDetails(dashboardId);
+    if (details) {
+      this.dashboardRepository.setCacheItem(dashboardId, details);
+      return details;
+    }
+
+    return null;
   }
 
   /**
@@ -59,7 +93,7 @@ export class DashboardService {
     const productWarningData =
       await this.dashboardRepository.getProductWarningUpdate(timestamp);
 
-    update.add = update.add.concat(productWarningData);
+    this.concatData(update, productWarningData);
 
     return update;
   }

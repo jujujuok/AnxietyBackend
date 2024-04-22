@@ -12,7 +12,7 @@ export class MapService {
    * @param mapItems
    * @returns
    */
-  async stripDetails(mapItems: IMapUpdate) {
+  stripDetails(mapItems: IMapUpdate) {
     mapItems.add.forEach((item) => {
       if (item.details) {
         this.mapRepository.setCacheItem(item.id.toString(), item.details);
@@ -38,7 +38,7 @@ export class MapService {
    * @param mapItems Map items
    * @param data Data to add
    */
-  async concatData(mapItems: IMapUpdate, data: IMapUpdate) {
+  concatData(mapItems: IMapUpdate, data: IMapUpdate) {
     mapItems.add = mapItems.add.concat(data.add);
     mapItems.delete = mapItems.delete.concat(data.delete);
   }
@@ -52,17 +52,17 @@ export class MapService {
 
     //### NINA ###
     let ninaData = await this.mapRepository.getWarnings("nina");
-    ninaData = await this.stripDetails(ninaData);
+    ninaData = this.stripDetails(ninaData);
     this.concatData(mapItems, ninaData);
 
     //### AUTOBAHN ###
     let autobahnData = await this.mapRepository.getWarnings("autobahn");
-    autobahnData = await this.stripDetails(autobahnData);
+    autobahnData = this.stripDetails(autobahnData);
     this.concatData(mapItems, autobahnData);
 
     //### DWD ###
     let dwdData = await this.mapRepository.getWarnings("dwd");
-    dwdData = await this.stripDetails(dwdData);
+    dwdData = this.stripDetails(dwdData);
     this.concatData(mapItems, dwdData);
 
     return mapItems;
@@ -98,7 +98,7 @@ export class MapService {
 
     //### NINA ###
     let ninaData = await this.mapRepository.getWarningUpdate("nina", timestamp);
-    ninaData = await this.stripDetails(ninaData);
+    ninaData = this.stripDetails(ninaData);
     this.cleanCache(ninaData);
     this.concatData(mapItems, ninaData);
 
@@ -107,13 +107,13 @@ export class MapService {
       "autobahn",
       timestamp
     );
-    autobahnData = await this.stripDetails(autobahnData);
+    autobahnData = this.stripDetails(autobahnData);
     this.cleanCache(autobahnData);
     this.concatData(mapItems, autobahnData);
 
     //### DWD ###
     let dwdData = await this.mapRepository.getWarningUpdate("dwd", timestamp);
-    dwdData = await this.stripDetails(dwdData);
+    dwdData = this.stripDetails(dwdData);
     this.cleanCache(dwdData);
     this.concatData(mapItems, dwdData);
 

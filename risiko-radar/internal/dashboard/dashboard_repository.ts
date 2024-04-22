@@ -1,4 +1,8 @@
-import { IDashboardItem, IDashboardItemDetails } from "../models/dashboard";
+import {
+  IDashboardItem,
+  IDashboardItemDetails,
+  IDashboardUpdate,
+} from "../models/dashboard";
 import { getDataFromApi } from "../utils/apiCalls";
 import { Cache } from "../utils/cache";
 
@@ -39,33 +43,45 @@ export class DashboardRepository {
     this.redis.del(id);
   }
 
+  findTypeById(id: string): string | undefined {
+    // Product warnings have only numbers as id
+    if (/^\d+$/.test(id)) {
+      return "product-warning";
+    }
+    return undefined;
+  }
+
+  async getWarningDetails(id: string): Promise<IDashboardItemDetails | null> {
+    const warningType = this.findTypeById(id);
+    if (warningType) {
+      return await getDataFromApi(
+        `http://${warningType}.risiko-radar.info/${warningType}/getDetails/${id}`
+      );
+    }
+
+    // If the warning type is not found, check all APIs
+    for (let element of ["product-warning"]) {
+      const detailsData = await getDataFromApi(
+        `http://${element}.risiko-radar.info/${element}/getDetails/${id}`
+      );
+      if (detailsData) {
+        return detailsData;
+      }
+    }
+
+    return null;
+  }
+
   /**
    * Get list of productwarnings
    * @returns List of dashboard items
    */
-  async getProductWarnings(): Promise<Array<IDashboardItem>> {
+  async getProductWarnings(): Promise<IDashboardUpdate> {
     const productWarningData = await getDataFromApi(
       "http://212.132.100.147:8080/product-warning/getData"
     );
 
-    return productWarningData;
-  }
-
-  /**
-   * Get details of a product warning from the API
-   * @param dashboardId ID of the product warning
-   * @returns Details of a product warning
-   */
-  async getProductWarningDetails(
-    warningId: string
-  ): Promise<IDashboardItemDetails> {
-    const productWarningDetails = await getDataFromApi(
-      `http://212.132.100.147:8080/product-warning/getDetails/${warningId}`
-    );
-
-    this.setCacheItem(warningId, productWarningDetails);
-
-    return productWarningDetails;
+    return { add: productWarningData, delete: [] };
   }
 
   /**
@@ -73,12 +89,12 @@ export class DashboardRepository {
    * @param timestamp Unix timestamp of the last update
    * @returns Update of the product warning list
    */
-  async getProductWarningUpdate(timestamp: number) {
+  async getProductWarningUpdate(timestamp: number): Promise<IDashboardUpdate> {
     const productWarningData = await getDataFromApi(
       "http://212.132.100.147:8080/product-warning/getData?timestamp=" +
         timestamp
     );
 
-    return productWarningData;
+    return { add: productWarningData, delete: [] };
   }
 }
