@@ -97,19 +97,22 @@ export class MapService {
     let mapItems: IMapUpdate = { add: [], delete: [] };
 
     //### NINA ###
-    let ninaData = await this.mapRepository.getWarnings("nina");
+    let ninaData = await this.mapRepository.getWarningUpdate("nina", timestamp);
     ninaData = await this.stripDetails(ninaData);
     this.cleanCache(ninaData);
     this.concatData(mapItems, ninaData);
 
     //### AUTOBAHN ###
-    let autobahnData = await this.mapRepository.getWarnings("autobahn");
+    let autobahnData = await this.mapRepository.getWarningUpdate(
+      "autobahn",
+      timestamp
+    );
     autobahnData = await this.stripDetails(autobahnData);
     this.cleanCache(autobahnData);
     this.concatData(mapItems, autobahnData);
 
     //### DWD ###
-    let dwdData = await this.mapRepository.getWarnings("dwd");
+    let dwdData = await this.mapRepository.getWarningUpdate("dwd", timestamp);
     dwdData = await this.stripDetails(dwdData);
     this.cleanCache(dwdData);
     this.concatData(mapItems, dwdData);
