@@ -28,7 +28,10 @@ export class MapService {
    * @param mapItems Map items to delete
    */
   async cleanCache(mapItems: IMapUpdate) {
-    mapItems.delete.forEach((id: string) => {
+    mapItems.delete.forEach((id: any) => {
+      if (typeof id === "object") {
+        id = id.warning_id;
+      }
       this.mapRepository.delCacheItem(id);
     });
   }

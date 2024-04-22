@@ -1,4 +1,3 @@
-import { de } from "@faker-js/faker";
 import { IMapItemDetails, IMapUpdate } from "../models/map";
 import { getDataFromApi } from "../utils/apiCalls";
 import { Cache } from "../utils/cache";
@@ -42,7 +41,7 @@ export class MapRepository {
 
   /**
    * Get list of nina warnings
-   * @returns DashboardUpdate Object
+   * @returns MapUpdate Object
    */
   async getWarnings(api: string): Promise<IMapUpdate> {
     const warningResponseData = await getDataFromApi(

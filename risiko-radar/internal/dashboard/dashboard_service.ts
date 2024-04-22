@@ -92,7 +92,8 @@ export class DashboardService {
 
     const productWarningData =
       await this.dashboardRepository.getProductWarningUpdate(timestamp);
-
+    this.stripDetails(productWarningData);
+    this.cleanCache(productWarningData);
     this.concatData(update, productWarningData);
 
     return update;
