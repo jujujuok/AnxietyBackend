@@ -1,4 +1,5 @@
 import { IMapItem, IMapUpdate } from "../models/map";
+import { IDeleteItem } from "../utils/apiCalls";
 import { MapRepository } from "./map_repository";
 
 /**
@@ -28,9 +29,10 @@ export class MapService {
    * @param mapItems Map items to delete
    */
   async cleanCache(mapItems: IMapUpdate) {
-    mapItems.delete.forEach((id: any) => {
+    mapItems.delete.forEach((id: IDeleteItem | string) => {
       if (typeof id === "object") {
-        id = id.warning_id;
+        this.mapRepository.delCacheItem(id.warning_id);
+        return;
       }
       this.mapRepository.delCacheItem(id);
     });
@@ -43,14 +45,17 @@ export class MapService {
    */
   concatData(mapItems: IMapUpdate, data: IMapUpdate) {
     mapItems.add = mapItems.add.concat(data.add);
-    mapItems.delete = mapItems.delete.concat(data.delete);
+    let ids = data.delete.map((item) =>
+      typeof item === "object" ? item.warning_id : item
+    );
+    mapItems.delete.push(...ids);
   }
 
   /**
    * Get object containing map items to add and ids to delete
    * @returns List of map items
    */
-  async getMap(): Promise<IMapUpdate> {
+  async getMap(): Promise<IMapItem[]> {
     let mapItems: IMapUpdate = { add: [], delete: [] };
 
     //### NINA ###
@@ -68,7 +73,7 @@ export class MapService {
     dwdData = this.stripDetails(dwdData);
     this.concatData(mapItems, dwdData);
 
-    return mapItems;
+    return mapItems.add;
   }
 
   /**

@@ -1,3 +1,5 @@
+import { IDeleteItem } from "../utils/apiCalls";
+
 /**
  * Dashboard model.
  */
@@ -27,5 +29,5 @@ export interface IDashboardItemDetails {
 
 export interface IDashboardUpdate {
   add: IDashboardItem[];
-  delete: string[];
+  delete: (string | IDeleteItem)[];
 }

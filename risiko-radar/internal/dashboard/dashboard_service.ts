@@ -1,6 +1,11 @@
 import { de } from "@faker-js/faker";
-import { IDashboardItemDetails, IDashboardUpdate } from "../models/dashboard";
+import {
+  IDashboardItem,
+  IDashboardItemDetails,
+  IDashboardUpdate,
+} from "../models/dashboard";
 import { DashboardRepository } from "./dashboard_repository";
+import { IDeleteItem } from "../utils/apiCalls";
 
 /**
  * Service for the dashboard module
@@ -29,7 +34,11 @@ export class DashboardService {
    * @param dashboardItems Map items to delete
    */
   async cleanCache(dashboardItems: IDashboardUpdate) {
-    dashboardItems.delete.forEach((id: string) => {
+    dashboardItems.delete.forEach((id: IDeleteItem | string) => {
+      if (typeof id === "object") {
+        this.dashboardRepository.delCacheItem(id.warning_id);
+        return;
+      }
       this.dashboardRepository.delCacheItem(id);
     });
   }
@@ -41,14 +50,17 @@ export class DashboardService {
    */
   concatData(dashboardItems: IDashboardUpdate, data: IDashboardUpdate) {
     dashboardItems.add = dashboardItems.add.concat(data.add);
-    dashboardItems.delete = dashboardItems.delete.concat(data.delete);
+    let ids = data.delete.map((item) =>
+      typeof item === "object" ? item.warning_id : item
+    );
+    dashboardItems.delete.push(...ids);
   }
 
   /**
    * Get object containing dashboard items to add and ids to delete
    * @returns DashboardUpdate Object
    */
-  async getDashboard(): Promise<IDashboardUpdate> {
+  async getDashboard(): Promise<IDashboardItem[]> {
     let dashboardItems: IDashboardUpdate = { add: [], delete: [] };
 
     let productWarningData =
@@ -57,7 +69,7 @@ export class DashboardService {
     productWarningData = this.stripDetails(productWarningData);
     this.concatData(dashboardItems, productWarningData);
 
-    return dashboardItems;
+    return dashboardItems.add;
   }
 
   /**

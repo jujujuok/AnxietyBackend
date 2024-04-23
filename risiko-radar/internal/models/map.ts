@@ -1,3 +1,5 @@
+import { IDeleteItem } from "../utils/apiCalls";
+
 /**
  * MapItem model
  */
@@ -42,5 +44,5 @@ export interface IMapItemDetails {
 
 export interface IMapUpdate {
   add: IMapItem[];
-  delete: string[];
+  delete: (string | IDeleteItem)[];
 }

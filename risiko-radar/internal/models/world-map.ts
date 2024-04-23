@@ -1,3 +1,5 @@
+import { IDeleteItem } from "../utils/apiCalls";
+
 /**
  * WorldMap model
  */
@@ -24,4 +26,9 @@ export interface IWorldMapItemDetails {
     | "travel_warning"
     | "country_representative";
   details: object;
+}
+
+export interface IWorldMapUpdate {
+  add: IWorldMapItem[];
+  delete: (string | IDeleteItem)[];
 }

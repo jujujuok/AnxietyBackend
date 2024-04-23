@@ -81,7 +81,7 @@ paths:
                   delete:
                     type: array
                     items:
-                      type: integer
+                      type: string
                     description: 'List of IDs to delete.'
         '204':
           description: No Content
@@ -149,7 +149,7 @@ paths:
                   delete:
                     type: array
                     items:
-                      type: integer
+                      type: string
                     description: 'List of IDs to delete.'
         '204':
           description: No Content
@@ -216,7 +216,7 @@ paths:
                   delete:
                     type: array
                     items:
-                      type: integer
+                      type: string
                     description: 'List of IDs to delete.'
         '204':
           description: No Content
@@ -248,9 +248,6 @@ components:
           type: string
         description:
           type: string
-        since:
-          type: integer
-          description: 'Timestamp of the registration of the event.'
     dashboardItemDetails:
       type: object
       properties:
@@ -308,9 +305,6 @@ components:
               description: 'Array for polygon.'
               items:
                 type: number
-        since:
-          type: integer
-          description: 'Timestamp of the registration of the event.'
     mapItemDetails:
       type: object
       properties:
@@ -347,9 +341,6 @@ components:
           type: string
         country:
           type: string
-        since:
-          type: integer
-          description: 'Timestamp of the registration of the event.'
     worldMapItemDetails:
       type: object
       properties:
