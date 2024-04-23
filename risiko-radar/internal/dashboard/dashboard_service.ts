@@ -1,4 +1,3 @@
-import { de } from "@faker-js/faker";
 import {
   IDashboardItem,
   IDashboardItemDetails,
@@ -21,6 +20,7 @@ export class DashboardService {
   stripDetails(dashboardItems: IDashboardUpdate) {
     dashboardItems.add.forEach((item) => {
       if (item.details) {
+        item.details.type = item.type;
         this.dashboardRepository.setCacheItem(item.id.toString(), item.details);
         dashboardItems.add.find((mapItem) => mapItem.id === item.id)!.details =
           undefined;

@@ -24,6 +24,7 @@ export interface IDashboardItem {
  */
 export interface IDashboardItemDetails {
   id: string;
+  type: string;
   details: object;
 }
 

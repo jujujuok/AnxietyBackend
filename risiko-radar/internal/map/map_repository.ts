@@ -89,9 +89,11 @@ export class MapRepository {
   async getWarningDetails(id: string): Promise<IMapItemDetails | null> {
     const warningType = this.findTypeById(id);
     if (warningType) {
-      return await getDataFromApi(
+      const detailsData = await getDataFromApi(
         `http://${warningType}.risiko-radar.info/${warningType}/getDetails/${id}`
       );
+      detailsData.type = warningType;
+      return detailsData;
     }
 
     // If the warning type is not found, try all types
@@ -100,6 +102,7 @@ export class MapRepository {
         `http://${element}.risiko-radar.info/${element}/getDetails/${id}`
       );
       if (detailsData) {
+        detailsData.type = element;
         return detailsData;
       }
     }

@@ -30,7 +30,7 @@ export class DashboardRepository {
     const cacheItem = await this.redis.get(id);
 
     if (cacheItem) {
-      return cacheItem;
+      return cacheItem as IDashboardItemDetails;
     }
     return null;
   }
@@ -54,9 +54,11 @@ export class DashboardRepository {
   async getWarningDetails(id: string): Promise<IDashboardItemDetails | null> {
     const warningType = this.findTypeById(id);
     if (warningType) {
-      return await getDataFromApi(
+      const detailsData = await getDataFromApi(
         `http://${warningType}.risiko-radar.info/${warningType}/getDetails/${id}`
       );
+      detailsData.type = warningType;
+      return await detailsData;
     }
 
     // If the warning type is not found, check all APIs
@@ -65,6 +67,7 @@ export class DashboardRepository {
         `http://${element}.risiko-radar.info/${element}/getDetails/${id}`
       );
       if (detailsData) {
+        detailsData.type = element;
         return detailsData;
       }
     }

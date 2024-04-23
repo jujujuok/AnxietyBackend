@@ -1,4 +1,4 @@
-import { IMapItem, IMapUpdate } from "../models/map";
+import { IMapItem, IMapItemDetails, IMapUpdate } from "../models/map";
 import { IDeleteItem } from "../utils/apiCalls";
 import { MapRepository } from "./map_repository";
 
@@ -16,6 +16,7 @@ export class MapService {
   stripDetails(mapItems: IMapUpdate) {
     mapItems.add.forEach((item) => {
       if (item.details) {
+        item.details.type = item.type;
         this.mapRepository.setCacheItem(item.id.toString(), item.details);
         mapItems.add.find((mapItem) => mapItem.id === item.id)!.details =
           undefined;
@@ -96,7 +97,7 @@ export class MapService {
    * @param mapId Map ID
    * @returns Details of a map item
    */
-  async getMapDetails(mapId: string) {
+  async getMapDetails(mapId: string): Promise<IMapItemDetails | null> {
     let detailsObject = await this.mapRepository.getCacheItem(mapId);
     if (detailsObject) {
       return detailsObject;
