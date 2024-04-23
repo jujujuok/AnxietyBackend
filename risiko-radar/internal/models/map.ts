@@ -5,15 +5,7 @@ import { IDeleteItem } from "../utils/apiCalls";
  */
 export interface IMapItem {
   id: string;
-  type:
-    | "weather_flood"
-    | "weather_storm"
-    | "weather_disaster"
-    | "street_closure"
-    | "street_report"
-    | "police"
-    | "air_quality"
-    | "radiation";
+  type: "weather" | "street_report" | "police" | "air_quality" | "radiation";
   severity: "information" | "warning" | "danger" | "extreme_danger";
   title: string;
   position: {
@@ -30,15 +22,7 @@ export interface IMapItem {
  */
 export interface IMapItemDetails {
   id: string;
-  type:
-    | "weather_flood"
-    | "weather_storm"
-    | "weather_disaster"
-    | "street_closure"
-    | "street_report"
-    | "police"
-    | "air_quality"
-    | "radiation";
+  type: "weather" | "street_report" | "police" | "air_quality" | "radiation";
   details: object;
 }
 

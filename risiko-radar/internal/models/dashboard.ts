@@ -8,7 +8,7 @@ export interface IDashboardItem {
   type:
     | "interpol_red"
     | "interpol_un"
-    | "food_waring"
+    | "food_warning"
     | "product_warning"
     | "travel_warning"
     | "country_representative";
