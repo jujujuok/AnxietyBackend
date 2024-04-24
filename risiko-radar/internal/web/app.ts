@@ -26,9 +26,8 @@ const start = async () => {
   setupCors(server);
 
   // setup services and routes for the different modules
-  const [dashboardService, mapService, worldMapService] = await setupServices(
-    redis,
-  );
+  const [dashboardService, mapService, worldMapService] =
+    await setupServices(redis);
   await setupRoutes(
     server,
     dashboardService as DashboardService,
@@ -70,6 +69,7 @@ const setupCache = (server: FastifyInstance): Cache => {
 };
 
 const setupCors = (server: FastifyInstance) => {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   server.register(require("@fastify/cors"), {
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"],

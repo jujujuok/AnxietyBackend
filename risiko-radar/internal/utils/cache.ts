@@ -1,4 +1,4 @@
-import { RedisClientType, createClient } from "redis";
+import { RedisClientType } from "redis";
 import { IDashboardItemDetails } from "../models/dashboard";
 import { IWorldMapItemDetails } from "../models/world-map";
 import { IMapItemDetails } from "../models/map";
@@ -18,13 +18,13 @@ export class Cache {
 
   public set(
     key: string,
-    value: IDashboardItemDetails | IWorldMapItemDetails | IMapItemDetails
+    value: IDashboardItemDetails | IWorldMapItemDetails | IMapItemDetails,
   ): void {
     this.client.set(key, JSON.stringify(value));
   }
 
   public async get(
-    key: string
+    key: string,
   ): Promise<
     IDashboardItemDetails | IWorldMapItemDetails | IMapItemDetails | null
   > {

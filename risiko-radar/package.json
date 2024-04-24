@@ -8,6 +8,7 @@
     "start": "node ./dist/web/app.js",
     "dev": "nodemon --watch './internal/**/*.ts' --exec ts-node ./internal/web/app.ts",
     "lint": "eslint 'internal/**/*.{js,ts,tsx}'",
+    "lint:fix": "eslint 'internal/**/*.{js,ts,tsx}' --fix",
     "format": "prettier --write 'internal/**/*.{js,ts,tsx,json,css,md}'",
     "clean": "npm run lint && npm run format"
   },

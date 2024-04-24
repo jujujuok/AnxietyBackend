@@ -50,8 +50,8 @@ export class DashboardService {
    */
   concatData(dashboardItems: IDashboardUpdate, data: IDashboardUpdate) {
     dashboardItems.add = dashboardItems.add.concat(data.add);
-    let ids = data.delete.map((item) =>
-      typeof item === "object" ? item.warning_id : item
+    const ids = data.delete.map((item) =>
+      typeof item === "object" ? item.warning_id : item,
     );
     dashboardItems.delete.push(...ids);
   }
@@ -76,7 +76,7 @@ export class DashboardService {
    * @returns DashboardUpdate Object
    */
   async getDashboard(): Promise<IDashboardItem[]> {
-    let dashboardItems: IDashboardUpdate = { add: [], delete: [] };
+    const dashboardItems: IDashboardUpdate = { add: [], delete: [] };
 
     let productWarningData =
       await this.dashboardRepository.getProductWarnings();
@@ -94,7 +94,7 @@ export class DashboardService {
    * @returns Details of a dashboard item
    */
   async getDashboardDetails(
-    dashboardId: string
+    dashboardId: string,
   ): Promise<IDashboardItemDetails | null> {
     let details = await this.dashboardRepository.getCacheItem(dashboardId);
     if (details) {
@@ -116,7 +116,7 @@ export class DashboardService {
    * @returns Update of the dashboard list containing ids to remove and objects to add
    */
   async getDashboardUpdate(timestamp: number) {
-    let update: IDashboardUpdate = { add: [], delete: [] };
+    const update: IDashboardUpdate = { add: [], delete: [] };
 
     const productWarningData =
       await this.dashboardRepository.getProductWarningUpdate(timestamp);

@@ -1,8 +1,4 @@
-import {
-  IDashboardItem,
-  IDashboardItemDetails,
-  IDashboardUpdate,
-} from "../models/dashboard";
+import { IDashboardItemDetails, IDashboardUpdate } from "../models/dashboard";
 import { getDataFromApi } from "../utils/apiCalls";
 import { Cache } from "../utils/cache";
 
@@ -55,16 +51,16 @@ export class DashboardRepository {
     const warningType = this.findTypeById(id);
     if (warningType) {
       const detailsData = await getDataFromApi(
-        `http://${warningType}.risiko-radar.info/${warningType}/getDetails/${id}`
+        `http://${warningType}.risiko-radar.info/${warningType}/getDetails/${id}`,
       );
       detailsData.type = warningType;
       return await detailsData;
     }
 
     // If the warning type is not found, check all APIs
-    for (let element of ["product-warning"]) {
+    for (const element of ["product-warning"]) {
       const detailsData = await getDataFromApi(
-        `http://${element}.risiko-radar.info/${element}/getDetails/${id}`
+        `http://${element}.risiko-radar.info/${element}/getDetails/${id}`,
       );
       if (detailsData) {
         detailsData.type = element;
@@ -81,7 +77,7 @@ export class DashboardRepository {
    */
   async getProductWarnings(): Promise<IDashboardUpdate> {
     const productWarningData = await getDataFromApi(
-      "http://212.132.100.147:8080/product-warning/getData"
+      "http://212.132.100.147:8080/product-warning/getData",
     );
 
     return { add: productWarningData, delete: [] };
@@ -95,7 +91,7 @@ export class DashboardRepository {
   async getProductWarningUpdate(timestamp: number): Promise<IDashboardUpdate> {
     const productWarningData = await getDataFromApi(
       "http://212.132.100.147:8080/product-warning/getData?timestamp=" +
-        timestamp
+        timestamp,
     );
 
     return { add: productWarningData, delete: [] };

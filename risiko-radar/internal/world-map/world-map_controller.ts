@@ -33,9 +33,8 @@ export class WorldMapController {
     }
 
     const worldMapId = req.params.id;
-    const worldMapDetails = await this.worldMapService.getWorldMapDetails(
-      worldMapId
-    );
+    const worldMapDetails =
+      await this.worldMapService.getWorldMapDetails(worldMapId);
 
     return reply.send(worldMapDetails);
   }
@@ -54,9 +53,8 @@ export class WorldMapController {
     }
 
     const timestamp = req.query.timestamp as number;
-    const worldMapUpdate = await this.worldMapService.getWorldMapUpdate(
-      timestamp
-    );
+    const worldMapUpdate =
+      await this.worldMapService.getWorldMapUpdate(timestamp);
 
     return reply.send(worldMapUpdate);
   }

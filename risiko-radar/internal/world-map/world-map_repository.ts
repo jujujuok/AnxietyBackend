@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { faker } from "@faker-js/faker";
 import { IWorldMapItem } from "../models/world-map";
 

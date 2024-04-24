@@ -46,8 +46,8 @@ export class MapService {
    */
   concatData(mapItems: IMapUpdate, data: IMapUpdate) {
     mapItems.add = mapItems.add.concat(data.add);
-    let ids = data.delete.map((item) =>
-      typeof item === "object" ? item.warning_id : item
+    const ids = data.delete.map((item) =>
+      typeof item === "object" ? item.warning_id : item,
     );
     mapItems.delete.push(...ids);
   }
@@ -72,7 +72,7 @@ export class MapService {
    * @returns List of map items
    */
   async getMap(): Promise<IMapItem[]> {
-    let mapItems: IMapUpdate = { add: [], delete: [] };
+    const mapItems: IMapUpdate = { add: [], delete: [] };
 
     //### NINA ###
     let ninaData = await this.mapRepository.getWarnings("nina");
@@ -118,7 +118,7 @@ export class MapService {
    * @returns Update of the map list containing ids to remove and objects to add
    */
   async getMapUpdate(timestamp: number) {
-    let mapItems: IMapUpdate = { add: [], delete: [] };
+    const mapItems: IMapUpdate = { add: [], delete: [] };
 
     //### NINA ###
     let ninaData = await this.mapRepository.getWarningUpdate("nina", timestamp);
@@ -129,7 +129,7 @@ export class MapService {
     //### AUTOBAHN ###
     let autobahnData = await this.mapRepository.getWarningUpdate(
       "autobahn",
-      timestamp
+      timestamp,
     );
     autobahnData = this.stripDetails(autobahnData);
     this.cleanCache(autobahnData);
