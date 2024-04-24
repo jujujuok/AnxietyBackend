@@ -34,7 +34,7 @@ export class DashboardController {
 
     const dashboardId = req.params.id;
     const dashboardDetails = await this.dashboardService.getDashboardDetails(
-      dashboardId
+      dashboardId,
     );
 
     return reply.send(dashboardDetails);
@@ -55,7 +55,7 @@ export class DashboardController {
 
     const timestamp = req.query.timestamp as number;
     const dashboardUpdate = await this.dashboardService.getDashboardUpdate(
-      timestamp
+      timestamp,
     );
 
     return reply.send(dashboardUpdate);

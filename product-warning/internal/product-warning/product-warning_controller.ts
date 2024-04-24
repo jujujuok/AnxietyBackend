@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { ProductWarningService } from "./product-warning_service";
-import { updateRequest } from "../utils/fastifyRequests";
+import { detailsRequest, updateRequest } from "../utils/fastifyRequests";
 
 export class ProductWarningController {
   constructor(private readonly productWarningService: ProductWarningService) {}
@@ -27,6 +27,17 @@ export class ProductWarningController {
 
     const timestamp = req.query.timestamp as number;
     const data = await this.productWarningService.getData(timestamp);
+    return reply.send(data);
+  }
+
+  async getDetails(req: detailsRequest, reply: FastifyReply) {
+    if (!req.params.id) {
+      console.log("No id provided");
+      return reply.status(400).send();
+    }
+
+    const id = req.params.id as number;
+    const data = await this.productWarningService.getDetails(id);
     return reply.send(data);
   }
 }

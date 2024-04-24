@@ -3,15 +3,16 @@
 echo "###Clearing deprecated images###"
 mkdir dockerImages
 rm ./dockerImages/*
-ssh root@212.132.100.147 "rm /root/anxiety/dockerImages/*"
+ssh root@212.132.100.147 "rm /root/dockerImages/*"
 cd dockerImages
 
 ##remote
-ssh root@212.132.100.147 "cd /root/anxiety && docker compose down"
+ssh root@212.132.100.147 "cd /root && docker compose down"
 ssh root@212.132.100.147 "docker image remove risiko-radar-api:latest"
 ssh root@212.132.100.147 "docker image remove product-warning-api:latest"
 ssh root@212.132.100.147 "docker image remove nina-api:latest"
 ssh root@212.132.100.147 "docker image remove autobahn-api:latest"
+ssh root@212.132.100.147 "docker image remove dwd-api:latest"
 
 #build and save images
 echo "\n###Building and saving images###\n"
@@ -31,20 +32,26 @@ rm autobahn-api.tar
 docker build -t autobahn-api ../autobahn
 docker save autobahn-api:latest > autobahn-api.tar
 
+rm dwd-api.tar
+docker build -t dwd-api ../dwd
+docker save dwd-api:latest > dwd-api.tar
+
 #copy images to server
 echo "\n###Copying images to server###\n"
 cd ..
-scp dockerImages/* root@212.132.100.147:/root/anxiety/dockerImages
+scp dockerImages/* root@212.132.100.147:/root/dockerImages
 
 #load images on server
 echo "\n###Loading images on server###\n"
-ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/risiko-radar-api.tar"
-ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/product-warning-api.tar"
-ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/nina-api.tar"
-ssh root@212.132.100.147 "docker load < /root/anxiety/dockerImages/autobahn-api.tar"
+ssh root@212.132.100.147 "docker load < /root/dockerImages/risiko-radar-api.tar"
+ssh root@212.132.100.147 "docker load < /root/dockerImages/product-warning-api.tar"
+ssh root@212.132.100.147 "docker load < /root/dockerImages/nina-api.tar"
+ssh root@212.132.100.147 "docker load < /root/dockerImages/autobahn-api.tar"
+ssh root@212.132.100.147 "docker load < /root/dockerImages/dwd-api.tar"
+
 
 #run images on server
 echo "\n###Running images on server###\n"
-ssh root@212.132.100.147 "cd /root/anxiety && docker compose up -d"
+ssh root@212.132.100.147 "cd /root && docker compose up -d"
 
 echo "\n###Images updated###\n"

@@ -1,6 +1,7 @@
 services:
   db:
     image: postgis/postgis
+    container_name: db
     restart: unless-stopped
     env_file:
       - .env
@@ -10,9 +11,12 @@ services:
       - ./postgres-data:/var/lib/postgresql/data
     networks:
       - backend
+    labels:
+      - "traefik.enable=false"
 
   redis:
     image: redis:latest
+    container_name: redis
     restart: unless-stopped
     env_file:
       - .env
@@ -24,9 +28,25 @@ services:
     command: redis-server /usr/local/etc/redis/redis.conf
     networks:
       - backend
+    labels:
+      - "traefik.enable=false"
+
+  frontend:
+    image: frontend:latest
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "8090:80"
+    networks:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`risiko-radar.info`)"
+      - "traefik.http.routers.frontend.service=frontend-root"
 
   risiko-radar:
     image: risiko-radar-api
+    container_name: risiko-radar
     depends_on:
       - db
       - redis
@@ -37,9 +57,14 @@ services:
       - "8000:8000"
     networks:
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.anxiety.rule=Host(`anxiety.risiko-radar.info`)"
+      - "traefik.http.routers.anxiety.service=anxiety-root"
 
   product-warning:
     image: product-warning-api
+    container_name: product-warning
     depends_on:
       - db
     restart: unless-stopped
@@ -49,9 +74,14 @@ services:
       - "8080:8000"
     networks:
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.product-warning.rule=Host(`product-warning.risiko-radar.info`)"
+      - "traefik.http.routers.product-warning.service=product-warning-root"
 
   nina:
     image: nina-api
+    container_name: nina
     depends_on:
       - db
     restart: unless-stopped
@@ -61,9 +91,14 @@ services:
       - "8081:8000"
     networks:
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nina.rule=Host(`nina.risiko-radar.info`)"
+      - "traefik.http.routers.nina.service=nina-root"
 
   autobahn:
     image: autobahn-api
+    container_name: autobahn
     depends_on:
       - db
     restart: unless-stopped
@@ -73,6 +108,46 @@ services:
       - "8082:8000"
     networks:
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.autobahn.rule=Host(`autobahn.risiko-radar.info`)"
+      - "traefik.http.routers.autobahn.service=autobahn-root"
+
+  dwd:
+    image: dwd-api
+    container_name: dwd
+    depends_on:
+      - db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8083:8000"
+    networks:
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dwd.rule=Host(`dwd.risiko-radar.info`)"
+      - "traefik.http.routers.dwd.service=dwd-root"
+
+  traefik:
+    image: traefik:v2.11
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "9000:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - backend
 
 networks:
-  backend:
+  backend: {}

@@ -34,13 +34,13 @@ export class AutobahnService {
 
     for (const autobahn of autobahnArray) {
       const autobahnWarningResult = await this.callApi(
-        `https://verkehr.autobahn.de/o/autobahn/${autobahn}/services/warning`
+        `https://verkehr.autobahn.de/o/autobahn/${autobahn}/services/warning`,
       );
       autobahnWarningResult.warning.forEach((warning: any) => {
         if (!bannedWarnings.includes(warning.abnormalTrafficType)) {
           const description_index = warning.description.indexOf("");
           const temp_description = warning.description.slice(
-            description_index + 3
+            description_index + 3,
           );
           let description = warning.description[
             description_index + 2
@@ -57,12 +57,14 @@ export class AutobahnService {
             description += description_part.replaceAll("\n", " ");
           });
 
+          const coordinates = [warning.geometry.coordinates];
+
           const warning_in_model: IWarningModel = {
             warning_id: warning.identifier,
             title: warning.title,
             publisheddate: warning.startTimestamp,
             description: description,
-            coordinates: warning.geometry.coordinates,
+            coordinates: coordinates,
           };
 
           autobahnWarnings.push(warning_in_model);
@@ -79,7 +81,7 @@ export class AutobahnService {
 
   async fetchData() {
     const autobahnApiResult = await this.callApi(
-      "https://verkehr.autobahn.de/o/autobahn/"
+      "https://verkehr.autobahn.de/o/autobahn/",
     );
     if (autobahnApiResult === null) {
       return 500;
@@ -91,13 +93,16 @@ export class AutobahnService {
     if (autobahnWarnings === null) {
       return 200;
     }
-    this.autobahnRepository.fetchData(autobahnWarnings);
-
-    return autobahnWarnings;
+    return this.autobahnRepository.fetchData(autobahnWarnings);
   }
 
   async getData(timestamp: number) {
     const data = this.autobahnRepository.getData(timestamp);
+    return data;
+  }
+
+  async getDetails(id: string) {
+    const data = this.autobahnRepository.getDetails(id);
     return data;
   }
 }

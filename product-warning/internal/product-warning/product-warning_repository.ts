@@ -1,6 +1,7 @@
 import { IWarningsModel } from "../models/warnings";
 import { Pool } from "pg";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class ProductWarningRepository {
   constructor(private readonly db: Pool) {}
@@ -20,11 +21,11 @@ export class ProductWarningRepository {
             warning.warning_link != null ||
             warning.publishedDate != null ||
             warning.title != null ||
-            warning.description != null
+            warning.description != null,
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}')`
+            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}', '${warning.image}')`,
         )
         .join(",");
 
@@ -34,24 +35,23 @@ export class ProductWarningRepository {
         values_warningsproduct !== "()"
       ) {
         const result_warningsproduct = await client.query(
-          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description) VALUES ${values_warningsproduct};`
+          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ${values_warningsproduct};`,
         );
         console.log(
-          result_warningsproduct.rowCount + " rows inserted (warningsproduct)"
+          result_warningsproduct.rowCount + " rows inserted (warningsproduct)",
         );
       }
 
       const values_productInformations = warnings.products
         .filter(
           (warning) =>
-            warning.designation != null ||
             warning.manufacturer != null ||
             warning.category != null ||
-            warning.affectedProducts != null
+            warning.affectedProducts != null,
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.designation}', '${warning.manufacturer}', '${warning.category}', '${warning.affectedProducts}')`
+            `(${warning.warning_id}, '${warning.manufacturer}', '${warning.category}', '${warning.affectedProducts}')`,
         )
         .join(",");
       if (
@@ -60,18 +60,18 @@ export class ProductWarningRepository {
         values_productInformations !== "()"
       ) {
         const result_productInformations = await client.query(
-          `INSERT INTO productwarnings.productInformations (warning_id, designation, manufacturer, category, affectedProducts) VALUES ${values_productInformations};`
+          `INSERT INTO productwarnings.productInformations (warning_id, manufacturer, category, affectedProducts) VALUES ${values_productInformations};`,
         );
         console.log(
           result_productInformations.rowCount +
-            " rows inserted (productInformations)"
+            " rows inserted (productInformations)",
         );
       }
       const values_safetyInformations = warnings.products
         .filter((warning) => warning.hazard != null || warning.injury != null)
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.hazard}', '${warning.injury}')`
+            `(${warning.warning_id}, '${warning.hazard}', '${warning.injury}')`,
         )
         .join(",");
 
@@ -81,11 +81,11 @@ export class ProductWarningRepository {
         values_safetyInformations !== "()"
       ) {
         const result_safetyInformations = await client.query(
-          `INSERT INTO productwarnings.safetyInformations (warning_id, hazard, injury) VALUES ${values_safetyInformations};`
+          `INSERT INTO productwarnings.safetyInformations (warning_id, hazard, injury) VALUES ${values_safetyInformations};`,
         );
         console.log(
           result_safetyInformations.rowCount +
-            " rows inserted (safetyInformations)"
+            " rows inserted (safetyInformations)",
         );
       }
       const values_warningsfood = warnings.foods
@@ -95,11 +95,11 @@ export class ProductWarningRepository {
             warning.warning_link != null ||
             warning.publishedDate != null ||
             warning.title != null ||
-            warning.description != null
+            warning.description != null,
         )
         .map(
           (warning) =>
-            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}')`
+            `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}', '${warning.image}')`,
         )
         .join(",");
 
@@ -109,17 +109,17 @@ export class ProductWarningRepository {
         values_warningsfood !== "()"
       ) {
         const result_warningsfood = await client.query(
-          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description) VALUES ${values_warningsfood};`
+          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ${values_warningsfood};`,
         );
         console.log(
-          result_warningsfood.rowCount + " rows inserted (warningsfood)"
+          result_warningsfood.rowCount + " rows inserted (warningsfood)",
         );
       }
 
       const values_foodInformations = warnings.foods
         .filter(
           (warning) =>
-            warning.manufacturer != null || warning.affectedStates != null
+            warning.manufacturer != null || warning.affectedStates != null,
         )
         .map((warning) => {
           const affectedStatesArray =
@@ -136,10 +136,11 @@ export class ProductWarningRepository {
         values_foodInformations !== "()"
       ) {
         const result_foodInformations = await client.query(
-          `INSERT INTO productwarnings.foodInformations (warning_id, manufacturer, affectedStates) VALUES ${values_foodInformations};`
+          `INSERT INTO productwarnings.foodInformations (warning_id, manufacturer, affectedStates) VALUES ${values_foodInformations};`,
         );
         console.log(
-          result_foodInformations.rowCount + " rows inserted (foodInformations)"
+          result_foodInformations.rowCount +
+            " rows inserted (foodInformations)",
         );
       }
     } finally {
@@ -164,14 +165,14 @@ export class ProductWarningRepository {
       const values_warningids =
         values_warningids_products + "," + values_warningids_foods;
       const result = await client.query(
-        `SELECT warning_id FROM productwarnings.warnings WHERE warning_id in (${values_warningids});`
+        `SELECT warning_id FROM productwarnings.warnings WHERE warning_id in (${values_warningids});`,
       );
       result.rows.forEach((row: any) => {
         warnings.products = warnings.products.filter(
-          (warning) => warning.warning_id != row.warning_id
+          (warning) => warning.warning_id != row.warning_id,
         );
         warnings.foods = warnings.foods.filter(
-          (warning) => warning.warning_id != row.warning_id
+          (warning) => warning.warning_id != row.warning_id,
         );
       });
     } finally {
@@ -190,7 +191,7 @@ export class ProductWarningRepository {
         timestampstatement = `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000);`;
       }
       const resultwarnings = await client.query(
-        `SELECT * FROM productwarnings.warnings ${timestampstatement}`
+        `SELECT * FROM productwarnings.warnings ${timestampstatement}`,
       );
 
       const values_warningids = resultwarnings.rows
@@ -198,13 +199,13 @@ export class ProductWarningRepository {
         .join(",");
 
       const result_productInformations = await client.query(
-        `SELECT * FROM productwarnings.productInformations WHERE warning_id in (${values_warningids});`
+        `SELECT * FROM productwarnings.productInformations WHERE warning_id in (${values_warningids});`,
       );
       const result_safetyInformations = await client.query(
-        `SELECT * FROM productwarnings.safetyInformations WHERE warning_id in (${values_warningids});`
+        `SELECT * FROM productwarnings.safetyInformations WHERE warning_id in (${values_warningids});`,
       );
       const result_foodInformations = await client.query(
-        `SELECT * FROM productwarnings.foodInformations WHERE warning_id in (${values_warningids});`
+        `SELECT * FROM productwarnings.foodInformations WHERE warning_id in (${values_warningids});`,
       );
       resultwarnings.rows.forEach((row: any) => {
         if (row.warning_id) {
@@ -213,35 +214,42 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "product_warning",
               title: row.title ?? undefined,
-              description: row.description ?? undefined,
-              since: row.publishedDate ?? undefined,
+              description:
+                row.description === "null"
+                  ? undefined
+                  : row.description ?? undefined,
+              area: undefined,
               details: {
                 link: row.warning_link ?? undefined,
-                designation:
-                  result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.designation ?? undefined,
                 manufacturer:
                   result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
+                    (row2: any) => row2.warning_id === row.warning_id,
                   )?.manufacturer ?? undefined,
                 category:
                   result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
+                    (row2: any) => row2.warning_id === row.warning_id,
                   )?.category ?? undefined,
                 hazard:
                   result_safetyInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
+                    (row2: any) => row2.warning_id === row.warning_id,
                   )?.hazard ?? undefined,
                 injury:
                   result_safetyInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
+                    (row2: any) => row2.warning_id === row.warning_id,
                   )?.injury ?? undefined,
                 affectedProducts:
                   result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedProducts ?? undefined,
-                affectedStates: undefined,
+                    (row2: any) => row2.warning_id === row.warning_id,
+                  )?.affectedproducts === "null" ||
+                  result_productInformations.rows.find(
+                    (row2: any) => row2.warning_id === row.warning_id,
+                  )?.affectedproducts === "Nicht bekannt"
+                    ? undefined
+                    : result_productInformations.rows.find(
+                        (row2: any) => row2.warning_id === row.warning_id,
+                      )?.affectedproducts ?? undefined,
+                image:
+                  row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };
             warnings.push(productWarning);
@@ -250,23 +258,26 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "food_warning",
               title: row.title ?? undefined,
-              description: row.description ?? undefined,
-              since: row.publishedDate ?? undefined,
+              description:
+                row.description === "null"
+                  ? undefined
+                  : row.description ?? undefined,
+              area:
+                result_foodInformations.rows.find(
+                  (row2: any) => row2.warning_id === row.warning_id,
+                )?.affectedstates ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
-                designation: undefined,
                 manufacturer:
-                  result_productInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
+                  result_foodInformations.rows.find(
+                    (row2: any) => row2.warning_id === row.warning_id,
                   )?.manufacturer ?? undefined,
                 category: undefined,
                 hazard: undefined,
                 injury: undefined,
                 affectedProducts: undefined,
-                affectedStates:
-                  result_foodInformations.rows.find(
-                    (row2: any) => row2.warning_id === row.warning_id
-                  )?.affectedStates ?? undefined,
+                image:
+                  row.image == "undefined" ? undefined : row.image ?? undefined,
               },
             };
             warnings.push(foodWarning);
@@ -276,6 +287,81 @@ export class ProductWarningRepository {
     } finally {
       client.release();
       return warnings;
+    }
+  }
+
+  async getDetails(id: number) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try {
+      const result_warnings = await client.query(
+        "SELECT * FROM productwarnings.warnings WHERE warning_id = $1;",
+        [id],
+      );
+      console.log("Details selected");
+      if (result_warnings.rows[0].warning_type === "p") {
+        const result_productInformations = await client.query(
+          "SELECT * FROM productwarnings.productInformations WHERE warning_id = $1;",
+          [id],
+        );
+        const result_safetyInformations = await client.query(
+          "SELECT * FROM productwarnings.safetyInformations WHERE warning_id = $1;",
+          [id],
+        );
+        console.log("Productdetails selected");
+        console.log(result_productInformations.rows[0]);
+        console.log(result_safetyInformations.rows[0]);
+        details = {
+          link: result_warnings.rows[0].warning_link ?? undefined,
+          manufacturer:
+            result_productInformations.rows[0].manufacturer ?? undefined,
+          category: result_productInformations.rows[0].category ?? undefined,
+          hazard: result_safetyInformations.rows[0]
+            ? result_safetyInformations.rows[0].hazard
+            : undefined,
+          injury: result_safetyInformations.rows[0]
+            ? result_safetyInformations.rows[0].injury
+            : undefined,
+          affectedProducts:
+            result_productInformations.rows[0].affectedproducts === "null" ||
+            result_productInformations.rows[0].affectedproducts ===
+              "Nicht bekannt"
+              ? undefined
+              : result_productInformations.rows[0].affectedproducts ??
+                undefined,
+          image:
+            result_productInformations.rows[0].image == "undefined"
+              ? undefined
+              : result_productInformations.rows[0].image ?? undefined,
+        };
+        console.log(details);
+      } else if (result_warnings.rows[0].warning_type === "f") {
+        const result_foodInformations = await client.query(
+          "SELECT * FROM productwarnings.foodInformations WHERE warning_id = $1;",
+          [id],
+        );
+        console.log("Fooddetails selected");
+        details = {
+          link: result_warnings.rows[0].warning_link ?? undefined,
+          manufacturer:
+            result_foodInformations.rows[0].manufacturer ?? undefined,
+          category: undefined,
+          hazard: undefined,
+          injury: undefined,
+          affectedProducts: undefined,
+          image:
+            result_foodInformations.rows[0].image == "undefined"
+              ? undefined
+              : result_foodInformations.rows[0].image ?? undefined,
+        };
+      }
+    } finally {
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
     }
   }
 }

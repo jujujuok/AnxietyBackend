@@ -4,7 +4,7 @@ import { FastifyRequest } from "fastify";
  * Fastify request for details
  */
 export type detailsRequest = FastifyRequest<{
-  Params: { id: number };
+  Params: { id: string };
 }>;
 
 /**

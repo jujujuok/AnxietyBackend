@@ -27,13 +27,13 @@ const start = async () => {
 
   // setup services and routes for the different modules
   const [dashboardService, mapService, worldMapService] = await setupServices(
-    redis
+    redis,
   );
   await setupRoutes(
     server,
     dashboardService as DashboardService,
     mapService as MapService,
-    worldMapService as WorldMapService
+    worldMapService as WorldMapService,
   );
 
   // setup logging
@@ -82,10 +82,10 @@ const setupCors = (server: FastifyInstance) => {
  */
 const setupServices = async (redis: Cache) => {
   const dashboardRepository: DashboardRepository = new DashboardRepository(
-    redis
+    redis,
   );
   const dashboardService: DashboardService = new DashboardService(
-    dashboardRepository
+    dashboardRepository,
   );
 
   const mapRepository: MapRepository = new MapRepository(redis);
@@ -93,7 +93,7 @@ const setupServices = async (redis: Cache) => {
 
   const worldMapRepository: WorldMapRepository = new WorldMapRepository();
   const worldMapService: WorldMapService = new WorldMapService(
-    worldMapRepository
+    worldMapRepository,
   );
 
   return [dashboardService, mapService, worldMapService];
@@ -110,7 +110,7 @@ const setupRoutes = async (
   server: FastifyInstance,
   dashboardService: DashboardService,
   mapService: MapService,
-  worldMapService: WorldMapService
+  worldMapService: WorldMapService,
 ) => {
   const dashboardController = new DashboardController(dashboardService);
   const mapController = new MapController(mapService);
@@ -149,20 +149,20 @@ const setupLog = async (server: FastifyInstance) => {
  * @returns FastifyPluginCallback for registering the routes
  */
 const addDashboardRoutes = (
-  dashboardController: DashboardController
+  dashboardController: DashboardController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get(
       "/",
-      dashboardController.getDashboard.bind(dashboardController)
+      dashboardController.getDashboard.bind(dashboardController),
     );
     instance.get(
       "/:id",
-      dashboardController.getDashboardDetails.bind(dashboardController)
+      dashboardController.getDashboardDetails.bind(dashboardController),
     );
     instance.get(
       "/update",
-      dashboardController.getDashboardUpdate.bind(dashboardController)
+      dashboardController.getDashboardUpdate.bind(dashboardController),
     );
     done();
   };
@@ -188,17 +188,17 @@ const addMapRoutes = (mapController: MapController): FastifyPluginCallback => {
  * @returns FastifyPluginCallback for registering the routes
  */
 const addWorldMapRoutes = (
-  WorldMapController: WorldMapController
+  WorldMapController: WorldMapController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/", WorldMapController.getWorldMap.bind(WorldMapController));
     instance.get(
       "/:id",
-      WorldMapController.getWorldMapDetails.bind(WorldMapController)
+      WorldMapController.getWorldMapDetails.bind(WorldMapController),
     );
     instance.get(
       "/update",
-      WorldMapController.getWorldMapUpdate.bind(WorldMapController)
+      WorldMapController.getWorldMapUpdate.bind(WorldMapController),
     );
     done();
   };
