@@ -1,8 +1,10 @@
+import { IDeleteItem } from "../utils/apiCalls";
+
 /**
- * Country model
+ * WorldMap model
  */
-export interface ICountryItem {
-  id: number;
+export interface IWorldMapItem {
+  id: string;
   type:
     | "interpol_red"
     | "interpol_un"
@@ -14,14 +16,19 @@ export interface ICountryItem {
 }
 
 /**
- * Country details model
+ * WorldMap details model
  */
-export interface ICountryItemDetails {
-  id: number;
+export interface IWorldMapItemDetails {
+  id: string;
   type:
     | "interpol_red"
     | "interpol_un"
     | "travel_warning"
     | "country_representative";
   details: object;
+}
+
+export interface IWorldMapUpdate {
+  add: IWorldMapItem[];
+  delete: (string | IDeleteItem)[];
 }

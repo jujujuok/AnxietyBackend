@@ -44,9 +44,9 @@ services:
       - "traefik.http.routers.frontend.rule=Host(`risiko-radar.info`)"
       - "traefik.http.routers.frontend.service=frontend-root"
 
-  anxiety:
-    image: anxiety-api
-    container_name: anxiety
+  risiko-radar:
+    image: risiko-radar-api
+    container_name: risiko-radar
     depends_on:
       - db
       - redis

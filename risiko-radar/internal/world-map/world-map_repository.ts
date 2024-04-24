@@ -1,21 +1,21 @@
 import { faker } from "@faker-js/faker";
-import { ICountryItem } from "../models/country";
+import { IWorldMapItem } from "../models/world-map";
 
 /**
- * Country repository
+ * WorldMap repository
  */
-export class CountryRepository {
+export class WorldMapRepository {
   /**
-   * Get list of country items
-   * @returns List of country items
+   * Get list of WorldMap items
+   * @returns List of WorldMap items
    */
-  async getCountry(): Promise<ICountryItem[]> {
+  async getWorldMap(): Promise<IWorldMapItem[]> {
     // Example Data:
-    const countryItems: ICountryItem[] = [];
+    const worldMapItems: IWorldMapItem[] = [];
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const countryItem: ICountryItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
+      const worldMapItem: IWorldMapItem = {
+        id: faker.internet.ip(),
         type: faker.helpers.arrayElement([
           "interpol_red",
           "interpol_un",
@@ -32,21 +32,21 @@ export class CountryRepository {
         since: faker.date.past().getTime(),
       };
 
-      countryItems.push(countryItem);
+      worldMapItems.push(worldMapItem);
     }
 
-    return countryItems;
+    return worldMapItems;
   }
 
   /**
-   * Get details of a country item
-   * @param countryId Country ID
-   * @returns Details of a country item
+   * Get details of a WorldMap item
+   * @param worldMapId WorldMap ID
+   * @returns Details of a WorldMap item
    */
-  async getCountryDetails(countryId: number) {
+  async getWorldMapDetails(worldMapId: string) {
     // Example Data:
-    const countryDetails = {
-      id: countryId,
+    const worldMapDetails = {
+      id: worldMapId,
       type: faker.helpers.arrayElement([
         "interpol_red",
         "interpol_un",
@@ -64,24 +64,24 @@ export class CountryRepository {
       },
     };
 
-    return countryDetails;
+    return worldMapDetails;
   }
 
   /**
-   * Get update of the countries list
+   * Get update of the WorldMap list
    * @param timestamp Unix Timestamp
-   * @returns Update of the countries list containing ids to remove and objects to add
+   * @returns Update of the WorldMap list containing ids to remove and objects to add
    */
-  async getCountryUpdate(timestamp: number) {
+  async getWorldMapUpdate(timestamp: number) {
     // Example Data:
-    const countryUpdate = {
-      add: [] as ICountryItem[],
+    const worldMapUpdate = {
+      add: [] as IWorldMapItem[],
       delete: [] as number[],
     };
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const countryItem: ICountryItem = {
-        id: faker.number.int({ min: 1, max: 1000 }),
+      const worldMapItem: IWorldMapItem = {
+        id: faker.internet.ip(),
         type: faker.helpers.arrayElement([
           "interpol_red",
           "interpol_un",
@@ -98,13 +98,13 @@ export class CountryRepository {
         since: faker.date.past().getTime(),
       };
 
-      countryUpdate.add.push(countryItem);
+      worldMapUpdate.add.push(worldMapItem);
     }
 
     for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      countryUpdate.delete.push(faker.number.int({ min: 1, max: 1000 }));
+      worldMapUpdate.delete.push(faker.number.int({ min: 1, max: 1000 }));
     }
 
-    return countryUpdate;
+    return worldMapUpdate;
   }
 }

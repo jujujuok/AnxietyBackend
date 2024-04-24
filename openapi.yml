@@ -81,7 +81,7 @@ paths:
                   delete:
                     type: array
                     items:
-                      type: integer
+                      type: string
                     description: 'List of IDs to delete.'
         '204':
           description: No Content
@@ -149,7 +149,7 @@ paths:
                   delete:
                     type: array
                     items:
-                      type: integer
+                      type: string
                     description: 'List of IDs to delete.'
         '204':
           description: No Content
@@ -157,7 +157,7 @@ paths:
     get:
       tags:
         - world-map
-      description: 'Get all country items.'
+      description: 'Get all world-map items.'
       parameters: []
       responses:
         '200':
@@ -167,16 +167,16 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/countryItem'
+                  $ref: '#/components/schemas/worldMapItem'
   /world-map/{id}:
     get:
       tags:
         - world-map
-      description: 'Get a country item by id.'
+      description: 'Get a WorldMap item by id.'
       parameters:
         - name: id
           in: path
-          description: 'ID of the country item to get.'
+          description: 'ID of the WorldMap item to get.'
           required: true
           schema:
             type: integer
@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/countryItemDetails'
+                $ref: '#/components/schemas/worldMapItemDetails'
         '404':
           description: Not Found
   /world-map/update:
@@ -216,7 +216,7 @@ paths:
                   delete:
                     type: array
                     items:
-                      type: integer
+                      type: string
                     description: 'List of IDs to delete.'
         '204':
           description: No Content
@@ -227,7 +227,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         type:
           type: string
           enum:
@@ -248,14 +248,11 @@ components:
           type: string
         description:
           type: string
-        since:
-          type: integer
-          description: 'Timestamp of the registration of the event.'
     dashboardItemDetails:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         type:
           type: string
           enum:
@@ -272,7 +269,7 @@ components:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         type:
           type: string
           enum:
@@ -308,14 +305,11 @@ components:
               description: 'Array for polygon.'
               items:
                 type: number
-        since:
-          type: integer
-          description: 'Timestamp of the registration of the event.'
     mapItemDetails:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         type:
           type: string
           enum:
@@ -331,11 +325,11 @@ components:
           type: object
           description: 'Details of the event. Depending of the type of event.'
 
-    countryItem:
+    worldMapItem:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         type:
           type: string
           enum:
@@ -347,14 +341,11 @@ components:
           type: string
         country:
           type: string
-        since:
-          type: integer
-          description: 'Timestamp of the registration of the event.'
-    countryItemDetails:
+    worldMapItemDetails:
       type: object
       properties:
         id:
-          type: integer
+          type: string
         type:
           type: string
           enum:

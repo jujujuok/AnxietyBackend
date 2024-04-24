@@ -5,28 +5,35 @@ import { DashboardRepository } from "../dashboard/dashboard_repository";
 import { MapRepository } from "../map/map_repository";
 import { MapController } from "../map/map_controller";
 import { MapService } from "../map/map_service";
-import { CountryController } from "../country/country_controller";
-import { CountryRepository } from "../country/country_repository";
-import { CountryService } from "../country/country_service";
+import { WorldMapController } from "../world-map/world-map_controller";
+import { WorldMapRepository } from "../world-map/world-map_repository";
+import { WorldMapService } from "../world-map/world-map_service";
+import { RedisClientType, createClient } from "redis";
+import { Cache } from "../utils/cache";
+import dotenv from "dotenv";
 
 /**
  * Start routine of the application
  */
 const start = async () => {
-  //TODO: Add getting of env variables
+  dotenv.config();
 
   // setup fastify instance
   const server = await fastify({ logger: true });
 
+  const redis = setupCache(server);
+
   setupCors(server);
 
   // setup services and routes for the different modules
-  const [dashboardService, mapService, countryService] = await setupServices();
+  const [dashboardService, mapService, worldMapService] = await setupServices(
+    redis,
+  );
   await setupRoutes(
     server,
     dashboardService as DashboardService,
     mapService as MapService,
-    countryService as CountryService,
+    worldMapService as WorldMapService,
   );
 
   // setup logging
@@ -39,6 +46,27 @@ const start = async () => {
     server.log.error(err);
     process.exit(1);
   }
+
+  gracefulShutdown(server);
+};
+
+const setupCache = (server: FastifyInstance): Cache => {
+  const host = process.env.REDIS_HOST;
+  const port = process.env.REDIS_PORT || "6379";
+  const password = process.env.REDIS_PASSWORD;
+
+  const client = createClient({
+    url: "redis://default:" + password + "@" + host + ":" + port,
+  });
+
+  const redis = new Cache(client as RedisClientType);
+
+  server.addHook("onClose", async () => {
+    await redis.close();
+    console.log("Redis connection closed");
+  });
+
+  return redis;
 };
 
 const setupCors = (server: FastifyInstance) => {
@@ -52,19 +80,23 @@ const setupCors = (server: FastifyInstance) => {
  * Initialize the services, including their repositories, for the different modules
  * @returns Array of the services for the different modules
  */
-const setupServices = async () => {
-  const dashboardRepository: DashboardRepository = new DashboardRepository();
+const setupServices = async (redis: Cache) => {
+  const dashboardRepository: DashboardRepository = new DashboardRepository(
+    redis,
+  );
   const dashboardService: DashboardService = new DashboardService(
     dashboardRepository,
   );
 
-  const mapRepository: MapRepository = new MapRepository();
+  const mapRepository: MapRepository = new MapRepository(redis);
   const mapService: MapService = new MapService(mapRepository);
 
-  const countryRepository: CountryRepository = new CountryRepository();
-  const countryService: CountryService = new CountryService(countryRepository);
+  const worldMapRepository: WorldMapRepository = new WorldMapRepository();
+  const worldMapService: WorldMapService = new WorldMapService(
+    worldMapRepository,
+  );
 
-  return [dashboardService, mapService, countryService];
+  return [dashboardService, mapService, worldMapService];
 };
 
 /**
@@ -72,17 +104,17 @@ const setupServices = async () => {
  * @param server Instance of Fastify
  * @param dashboardService Service for dashboard module
  * @param mapService Service for map module
- * @param countryService Service for country module
+ * @param worldMapService Service for WorldMap module
  */
 const setupRoutes = async (
   server: FastifyInstance,
   dashboardService: DashboardService,
   mapService: MapService,
-  countryService: CountryService,
+  worldMapService: WorldMapService,
 ) => {
   const dashboardController = new DashboardController(dashboardService);
   const mapController = new MapController(mapService);
-  const countryController = new CountryController(countryService);
+  const worldMapController = new WorldMapController(worldMapService);
 
   server.register(addDashboardRoutes(dashboardController), {
     prefix: "/dashboard",
@@ -92,7 +124,7 @@ const setupRoutes = async (
     prefix: "/map",
   });
 
-  server.register(addCountryRoutes(countryController), {
+  server.register(addWorldMapRoutes(worldMapController), {
     prefix: "/world-map",
   });
 };
@@ -102,7 +134,7 @@ const setupRoutes = async (
  * @param server Instance of Fastify
  */
 const setupLog = async (server: FastifyInstance) => {
-  server.log.info("### Anxiety started ###");
+  server.log.info("### risiko-radar started ###");
 
   // log all requests
   server.addHook("onRequest", (request, reply, done) => {
@@ -151,25 +183,43 @@ const addMapRoutes = (mapController: MapController): FastifyPluginCallback => {
 };
 
 /**
- * Add routes for the country module
- * @param countryController Controller for the country module
+ * Add routes for the WorldMap module
+ * @param WorldMapController Controller for the WorldMap module
  * @returns FastifyPluginCallback for registering the routes
  */
-const addCountryRoutes = (
-  countryController: CountryController,
+const addWorldMapRoutes = (
+  WorldMapController: WorldMapController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
-    instance.get("/", countryController.getCountry.bind(countryController));
+    instance.get("/", WorldMapController.getWorldMap.bind(WorldMapController));
     instance.get(
       "/:id",
-      countryController.getCountryDetails.bind(countryController),
+      WorldMapController.getWorldMapDetails.bind(WorldMapController),
     );
     instance.get(
       "/update",
-      countryController.getCountryUpdate.bind(countryController),
+      WorldMapController.getWorldMapUpdate.bind(WorldMapController),
     );
     done();
   };
+};
+
+const gracefulShutdown = async (server: FastifyInstance) => {
+  // For stopping server running locally
+  process.on("SIGINT", () => {
+    console.log("Received SIGINT. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service stopped ###");
+    });
+  });
+
+  // For docker compose down
+  process.on("SIGTERM", () => {
+    console.log("Received SIGTERM. Shutting down gracefully...");
+    server.close().then(() => {
+      console.log("### productwarning service stopped ###");
+    });
+  });
 };
 
 // Initial start call

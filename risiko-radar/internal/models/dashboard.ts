@@ -1,12 +1,14 @@
+import { IDeleteItem } from "../utils/apiCalls";
+
 /**
  * Dashboard model.
  */
 export interface IDashboardItem {
-  id: number;
+  id: string;
   type:
     | "interpol_red"
     | "interpol_un"
-    | "food_waring"
+    | "food_warning"
     | "product_warning"
     | "travel_warning"
     | "country_representative";
@@ -14,19 +16,19 @@ export interface IDashboardItem {
   title: string;
   description: string;
   since: number;
+  details?: IDashboardItemDetails;
 }
 
 /**
  * Dashboard details model.
  */
 export interface IDashboardItemDetails {
-  id: number;
-  type:
-    | "interpol_red"
-    | "interpol_un"
-    | "food_waring"
-    | "product_warning"
-    | "traverl_warning"
-    | "country_representative";
+  id: string;
+  type: string;
   details: object;
+}
+
+export interface IDashboardUpdate {
+  add: IDashboardItem[];
+  delete: (string | IDeleteItem)[];
 }
