@@ -45,3 +45,6 @@ yarn.lock
 
 # Redis
 redis.conf
+
+# SSL
+/.ssl
