@@ -1,6 +1,7 @@
 import { AwARepository } from "./awa_repository";
 import axios from "axios";
 import https from "https";
+import { IWarningModel } from "../models/warning";
 
 export class AwAService {
   constructor(private readonly awaRepository: AwARepository) {}
@@ -30,7 +31,6 @@ export class AwAService {
       warning = warning.replaceAll(/<.*?>/g, "");
       warning = warning.replaceAll(/\.(?!\s)/g, ". ");
       const warningObject = {
-        warningtitle: "leer",
         warningtext: warning,
       };
 
@@ -45,12 +45,13 @@ export class AwAService {
         warningtitle = element.split("</h3>")[0];
         warningtext = element.split("</h3>")[1];
       } else {
-        warningtitle = "leer";
         warningtext = element;
       }
       warningtext = warningtext.replaceAll(/<.*?>/g, "");
       warningtext = warningtext.replaceAll(/\.(?!\s)/g, ". ");
-      warningtitle = warningtitle.replaceAll(/<.*?>/g, "");
+      if (warningtitle != null) {
+        warningtitle = warningtitle.replaceAll(/<.*?>/g, "");
+      }
       const warningObject = {
         warningtitle,
         warningtext,
@@ -66,34 +67,36 @@ export class AwAService {
       await this.callApi(
         `https://www.auswaertiges-amt.de/opendata/travelwarning/${id}`,
       )
-    ).response[id].content;
+    ).response[id];
 
-    if (!warning) {
+    const warningContent = warning.content;
+
+    if (!warningContent) {
       console.error("Failed to fetch data");
       return;
     }
 
     let aktuellWarningArray: object[] = [];
 
-    if (warning.match(/<h2>.*?Aktuelles.*?<\/h2>/)) {
-      const aktuellwarning = warning
+    if (warningContent.match(/<h2>.*?Aktuelles.*?<\/h2>/)) {
+      const aktuellwarning = warningContent
         .split(/<h2>.*?Aktuelles.*?<\/h2>/)[1]
         .split(/<h2>.*?Sicherheit.*?<\/h2>/)[0];
       aktuellWarningArray = this.transformWarning(aktuellwarning);
     }
 
-    const sicherheitswarning = warning
+    const sicherheitswarning = warningContent
       .split(/<h2>.*?Sicherheit.*?<\/h2>/)[1]
       .split(/<h2>.*?Natur und Klima.*?<\/h2>/)[0];
 
     let gesundheitswarning = "";
 
     if (
-      warning
+      warningContent
         .split(/<h2>.*?Natur und Klima.*?<\/h2>/)[1]
         .match(/<h3>.*?Aktuelles.*?<\/h3>/)
     ) {
-      gesundheitswarning = warning
+      gesundheitswarning = warningContent
         .split(/<h2>.*?Natur und Klima.*?<\/h2>/)[1]
         .split(/<h3>.*?Aktuelles.*?<\/h3>/)[1]
         .split(/<h3>.*?Impfschutz.*?<\/h3>/)[0];
@@ -104,10 +107,20 @@ export class AwAService {
 
     const sicherheitswarningArray = this.transformWarning(sicherheitswarning);
 
-    const result = {
-      aktuellWarningArray,
-      sicherheitswarningArray,
-      gesundheitswarning,
+    const result: IWarningModel = {
+      countryCode: warning.countryCode,
+      iso3CountryCode: warning.iso3CountryCode,
+      countryName: warning.countryName,
+      warning: warning.warning,
+      partialWarning: warning.partialWarning,
+      situationWarning: warning.situationWarning,
+      situationPartWarning: warning.situationPartWarning,
+      link: `https://www.auswaertiges-amt.de/de/service/laender/${id}`,
+      warningText: {
+        aktuell: aktuellWarningArray,
+        sicherheit: sicherheitswarningArray,
+        gesundheit: gesundheitswarning,
+      },
     };
 
     return result;
@@ -149,7 +162,6 @@ export class AwAService {
     const promises = countryWarningswithWarning.map(async (country: any) => {
       try {
         const fetchResult = await this.fetchAndTransformWarnings(country.id);
-        result.push(country.id);
         result.push(fetchResult);
       } catch (error) {
         console.error(
@@ -161,6 +173,6 @@ export class AwAService {
 
     // Warten Sie auf die Auflösung aller Promises
     await Promise.all(promises);
-    return await this.fetchAndTransformWarnings("213032");
+    return result;
   }
 }
