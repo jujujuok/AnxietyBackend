@@ -4,6 +4,7 @@ export interface IReturnSchema {
   title: string | undefined;
   description: string | undefined;
   area: string[] | undefined;
+  publishedDate: string | undefined;
   details: {
     link: string | undefined;
     manufacturer: string | undefined;

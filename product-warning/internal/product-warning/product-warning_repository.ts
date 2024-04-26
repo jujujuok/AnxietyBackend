@@ -219,6 +219,7 @@ export class ProductWarningRepository {
                   ? undefined
                   : row.description ?? undefined,
               area: undefined,
+              publishedDate: row.publisheddate ?? undefined,
               details: {
                 link: row.warning_link ?? undefined,
                 manufacturer:
@@ -266,6 +267,8 @@ export class ProductWarningRepository {
                 result_foodInformations.rows.find(
                   (row2: any) => row2.warning_id === row.warning_id,
                 )?.affectedstates ?? undefined,
+              publishedDate: row.publisheddate ?? undefined,
+
               details: {
                 link: row.warning_link ?? undefined,
                 manufacturer:
