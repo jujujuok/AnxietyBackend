@@ -337,9 +337,11 @@ components:
             - interpol_un
             - travel_warning
             - country_representetive
-        title:
-          type: string
         country:
+          type: string
+        severity:
+          type: string
+        iso3: 
           type: string
     worldMapItemDetails:
       type: object
