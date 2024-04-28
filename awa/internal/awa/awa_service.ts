@@ -25,17 +25,16 @@ export class AwAService {
   }
 
   transformWarning(warning: string) {
-    const warningArray: object[] = [];
+    const warningsArray: object[] = [];
 
     if (!warning.includes("<h3>")) {
       warning = warning.replaceAll(/<.*?>/g, "");
       warning = warning.replaceAll(/\.(?!\s)/g, ". ");
-      const warningObject = {
-        warningtext: warning,
-      };
+      warning = warning.replaceAll("'", "´");
+      const warningArray = [warning];
 
-      warningArray.push(warningObject);
-      return warningArray;
+      warningsArray.push(warningArray);
+      return warningsArray;
     }
 
     warning.split("<h3>").forEach((element: string) => {
@@ -49,17 +48,16 @@ export class AwAService {
       }
       warningtext = warningtext.replaceAll(/<.*?>/g, "");
       warningtext = warningtext.replaceAll(/\.(?!\s)/g, ". ");
+      warningtext = warningtext.replaceAll("'", "´");
       if (warningtitle != null) {
         warningtitle = warningtitle.replaceAll(/<.*?>/g, "");
+        warningtitle = warningtitle.replaceAll("'", "´");
       }
-      const warningObject = {
-        warningtitle,
-        warningtext,
-      };
-      warningArray.push(warningObject);
+      const warningArray = [warningtitle, warningtext];
+      warningsArray.push(warningArray);
     });
 
-    return warningArray;
+    return warningsArray;
   }
 
   async fetchAndTransformWarnings(id: string) {
@@ -76,7 +74,7 @@ export class AwAService {
       return;
     }
 
-    let aktuellWarningArray: object[] = [];
+    let aktuellWarningArray: object[] | undefined = [];
 
     if (warningContent.match(/<h2>.*?Aktuelles.*?<\/h2>/)) {
       const aktuellwarning = warningContent
@@ -89,7 +87,7 @@ export class AwAService {
       .split(/<h2>.*?Sicherheit.*?<\/h2>/)[1]
       .split(/<h2>.*?Natur und Klima.*?<\/h2>/)[0];
 
-    let gesundheitswarning = "";
+    let gesundheitswarning: string = "";
 
     if (
       warningContent
@@ -104,23 +102,37 @@ export class AwAService {
 
     gesundheitswarning = gesundheitswarning.replaceAll(/<.*?>/g, "");
     gesundheitswarning = gesundheitswarning.replaceAll(/\.(?!\s)/g, ". ");
+    gesundheitswarning = gesundheitswarning.replaceAll("'", "´");
 
     const sicherheitswarningArray = this.transformWarning(sicherheitswarning);
 
+    let severity;
+
+    if (warning.warning == true) {
+      severity = "Warnung";
+    } else if (warning.partialWarning == true) {
+      severity = "Teilwarnung";
+    } else if (warning.situationWarning == true) {
+      severity = "Situationswarnung";
+    } else if (warning.situationPartWarning == true) {
+      severity = "Teil-Situationswarnung";
+    }
+
+    if (aktuellWarningArray.length == 0) {
+      aktuellWarningArray = undefined;
+    }
+
+    const countryName = warning.countryName.replaceAll("'", "´");
+
     const result: IWarningModel = {
-      countryCode: warning.countryCode,
-      iso3CountryCode: warning.iso3CountryCode,
-      countryName: warning.countryName,
-      warning: warning.warning,
-      partialWarning: warning.partialWarning,
-      situationWarning: warning.situationWarning,
-      situationPartWarning: warning.situationPartWarning,
+      country: countryName,
+      ISO3: warning.iso3CountryCode,
+      severity: severity,
       link: `https://www.auswaertiges-amt.de/de/service/laender/${id}`,
-      warningText: {
-        aktuell: aktuellWarningArray,
-        sicherheit: sicherheitswarningArray,
-        gesundheit: gesundheitswarning,
-      },
+      aktuell: aktuellWarningArray,
+      sicherheit: sicherheitswarningArray,
+      gesundheit: gesundheitswarning ? gesundheitswarning : undefined,
+      lastModified: warning.lastModified,
     };
 
     return result;
@@ -157,12 +169,14 @@ export class AwAService {
       }
     });
 
-    const result: any = [];
+    const result: IWarningModel[] | undefined = [];
 
     const promises = countryWarningswithWarning.map(async (country: any) => {
       try {
         const fetchResult = await this.fetchAndTransformWarnings(country.id);
-        result.push(fetchResult);
+        if (fetchResult) {
+          result.push(fetchResult);
+        }
       } catch (error) {
         console.error(
           `Failed to fetch and transform warnings for country ID: ${country.id}`,
@@ -173,6 +187,9 @@ export class AwAService {
 
     // Warten Sie auf die Auflösung aller Promises
     await Promise.all(promises);
-    return result;
+
+    const returnvalue = await this.awaRepository.fetchData(result);
+
+    return returnvalue;
   }
 }
