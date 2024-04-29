@@ -214,13 +214,13 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "product_warning",
               title: row.title ?? undefined,
-              description:
-                row.description === "null"
-                  ? undefined
-                  : row.description ?? undefined,
               area: undefined,
               publishedDate: row.publisheddate ?? undefined,
               details: {
+                description:
+                  row.description === "null"
+                    ? undefined
+                    : row.description ?? undefined,
                 link: row.warning_link ?? undefined,
                 manufacturer:
                   result_productInformations.rows.find(
@@ -259,10 +259,6 @@ export class ProductWarningRepository {
               id: row.warning_id,
               type: "food_warning",
               title: row.title ?? undefined,
-              description:
-                row.description === "null"
-                  ? undefined
-                  : row.description ?? undefined,
               area:
                 result_foodInformations.rows.find(
                   (row2: any) => row2.warning_id === row.warning_id,
@@ -270,6 +266,10 @@ export class ProductWarningRepository {
               publishedDate: row.publisheddate ?? undefined,
 
               details: {
+                description:
+                  row.description === "null"
+                    ? undefined
+                    : row.description ?? undefined,
                 link: row.warning_link ?? undefined,
                 manufacturer:
                   result_foodInformations.rows.find(
@@ -315,6 +315,10 @@ export class ProductWarningRepository {
         console.log(result_productInformations.rows[0]);
         console.log(result_safetyInformations.rows[0]);
         details = {
+          description:
+            result_warnings.rows[0].description === "null"
+              ? undefined
+              : result_warnings.rows[0].description ?? undefined,
           link: result_warnings.rows[0].warning_link ?? undefined,
           manufacturer:
             result_productInformations.rows[0].manufacturer ?? undefined,
@@ -345,6 +349,10 @@ export class ProductWarningRepository {
         );
         console.log("Fooddetails selected");
         details = {
+          description:
+            result_warnings.rows[0].description === "null"
+              ? undefined
+              : result_warnings.rows[0].description ?? undefined,
           link: result_warnings.rows[0].warning_link ?? undefined,
           manufacturer:
             result_foodInformations.rows[0].manufacturer ?? undefined,

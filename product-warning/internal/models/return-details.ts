@@ -1,4 +1,5 @@
 export interface IDetailsReturnSchema {
+  description: string | undefined;
   link: string | undefined;
   manufacturer: string | undefined;
   category: string | undefined;

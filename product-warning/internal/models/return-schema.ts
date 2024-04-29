@@ -2,10 +2,10 @@ export interface IReturnSchema {
   id: number;
   type: string;
   title: string | undefined;
-  description: string | undefined;
   area: string[] | undefined;
   publishedDate: string | undefined;
   details: {
+    description: string | undefined;
     link: string | undefined;
     manufacturer: string | undefined;
     category: string | undefined;
