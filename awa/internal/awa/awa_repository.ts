@@ -1,6 +1,7 @@
 import { Pool } from "pg";
 import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class AwARepository {
   constructor(private readonly db: Pool) {}
@@ -169,30 +170,32 @@ export class AwARepository {
       return result;
     }
   }
-  //
-  //async getDetails(id: string) {
-  //  const client = await this.db.connect();
-  //  let details: IDetailsReturnSchema | undefined = undefined;
-  //  try {
-  //    const result_warnings = await client.query(
-  //      "SELECT * FROM dwd.warnings WHERE warning_id = $1;",
-  //      [id],
-  //    );
-  //    console.log("Details selected");
-  //    if (result_warnings.rows.length > 0) {
-  //      const row = result_warnings.rows[0];
-  //      details = {
-  //        description: row.description === "null" ? undefined : row.description,
-  //        instruction: row.instruction === "null" ? undefined : row.instruction,
-  //      };
-  //    }
-  //  } finally {
-  //    client.release();
-  //    if (details !== undefined) {
-  //      return details;
-  //    } else {
-  //      return 204;
-  //    }
-  //  }
-  //}
+  
+  async getDetails(id: string) {
+    const client = await this.db.connect();
+    let details: IDetailsReturnSchema | undefined = undefined;
+    try {
+      const result_warnings = await client.query(
+        "SELECT * FROM awa.warnings WHERE warning_id = $1;",
+        [id],
+      );
+      console.log("Details selected");
+      if (result_warnings.rows.length > 0) {
+        const row = result_warnings.rows[0];
+        details = {
+          link: row.warning_link,
+          aktuell: row.aktuell === "undefined" ? undefined : row.aktuell,
+          sicherheit: row.sicherheit,
+          gesundheit: row.gesundheit === "undefined" ? undefined : row.gesundheit,
+        };
+      }
+    } finally {
+      client.release();
+      if (details !== undefined) {
+        return details;
+      } else {
+        return 204;
+      }
+    }
+  }
 }

@@ -197,4 +197,9 @@ export class AwAService {
     const data = this.awaRepository.getData(timestamp);
     return data;
   }
+
+  async getDetails(id: string) {
+    const data = this.awaRepository.getDetails(id);
+    return data;
+  }
 }
