@@ -192,4 +192,9 @@ export class AwAService {
 
     return returnvalue;
   }
+
+  async getData(timestamp: number) {
+    const data = this.awaRepository.getData(timestamp);
+    return data;
+  }
 }

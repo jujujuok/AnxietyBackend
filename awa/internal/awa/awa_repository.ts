@@ -1,5 +1,6 @@
 import { Pool } from "pg";
 import { IWarningModel } from "../models/warning";
+import { IReturnSchema } from "../models/return-schema";
 
 export class AwARepository {
   constructor(private readonly db: Pool) {}
@@ -108,65 +109,66 @@ export class AwARepository {
     }
   }
 
-  //async getClosedData(timestamp: number) {
-  //  if (!timestamp) {
-  //    return "";
-  //  }
-  //
-  //  var warningids = [];
-  //
-  //  const client = await this.db.connect();
-  //  try {
-  //    const result = await client.query(
-  //      `SELECT warning_id FROM dwd.warnings WHERE loadenddate > TO_TIMESTAMP(${timestamp}/1000)`,
-  //    );
-  //    warningids = result.rows;
-  //    console.log(result.rows.length + " rows closed since last request");
-  //  } finally {
-  //    client.release();
-  //    return warningids;
-  //  }
-  //}
+  async getClosedData(timestamp: number) {
+    if (!timestamp) {
+      return "";
+    }
+  
+    var warningids = [];
+  
+    const client = await this.db.connect();
+    try {
+      const result = await client.query(
+        `SELECT warning_id FROM awa.warnings WHERE loadenddate > TO_TIMESTAMP(${timestamp}/1000)`,
+      );
+      warningids = result.rows;
+      console.log(result.rows.length + " rows closed since last request");
+    } finally {
+      client.release();
+      return warningids;
+    }
+  }
 
-  //async getData(timestamp: number) {
-  //  const warnings: IReturnSchema[] = [];
-  //
-  //  const client = await this.db.connect();
-  //  try {
-  //    var timestampstatement = "WHERE";
-  //    if (timestamp) {
-  //      timestampstatement = `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000) AND`;
-  //    }
-  //
-  //    const resultwarnings = await client.query(
-  //      `SELECT warning_id, warning_type, title, description, instruction, ST_AsGeoJSON(coordinates) AS coordinates FROM dwd.warnings ${timestampstatement} loadenddate IS NULL`,
-  //    );
-  //
-  //    console.log(resultwarnings.rows.length + " rows selected");
-  //
-  //    resultwarnings.rows.forEach((row: any) => {
-  //      const coordinates = JSON.parse(row.coordinates).coordinates;
-  //
-  //      const warning: IReturnSchema = {
-  //        id: row.warning_id,
-  //        type: "weather",
-  //        warning: row.warning_type,
-  //        title: row.title,
-  //        area: coordinates,
-  //        details: {
-  //          description: row.description,
-  //          instruction: row.instruction,
-  //        },
-  //      };
-  //      warnings.push(warning);
-  //    });
-  //  } finally {
-  //    client.release();
-  //    const closedWarningIds = await this.getClosedData(timestamp);
-  //    const result = [warnings, closedWarningIds];
-  //    return result;
-  //  }
-  //}
+  async getData(timestamp: number) {
+    const warnings: IReturnSchema[] = [];
+
+    const client = await this.db.connect();
+    try {
+      var timestampstatement = "WHERE";
+      if (timestamp) {
+        timestampstatement = `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000) AND`;
+      }
+
+      const resultwarnings = await client.query(
+        `SELECT * FROM awa.warnings ${timestampstatement} loadenddate IS NULL`,
+      );
+
+      console.log(resultwarnings.rows.length + " rows selected");
+
+      resultwarnings.rows.forEach((row: any) => {
+
+        const warning: IReturnSchema = {
+          id: row.warning_id,
+          type: "travel_warning",
+          severity: row.severity,
+          country: row.country,
+          iso3: row.iso3,
+          details: {
+            link: row.warning_link,
+            aktuell: row.aktuell === "undefined" ? undefined : row.aktuell,
+            sicherheit: row.sicherheit,
+            gesundheit: row.gesundheit === "undefined" ? undefined : row.gesundheit,
+          },
+        };
+        warnings.push(warning);
+      });
+    } finally {
+      client.release();
+      const closedWarningIds = await this.getClosedData(timestamp);
+      const result = [warnings, closedWarningIds];
+      return result;
+    }
+  }
   //
   //async getDetails(id: string) {
   //  const client = await this.db.connect();

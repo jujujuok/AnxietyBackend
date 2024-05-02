@@ -71,6 +71,7 @@ const setupLog = async (server: FastifyInstance) => {
 const addTypeRoutes = (controller: AwAController): FastifyPluginCallback => {
   return (instance, options, done) => {
     instance.get("/fetchData", controller.fetchData.bind(controller));
+    instance.get("/getData", controller.getData.bind(controller));
     done();
   };
 };
