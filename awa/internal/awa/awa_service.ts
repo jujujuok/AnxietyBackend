@@ -2,6 +2,7 @@ import { AwARepository } from "./awa_repository";
 import axios from "axios";
 import https from "https";
 import { IWarningModel } from "../models/warning";
+import { IEmbassyModel } from "../models/embassy";
 
 export class AwAService {
   constructor(private readonly awaRepository: AwARepository) {}
@@ -140,7 +141,7 @@ export class AwAService {
     return result;
   }
 
-  async fetchData() {
+  async fetchWarnings() {
     const countryWarnings = (
       await this.callApi(
         "https://www.auswaertiges-amt.de/opendata/travelwarning",
@@ -187,12 +188,55 @@ export class AwAService {
       }
     });
 
-    // Warten Sie auf die Auflösung aller Promises
     await Promise.all(promises);
 
-    const returnvalue = await this.awaRepository.fetchData(result);
+    const returnvalue = await this.awaRepository.fetchWarnings(result);
 
     return returnvalue;
+  }
+
+  transformEmbassy(embassysCountry: any) {
+    const embassyContent = embassysCountry.contentList;
+    const country = embassysCountry.country;
+    const lastModified = embassysCountry.lastModified;
+
+    const embassys: IEmbassyModel[] = [];
+
+    embassyContent.forEach((embassyId: string) => {
+      const embassy = embassysCountry[embassyId];
+      const embassyModel: IEmbassyModel = {
+        country: country,
+        city: embassy.city,
+        description: embassy.description,
+        address: embassy.address,
+        open: embassy.open,
+        contact: embassy.contact,
+      };
+      embassys.push(embassyModel);
+    });
+
+    return embassys;
+  };
+
+  async fetchEmbassys() {
+    const apiResponse = (await this.callApi("https://www.auswaertiges-amt.de/opendata/representativesInCountry")).response;
+    if (!apiResponse) {
+      console.error("Failed to fetch data");
+      return;
+    }
+
+    const countryIds = apiResponse.contentList;
+    const embassys: IEmbassyModel[] = [];
+
+    countryIds.forEach(async (countryid: string) => {
+      const country = apiResponse[countryid];
+      const embassysReturnArray = this.transformEmbassy(country);
+      embassysReturnArray.forEach((embassy: any) => {
+        embassys.push(embassy);
+      });
+    });
+
+    return embassys;
   }
 
   async getData(timestamp: number) {

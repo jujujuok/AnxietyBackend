@@ -64,7 +64,7 @@ export class AwARepository {
     }
   }
 
-  async fetchData(warnings: IWarningModel[]) {
+  async fetchWarnings(warnings: IWarningModel[]) {
     const newwarnings = await this.checkData(warnings);
 
     if (newwarnings.length == 0) {
@@ -73,16 +73,14 @@ export class AwARepository {
     }
     const values_warnings = newwarnings
       .map((warning) => {
-        // Prüfen, ob 'aktuell' undefined ist und entsprechend behandeln
         const aktuellArray = warning.aktuell
           ? warning.aktuell.map((aktuell) => `'${aktuell}'`).join(", ")
           : "NULL";
-        // Prüfen, ob 'sicherheit' undefined ist und entsprechend behandeln
+
         const sicherheitArray = warning.sicherheit
           ? warning.sicherheit.map((sicherheit) => `'${sicherheit}'`).join(", ")
           : "NULL";
 
-        // Verwenden von NULL oder ARRAY, je nachdem, ob die Werte vorhanden sind oder nicht
         const aktuellValue = warning.aktuell
           ? `ARRAY[${aktuellArray}]`
           : "NULL";

@@ -5,8 +5,13 @@ import { updateRequest, detailsRequest } from "../utils/fastifyRequests";
 export class AwAController {
   constructor(private readonly awaService: AwAService) {}
 
-  async fetchData(req: FastifyRequest, reply: FastifyReply) {
-    const result = await this.awaService.fetchData();
+  async fetchWarnings(req: FastifyRequest, reply: FastifyReply) {
+    const result = await this.awaService.fetchWarnings();
+    return reply.send(result);
+  }
+
+  async fetchEmbassys(req: FastifyRequest, reply: FastifyReply) {
+    const result = await this.awaService.fetchEmbassys();
     return reply.send(result);
   }
 
