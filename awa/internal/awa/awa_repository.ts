@@ -56,10 +56,7 @@ export class AwARepository {
         );
       });
     } finally {
-      warnings = warnings.filter(
-        (warning: IWarningModel) =>
-          warning.ISO3 != "JPN" && warning.ISO3 != "SSD",
-      );
+      
 
       client.release();
       console.log("New Data: " + warnings.length);

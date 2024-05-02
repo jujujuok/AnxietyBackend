@@ -28,6 +28,7 @@ export class AwAService {
     const warningsArray: object[] = [];
 
     if (!warning.includes("<h3>")) {
+      warning = warning.replaceAll("\n", "");
       warning = warning.replaceAll(/<.*?>/g, "");
       warning = warning.replaceAll(/\.(?!\s)/g, ". ");
       warning = warning.replaceAll("'", "´");
@@ -46,6 +47,7 @@ export class AwAService {
       } else {
         warningtext = element;
       }
+      warningtext = warningtext.replaceAll("\n", "");
       warningtext = warningtext.replaceAll(/<.*?>/g, "");
       warningtext = warningtext.replaceAll(/\.(?!\s)/g, ". ");
       warningtext = warningtext.replaceAll("'", "´");
