@@ -38,7 +38,7 @@ export class AwARepository {
     }
   }
 
-  async checkData(warnings: IWarningModel[]) {
+  async checkWarnings(warnings: IWarningModel[]) {
     const values = warnings
       .map((warning: IWarningModel) => `'${warning.ISO3}'`)
       .join(",");
@@ -65,7 +65,7 @@ export class AwARepository {
   }
 
   async fetchWarnings(warnings: IWarningModel[]) {
-    const newwarnings = await this.checkData(warnings);
+    const newwarnings = await this.checkWarnings(warnings);
 
     if (newwarnings.length == 0) {
       console.log("No new data");
@@ -105,7 +105,7 @@ export class AwARepository {
     }
   }
 
-  async getClosedData(timestamp: number) {
+  async getClosedWarnings(timestamp: number) {
     if (!timestamp) {
       return "";
     }
@@ -125,7 +125,7 @@ export class AwARepository {
     }
   }
 
-  async getData(timestamp: number) {
+  async getWarning(timestamp: number) {
     const warnings: IReturnSchema[] = [];
 
     const client = await this.db.connect();
@@ -144,7 +144,7 @@ export class AwARepository {
       resultwarnings.rows.forEach((row: any) => {
 
         const warning: IReturnSchema = {
-          id: row.warning_id,
+          id: "tra." + row.warning_id,
           type: "travel_warning",
           severity: row.severity,
           country: row.country,
@@ -160,12 +160,17 @@ export class AwARepository {
       });
     } finally {
       client.release();
-      const closedWarningIds = await this.getClosedData(timestamp);
+      const closedWarningIds = await this.getClosedWarnings(timestamp);
       const result = [warnings, closedWarningIds];
       return result;
     }
   }
   
+  async getData(timestamp: number){
+    const warnings = await this.getWarning(timestamp);
+    return warnings;
+  }
+
   async getDetails(id: string) {
     const client = await this.db.connect();
     let details: IDetailsReturnSchema | undefined = undefined;

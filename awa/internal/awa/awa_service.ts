@@ -17,7 +17,7 @@ export class AwAService {
     });
 
     try {
-      const response = await axios.get(url, { headers, httpsAgent: agent });
+      const response = await axios.get(url, { httpsAgent: agent });
       return response.data;
     } catch (error) {
       console.error(error);
@@ -195,26 +195,44 @@ export class AwAService {
     return returnvalue;
   }
 
-  transformEmbassy(embassysCountry: any) {
-    const embassyContent = embassysCountry.contentList;
-    const country = embassysCountry.country;
-    const lastModified = embassysCountry.lastModified;
+  //async getCoordinatesEmbassy(address: string, country: string): Promise<any>{
+  //  const apiResponse = await this.callApi(`https://nominatim.openstreetmap.org/search?${address},${country}&format=json&addressdetails=1`);
+  //  return apiResponse;
+  //}
 
+  transformEmbassy(embassysCountry: any) {
+    const embassyContent: string[] = embassysCountry.contentList;
     const embassys: IEmbassyModel[] = [];
+
+    if (!embassyContent) {
+      console.error("Failed to fetch data");
+      return [embassysCountry.country];
+    }
 
     embassyContent.forEach((embassyId: string) => {
       const embassy = embassysCountry[embassyId];
+
       const embassyModel: IEmbassyModel = {
-        country: country,
+        country: embassy.country,
         city: embassy.city,
         description: embassy.description,
         address: embassy.address,
         open: embassy.open,
         contact: embassy.contact,
+        lastModified: embassy.lastModified,
+        leader: embassy.leader,
+        emergencyphone: embassy.emergencyphone,
+        phone: embassy.phone,
+        fax: embassy.fax,
+        website: embassy.website ? embassy.website[0] : undefined,
+        mail: embassy.mail,
+        postal: embassy.postal,
+        county: embassy.county,
+        misc: embassy.misc,
+        remark: embassy.remark,
       };
       embassys.push(embassyModel);
     });
-
     return embassys;
   };
 

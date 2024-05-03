@@ -1,9 +1,19 @@
 export interface IEmbassyModel {
-  country: string;
-  city: string;
-  description: string;
-  address: string;
-  open: string;
-  contact: string;
-  // es fehlen noch viele Sachen
+  country: string | undefined;
+  city: string | undefined;
+  description: string | undefined;
+  leader: string | undefined;
+  address: string | undefined;
+  open: string | undefined;
+  contact: string | undefined;
+  emergencyphone: string | undefined;
+  phone: string | undefined;
+  fax: string | undefined;
+  website: string | undefined;
+  mail: string | undefined;
+  lastModified: number | undefined;
+  postal: string | undefined;
+  county: string | undefined;
+  misc: string | undefined;
+  remark: string | undefined;
 }
