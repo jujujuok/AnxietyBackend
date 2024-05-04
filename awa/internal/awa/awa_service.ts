@@ -221,7 +221,7 @@ export class AwAService {
         contact: embassy.contact,
         lastModified: embassy.lastModified,
         leader: embassy.leader,
-        emergencyphone: embassy.emergencyphone,
+        emergencyphone: embassy.emergencyPhone,
         phone: embassy.phone,
         fax: embassy.fax,
         website: embassy.website ? embassy.website[0] : undefined,
