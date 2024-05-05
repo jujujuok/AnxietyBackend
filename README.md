@@ -1,63 +1,103 @@
-# AnxietyBackend
+![Website](https://img.shields.io/website?url=http%3A%2F%2Fapi.risiko-radar.info%2Fhealthcheck&label=API%20Status&link=http%3A%2F%2Fapi.risiko-radar.info%2Fhealthcheck)
 
-## Start Backend locally
 
-### Build docker images
+# Risiko Radar Backend
+
+A set of services collecting warnings from different APIs.
+These warnings are then processed and stored in a database.
+The data is then served to the frontend via a Main REST API (risiko-radar).
+
+_See the openapi documentation for more information on the endpoints._
+
+This solves the problem of having to access different apps and websites to access information regarding your security.
+
+## Table of Contents
+* [Clone the repository](#clone-the-repository)
+* [Requirements](#requirements)
+* [Local Development Setup](#local-development-setup)
+* [Access the production environment](#access-the-production-environment)
+* [Technologies used](#technologies-used)
+
+## Clone the repository
 
 ```bash
-cd anxietyBackend/anxiety
-docker build -t anxiety-api .
-
-cd ../product-warning
-docker build -t product-warning-api .
-
-...
+git clone https://github.com/jujujuok/AnxietyBackend.git
 ```
 
-### Start docker compose
+## Requirements
+
+- Node.js/NPM
+- Docker
+- Docker Compose
+
+## Local Development Setup
+
+Create a `.env` file in the root directory of the repository with content based on the `.env.example` file.
+
+The values for the .env file can be copied from the server.
+
+### Start single service
+
+Copy the `.env` file to the directory of the service you want to start. 
+Then enter the directory and run the following command:
 
 ```bash
-cd ..
-docker compose up
+npm i
+npm build
+npm start
 ```
 
-Add the `-d` flag to run in detached mode.
+Alternatively, you can use the following command to start the service in development mode (with hot reload):
 
-## Update Images on Server
+```bash
+npm run dev
+```
+
+### Start all services
+To start all services, run the following command in the root directory of the repository:
+
+```bash
+docker compose up -d
+```
+
+**!This does not perfectly reflect the architecture running on the Server!**
+
+_Since all of the services are dependent on the database and it's content, there wouldn't be much sense in using a local db with blank tables. Therefore the services will connect to postgres and redis running on the server, allthough the docker compose services will start locally._
+
+_Also the `docker-compose.yml` has the same content as the server and will try to setup traefik routes for the domain and an ssl certificate, which will fail locally._
+
+## Access the production environment
+
+The production environment is running on a server with the following IP: `212.132.100.147`.
+You can access it via ssh if you have the correct permissions.
+
+### Update Images on Server
 
 To do this, you will need to have your ssh key added to the server.
 
-### Via the script
-
-execute the bashscript`./updateImages.sh`
-
-### Manually:
-
-#### Build and save images locally
+You can make a clean update of the images on the server by running the following script:
 
 ```bash
-docker build -t anxiety-api anxietyBackend/anxiety
-docker save anxiety-api:latest > anxiety-api.tar
-scp anxiety-api.tar root@212.132.100.147:/root/anxiety/dockerImages
-
-docker build -t product-warning-api anxietyBackend/product-warning
-docker save product-warning-api:latest > product-warning-api.tar
-scp product-warning-api.tar root@212.132.100.147:/root/anxiety/dockerImages
-
-...
+./updateImages.sh
 ```
 
-#### Load images on server
-
-`ssh 212.132.100.147 -l root`
-
+Alternatively, you can manually update one service:
 ```bash
-cd anxiety/dockerImages
-
-docker load < anxiety-api.tar
-docker load < product-warning-api.tar
-...
-
-cd ..
-docker compose up -d
+./updateService.sh <service-name>
 ```
+
+## Technologies used
+
+### API Services
+- TypeScript (language)
+- Node.js (runtime)
+- Fastify (framework for API services)
+- Axios (HTTP client)
+- Faker.js (mock data generator)
+
+### Architecture
+- Docker (containerization)
+- Traefik (reverse proxy)
+- PostgreSQL (database)
+- PostGIS (database extension for geospatial data)
+- Redis (cache)
