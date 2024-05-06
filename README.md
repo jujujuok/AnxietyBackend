@@ -1,5 +1,4 @@
-![Website](https://img.shields.io/website?url=http%3A%2F%2Fapi.risiko-radar.info%2Fhealthcheck&label=API%20Status&link=http%3A%2F%2Fapi.risiko-radar.info%2Fhealthcheck)
-
+![Website](https://img.shields.io/website?url=http%3A%2F%2Fapi.risiko-radar.info%2Fhealth&label=API%20Status&link=https%3A%2F%2Frisiko-radar.info%2F)
 
 # Risiko Radar Backend
 

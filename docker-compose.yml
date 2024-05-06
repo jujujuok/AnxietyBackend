@@ -60,6 +60,11 @@ services:
       - "8000:8000"
     networks:
       - backend
+    # healthcheck:
+    #   test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8000/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.risiko-radar.rule=Host(`api.risiko-radar.info`)"

@@ -127,6 +127,10 @@ const setupRoutes = async (
   server.register(addWorldMapRoutes(worldMapController), {
     prefix: "/world-map",
   });
+
+  server.get("/health", async (request, reply) => {
+    reply.send({ status: "ok" });
+  });
 };
 
 /**
