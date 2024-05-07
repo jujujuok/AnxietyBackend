@@ -1,4 +1,4 @@
-export interface IReturnSchema {
+export interface IReturnWarningSchema {
   id: string;
   type: string;
   severity: string;

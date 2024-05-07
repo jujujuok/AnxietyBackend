@@ -211,33 +211,43 @@ export class AwAService {
 
     embassyContent.forEach((embassyId: string) => {
       const embassy = embassysCountry[embassyId];
+      const city = embassy.city ? embassy.city.replaceAll("'", "´") : undefined;
+      const country = embassy.country
+        ? embassy.country.replaceAll("'", "´")
+        : undefined;
+      const description = embassy.description
+        ? embassy.description.replaceAll("'", "´")
+        : undefined;
+      const address = embassy.address
+        ? embassy.address.replaceAll("'", "´")
+        : undefined;
+      const contact = embassy.contact
+        ? embassy.contact.replaceAll("'", "´")
+        : undefined;
 
       const embassyModel: IEmbassyModel = {
-        country: embassy.country,
-        city: embassy.city,
-        description: embassy.description,
-        address: embassy.address,
-        open: embassy.open,
-        contact: embassy.contact,
+        country: country,
+        city: city,
+        description: description,
+        address: address,
+        contact: contact,
         lastModified: embassy.lastModified,
-        leader: embassy.leader,
         emergencyphone: embassy.emergencyPhone,
         phone: embassy.phone,
-        fax: embassy.fax,
         website: embassy.website ? embassy.website[0] : undefined,
         mail: embassy.mail,
-        postal: embassy.postal,
-        county: embassy.county,
-        misc: embassy.misc,
-        remark: embassy.remark,
       };
       embassys.push(embassyModel);
     });
     return embassys;
-  };
+  }
 
   async fetchEmbassys() {
-    const apiResponse = (await this.callApi("https://www.auswaertiges-amt.de/opendata/representativesInCountry")).response;
+    const apiResponse = (
+      await this.callApi(
+        "https://www.auswaertiges-amt.de/opendata/representativesInCountry",
+      )
+    ).response;
     if (!apiResponse) {
       console.error("Failed to fetch data");
       return;
@@ -254,7 +264,7 @@ export class AwAService {
       });
     });
 
-    return embassys;
+    return this.awaRepository.fetchEmbassys(embassys);
   }
 
   async getData(timestamp: number) {
