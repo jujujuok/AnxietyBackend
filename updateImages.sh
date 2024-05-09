@@ -13,6 +13,7 @@ ssh root@212.132.100.147 "docker image remove product-warning-api:latest"
 ssh root@212.132.100.147 "docker image remove nina-api:latest"
 ssh root@212.132.100.147 "docker image remove autobahn-api:latest"
 ssh root@212.132.100.147 "docker image remove dwd-api:latest"
+ssh root@212.132.100.147 "docker image remove awa-api:latest"
 
 #build and save images
 echo "\n###Building and saving images###\n"
@@ -36,6 +37,10 @@ rm dwd-api.tar
 docker build -t dwd-api ../dwd
 docker save dwd-api:latest > dwd-api.tar
 
+rm awa-api.tar
+docker build -t awa-api ../awa
+docker save awa-api:latest > awa-api.tar
+
 #copy images to server
 echo "\n###Copying images to server###\n"
 cd ..
@@ -48,7 +53,7 @@ ssh root@212.132.100.147 "docker load < /root/dockerImages/product-warning-api.t
 ssh root@212.132.100.147 "docker load < /root/dockerImages/nina-api.tar"
 ssh root@212.132.100.147 "docker load < /root/dockerImages/autobahn-api.tar"
 ssh root@212.132.100.147 "docker load < /root/dockerImages/dwd-api.tar"
-
+ssh root@212.132.100.147 "docker load < /root/dockerImages/awa-api.tar"
 
 #run images on server
 echo "\n###Running images on server###\n"

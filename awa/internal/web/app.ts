@@ -56,7 +56,7 @@ const setupServices = async (db: Pool) => {
 const setupRoutes = async (server: FastifyInstance, service: AwAService) => {
   const awaController = new AwAController(service);
 
-  server.register(addTypeRoutes(awaController), { prefix: "/awa" });
+  server.register(addTypeRoutes(awaController));
 };
 
 const setupLog = async (server: FastifyInstance) => {
