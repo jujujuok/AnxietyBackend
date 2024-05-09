@@ -34,8 +34,8 @@ const setupDB = async (server: FastifyInstance) => {
   const db_pool = new Pool({
     host: process.env.HOST || "",
     database: process.env.DATABASE || "",
-    user: process.env.TEMPLATE_USER || "",
-    password: process.env.TEMPLATE_PASSWORD || "",
+    user: process.env.AWA_USER || "",
+    password: process.env.AWA_PASSWORD || "",
   });
 
   server.addHook("onClose", async () => {
