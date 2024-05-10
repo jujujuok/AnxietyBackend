@@ -25,6 +25,11 @@ export class DwDRepository {
       .join(",");
     const closeresult = await this.closeData(values);
 
+    if (values == ""){
+      console.log("New Data: 0");
+      return warnings;
+    }
+
     const client = await this.db.connect();
     try {
       const result = await client.query(
