@@ -7,10 +7,16 @@ export class DwDRepository {
   constructor(private readonly db: Pool) {}
 
   async closeData(warningids: any) {
+    var whereStatement = `WHERE WHERE warning_id NOT IN (${warningids}) AND loadenddate IS NULL`;
+
+    if (warningids == "") {
+      whereStatement = `WHERE loadenddate IS NULL`;
+    }
+
     const client = await this.db.connect();
     try {
       const result = await client.query(
-        `Update dwd.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN (${warningids}) AND loadenddate IS NULL`,
+        `Update dwd.warnings SET loadenddate = CURRENT_TIMESTAMP ${whereStatement}`,
       );
       console.log(result.rowCount + " rows updated");
     } finally {
