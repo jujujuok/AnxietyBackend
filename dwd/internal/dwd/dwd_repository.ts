@@ -7,7 +7,7 @@ export class DwDRepository {
   constructor(private readonly db: Pool) {}
 
   async closeData(warningids: any) {
-    var whereStatement = `WHERE WHERE warning_id NOT IN (${warningids}) AND loadenddate IS NULL`;
+    var whereStatement = `WHERE warning_id NOT IN (${warningids}) AND loadenddate IS NULL`;
 
     if (warningids == "") {
       whereStatement = `WHERE loadenddate IS NULL`;
