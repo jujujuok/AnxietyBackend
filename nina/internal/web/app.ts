@@ -56,7 +56,7 @@ const setupServices = async (db: Pool) => {
 const setupRoutes = async (server: FastifyInstance, service: NinaService) => {
   const ninaController = new NinaController(service);
 
-  server.register(addNinaRoutes(ninaController), { prefix: "/nina" });
+  server.register(addNinaRoutes(ninaController));
 };
 
 const setupLog = async (server: FastifyInstance) => {

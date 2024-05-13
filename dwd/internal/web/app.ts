@@ -53,7 +53,7 @@ const setupServices = async (db: Pool) => {
 const setupRoutes = async (server: FastifyInstance, service: DwDService) => {
   const dwdController = new DwDController(service);
 
-  server.register(addTypeRoutes(dwdController), { prefix: "/dwd" });
+  server.register(addTypeRoutes(dwdController));
 };
 
 const setupLog = async (server: FastifyInstance) => {

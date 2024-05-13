@@ -60,9 +60,7 @@ const setupRoutes = async (
 ) => {
   const productWarningController = new ProductWarningController(service);
 
-  server.register(addProductWarningRoutes(productWarningController), {
-    prefix: "/product-warning",
-  });
+  server.register(addProductWarningRoutes(productWarningController));
 };
 
 const setupLog = async (server: FastifyInstance) => {
