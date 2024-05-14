@@ -59,9 +59,7 @@ const setupRoutes = async (
 ) => {
   const autobahnController = new AutobahnController(service);
 
-  server.register(addAutobahnRoutes(autobahnController), {
-    prefix: "/autobahn",
-  });
+  server.register(addAutobahnRoutes(autobahnController));
 };
 
 const setupLog = async (server: FastifyInstance) => {
