@@ -3,7 +3,6 @@ import { IFoodWarningModel } from "../models/food-warning";
 import { IWarningsModel } from "../models/warnings";
 import { ProductWarningRepository } from "./product-warning_repository";
 import axios from "axios";
-import { time } from "console";
 
 export class ProductWarningService {
   constructor(
@@ -25,86 +24,76 @@ export class ProductWarningService {
       return response.data;
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
+  parseProductWarning(warning: any): IProductWarningModel {
+    return {
+      warning_id: warning.id,
+      warning_type: "p",
+      publishedDate: warning.publishedDate.toString(),
+      warning_link: warning.link ? warning.link.replaceAll("'", '"') : null,
+      title: warning.title ? warning.title.replaceAll("'", '"') : null,
+      description: warning.warning
+        ? warning.warning.replaceAll("'", '"')
+        : null,
+      manufacturer: warning.product
+        ? warning.product.manufacturer
+          ? warning.product.manufacturer.replaceAll("'", '"')
+          : null
+        : null,
+      category: warning.product
+        ? warning.product.category
+          ? warning.product.category.replaceAll("'", '"')
+          : null
+        : null,
+      hazard: warning.safetyInformation
+        ? warning.safetyInformation.hazard
+          ? warning.safetyInformation.hazard.replaceAll("'", '"')
+          : null
+        : null,
+      injury: warning.safetyInformation
+        ? warning.safetyInformation.injury
+          ? warning.safetyInformation.injury.replaceAll("'", '"')
+          : null
+        : null,
+      affectedProducts: warning.product
+        ? warning.product.affectedProducts
+          ? warning.product.affectedProducts.replaceAll("'", '"')
+          : null
+        : null,
+      image: warning.product ? warning.product.imageUrls[0] : null,
+    };
+  }
+
+  parseFoodWarning(warning: any): IFoodWarningModel {
+    return {
+      warning_id: warning.id,
+      warning_type: "f",
+      warning_link: warning.link.replaceAll("'", '"'),
+      publishedDate: warning.publishedDate.toString(),
+      title: warning.title.replaceAll("'", '"'),
+      description: warning.warning.replaceAll("'", '"'),
+      affectedStates: warning.affectedStates,
+      manufacturer: warning.product
+        ? warning.product.manufacturer.replaceAll("'", '"')
+        : null,
+      image: warning.product ? warning.product.imageUrls[0] : null,
+    };
+  }
+
   getWarnings(data: any) {
-    var warnings: IWarningsModel = { foods: [], products: [] };
+    const warnings: IWarningsModel = { foods: [], products: [] };
     data.response.docs.forEach((warning: any) => {
       if (warning._type === ".ProductWarning") {
-        const productWarning: IProductWarningModel = {
-          warning_id: warning.id,
-          warning_type: "p",
-          publishedDate: warning.publishedDate.toString(),
-          warning_link: warning.link ? warning.link.replaceAll("'", '"') : null,
-          title: warning.title ? warning.title.replaceAll("'", '"') : null,
-          description: warning.warning
-            ? warning.warning.replaceAll("'", '"')
-            : null,
-          manufacturer: warning.product
-            ? warning.product.manufacturer
-              ? warning.product.manufacturer.replaceAll("'", '"')
-              : null
-            : null,
-          category: warning.product
-            ? warning.product.category
-              ? warning.product.category.replaceAll("'", '"')
-              : null
-            : null,
-          hazard: warning.safetyInformation
-            ? warning.safetyInformation.hazard
-              ? warning.safetyInformation.hazard.replaceAll("'", '"')
-              : null
-            : null,
-          injury: warning.safetyInformation
-            ? warning.safetyInformation.injury
-              ? warning.safetyInformation.injury.replaceAll("'", '"')
-              : null
-            : null,
-          affectedProducts: warning.product
-            ? warning.product.affectedProducts
-              ? warning.product.affectedProducts.replaceAll("'", '"')
-              : null
-            : null,
-          image: warning.product ? warning.product.imageUrls[0] : null,
-        };
-
-        warnings.products.push(productWarning);
+        warnings.products.push(this.parseProductWarning(warning));
       } else if (warning._type === ".FoodWarning") {
-        const foodWarning: IFoodWarningModel = {
-          warning_id: warning.id,
-          warning_type: "f",
-          warning_link: warning.link.replaceAll("'", '"'),
-          publishedDate: warning.publishedDate.toString(),
-          title: warning.title.replaceAll("'", '"'),
-          description: warning.warning.replaceAll("'", '"'),
-          affectedStates: warning.affectedStates,
-          manufacturer: warning.product
-            ? warning.product.manufacturer.replaceAll("'", '"')
-            : null,
-          image: warning.product ? warning.product.imageUrls[0] : null,
-        };
-        warnings.foods.push(foodWarning);
+        warnings.foods.push(this.parseFoodWarning(warning));
       }
     });
 
     return warnings;
-  }
-
-  async fetchAll() {
-    const body = {
-      food: {
-        sort: "publishedDate desc, title asc",
-      },
-      products: {
-        sort: "publishedDate desc, title asc",
-      },
-    };
-
-    const data = await this.callApi(body);
-    const warnings = this.getWarnings(data);
-
-    return this.productWarningRepository.saveAll(warnings);
   }
 
   async fetchUpdate() {

@@ -60,9 +60,7 @@ const setupRoutes = async (
 ) => {
   const productWarningController = new ProductWarningController(service);
 
-  server.register(addProductWarningRoutes(productWarningController), {
-    prefix: "/product-warning",
-  });
+  server.register(addProductWarningRoutes(productWarningController));
 };
 
 const setupLog = async (server: FastifyInstance) => {
@@ -78,7 +76,6 @@ const addProductWarningRoutes = (
   controller: ProductWarningController,
 ): FastifyPluginCallback => {
   return (instance, options, done) => {
-    instance.get("/fetchAll", controller.fetchAll.bind(controller)); // fetch all warnings from external API
     instance.get("/fetchUpdate", controller.fetchUpdate.bind(controller)); // fetch only new warnings from external API (last 600min)
     instance.get("/fetchUpdateAll", controller.fetchUpdateAll.bind(controller)); // fetch all warnings from external API, but don't override existing ones (last 6min)
     instance.get("/getData", controller.getData.bind(controller)); // get warnings from DB
