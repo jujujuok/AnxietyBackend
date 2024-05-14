@@ -1,111 +1,112 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { faker } from "@faker-js/faker";
-import { IWorldMapItem } from "../models/world-map";
+import {
+  IWorldMapItem,
+  IWorldMapItemDetails,
+  IWorldMapUpdate,
+} from "../models/world-map";
+import { Cache } from "../utils/cache";
+import { getDataFromApi } from "../utils/apiCalls";
 
 /**
  * WorldMap repository
  */
 export class WorldMapRepository {
+  constructor(private readonly redis: Cache) {}
+
   /**
-   * Get list of WorldMap items
-   * @returns List of WorldMap items
+   * Add a key-value pair to the cache
+   * @param id Key of the cache item
+   * @param value Value of the cache item
    */
-  async getWorldMap(): Promise<IWorldMapItem[]> {
-    // Example Data:
-    const worldMapItems: IWorldMapItem[] = [];
-
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const worldMapItem: IWorldMapItem = {
-        id: faker.internet.ip(),
-        type: faker.helpers.arrayElement([
-          "interpol_red",
-          "interpol_un",
-          "travel_warning",
-          "country_representative",
-        ]),
-        title:
-          faker.hacker.adjective() +
-          " " +
-          faker.hacker.ingverb() +
-          " " +
-          faker.hacker.noun(),
-        country: faker.location.country(),
-        since: faker.date.past().getTime(),
-      };
-
-      worldMapItems.push(worldMapItem);
-    }
-
-    return worldMapItems;
+  async setCacheItem(id: string, value: IWorldMapItemDetails) {
+    this.redis.set(id, value);
   }
 
   /**
-   * Get details of a WorldMap item
-   * @param worldMapId WorldMap ID
-   * @returns Details of a WorldMap item
+   * Retrieve a cache item by key
+   * @param id Key of the cache item
+   * @returns Cache item
    */
-  async getWorldMapDetails(worldMapId: string) {
-    // Example Data:
-    const worldMapDetails = {
-      id: worldMapId,
-      type: faker.helpers.arrayElement([
-        "interpol_red",
-        "interpol_un",
-        "travel_warning",
-        "country_representative",
-      ]),
-      details: {
-        name: faker.person.fullName(),
-        email: faker.internet.email(),
-        phone: faker.phone.number(),
-        job: faker.person.jobTitle(),
-        sex: faker.person.sex(),
-        address: faker.location.streetAddress(),
-        building: faker.location.buildingNumber(),
-      },
-    };
+  async getCacheItem(id: string): Promise<IWorldMapItemDetails | null> {
+    const cacheItem = await this.redis.get(id);
 
-    return worldMapDetails;
+    if (cacheItem) {
+      return cacheItem as IWorldMapItemDetails;
+    }
+    return null;
   }
 
   /**
-   * Get update of the WorldMap list
-   * @param timestamp Unix Timestamp
-   * @returns Update of the WorldMap list containing ids to remove and objects to add
+   * Delete a cache item by key
+   * @param id Key of the cache item
    */
-  async getWorldMapUpdate(timestamp: number) {
-    // Example Data:
-    const worldMapUpdate = {
-      add: [] as IWorldMapItem[],
-      delete: [] as number[],
+  async delCacheItem(id: string) {
+    this.redis.del(id);
+  }
+
+  /**
+   * Get list of nina warnings
+   * @returns MapUpdate Object
+   */
+  async getWarnings(api: string): Promise<IWorldMapUpdate> {
+    const warningResponseData = await getDataFromApi(
+      `http://${api}.risiko-radar.info/getData`,
+    );
+
+    const warningData: IWorldMapUpdate = {
+      add: warningResponseData[0],
+      delete: [],
     };
 
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      const worldMapItem: IWorldMapItem = {
-        id: faker.internet.ip(),
-        type: faker.helpers.arrayElement([
-          "interpol_red",
-          "interpol_un",
-          "travel_warning",
-          "country_representative",
-        ]),
-        title:
-          faker.hacker.adjective() +
-          " " +
-          faker.hacker.ingverb() +
-          " " +
-          faker.hacker.noun(),
-        country: faker.location.country(),
-        since: faker.date.past().getTime(),
-      };
+    return warningData;
+  }
 
-      worldMapUpdate.add.push(worldMapItem);
+  async getWarningUpdate(
+    api: string,
+    timestamp: number,
+  ): Promise<IWorldMapUpdate> {
+    const warningResponseData = await getDataFromApi(
+      `http://${api}.risiko-radar.info/getData?timestamp=${timestamp}`,
+    );
+
+    const warningData: IWorldMapUpdate = {
+      add: warningResponseData[0],
+      delete: warningResponseData[1],
+    };
+
+    return warningData;
+  }
+
+  findTypeById(id: string): string | undefined {
+    // awa warnings have only numbers as id
+    if (id.includes("tra.")) {
+      return "awa";
+    }
+    return undefined;
+  }
+
+  async getWarningDetails(id: string): Promise<IWorldMapItemDetails | null> {
+    const warningType = this.findTypeById(id);
+    if (warningType) {
+      const detailsData = await getDataFromApi(
+        `http://${warningType}.risiko-radar.info/getDetails/${id}`,
+      );
+      detailsData.type = warningType;
+      return detailsData;
     }
 
-    for (let i = 0; i < faker.number.int({ max: 10 }); i++) {
-      worldMapUpdate.delete.push(faker.number.int({ min: 1, max: 1000 }));
+    // If the warning type is not found, try all types
+    for (const element of ["awa"]) {
+      const detailsData = await getDataFromApi(
+        `http://${element}.risiko-radar.info/getDetails/${id}`,
+      );
+      if (detailsData) {
+        detailsData.type = element;
+        return detailsData;
+      }
     }
 
-    return worldMapUpdate;
+    return null;
   }
 }

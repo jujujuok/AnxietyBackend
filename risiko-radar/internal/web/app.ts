@@ -26,8 +26,9 @@ const start = async () => {
   setupCors(server);
 
   // setup services and routes for the different modules
-  const [dashboardService, mapService, worldMapService] =
-    await setupServices(redis);
+  const [dashboardService, mapService, worldMapService] = await setupServices(
+    redis,
+  );
   await setupRoutes(
     server,
     dashboardService as DashboardService,
@@ -91,7 +92,7 @@ const setupServices = async (redis: Cache) => {
   const mapRepository: MapRepository = new MapRepository(redis);
   const mapService: MapService = new MapService(mapRepository);
 
-  const worldMapRepository: WorldMapRepository = new WorldMapRepository();
+  const worldMapRepository: WorldMapRepository = new WorldMapRepository(redis);
   const worldMapService: WorldMapService = new WorldMapService(
     worldMapRepository,
   );

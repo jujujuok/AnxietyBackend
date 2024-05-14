@@ -13,6 +13,7 @@ export interface IWorldMapItem {
   title: string;
   country: string;
   since: number;
+  details?: IWorldMapItemDetails;
 }
 
 /**

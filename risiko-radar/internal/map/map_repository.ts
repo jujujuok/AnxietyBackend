@@ -40,7 +40,7 @@ export class MapRepository {
   }
 
   /**
-   * Get list of nina warnings
+   * Get list of warnings
    * @returns MapUpdate Object
    */
   async getWarnings(api: string): Promise<IMapUpdate> {
