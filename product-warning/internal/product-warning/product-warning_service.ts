@@ -28,7 +28,8 @@ export class ProductWarningService {
     }
   }
 
-  parseProductWarning(warning: any): IProductWarningModel {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private parseProductWarning(warning: any): IProductWarningModel {
     return {
       warning_id: warning.id,
       warning_type: "p",
@@ -67,7 +68,8 @@ export class ProductWarningService {
     };
   }
 
-  parseFoodWarning(warning: any): IFoodWarningModel {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private parseFoodWarning(warning: any): IFoodWarningModel {
     return {
       warning_id: warning.id,
       warning_type: "f",
@@ -83,8 +85,10 @@ export class ProductWarningService {
     };
   }
 
-  getWarnings(data: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getWarnings(data: any) {
     const warnings: IWarningsModel = { foods: [], products: [] };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data.response.docs.forEach((warning: any) => {
       if (warning._type === ".ProductWarning") {
         warnings.products.push(this.parseProductWarning(warning));

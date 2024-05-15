@@ -10,7 +10,7 @@ export class ProductWarningRepository {
 
   private async executeQuery(
     query: string,
-    values: any[],
+    values: unknown[],
   ): Promise<QueryResult> {
     const client = await this.db.connect();
     try {
@@ -23,98 +23,109 @@ export class ProductWarningRepository {
     }
   }
 
-  private mapIds(warnings: any) {
-    return warnings.map((warning: any) => warning.warning_id).join(",");
+  private mapIds(warnings: IFoodWarningModel[] | IProductWarningModel[]) {
+    return warnings.map(
+      (warning: IFoodWarningModel | IProductWarningModel) => warning.warning_id,
+    );
   }
 
-  private valueCheck(value: any) {
-    return value !== "" && value !== null && value !== "()" ? true : false;
+  private valueCheck(
+    value:
+      | IFoodWarningModel[]
+      | IProductWarningModel[]
+      | (IFoodWarningModel | IProductWarningModel)[],
+  ) {
+    return value.length > 0 ? true : false;
   }
 
   private async saveWarnings(
     warnings: IProductWarningModel[] | IFoodWarningModel[],
   ) {
-    const values_warnings = warnings
-      .filter(
-        (warning) =>
-          warning.warning_type != null ||
-          warning.warning_link != null ||
-          warning.publishedDate != null ||
-          warning.title != null ||
-          warning.description != null ||
-          warning.image != null,
-      )
-      .map(
-        (warning) =>
-          `(${warning.warning_id}, '${warning.warning_type}', '${warning.warning_link}', '${warning.publishedDate}', '${warning.title}', '${warning.description}', '${warning.image}')`,
-      )
-      .join(",");
+    const values_warnings = warnings.filter(
+      (warning) =>
+        warning.warning_type != null ||
+        warning.warning_link != null ||
+        warning.publishedDate != null ||
+        warning.title != null ||
+        warning.description != null ||
+        warning.image != null,
+    );
 
     if (this.valueCheck(values_warnings)) {
-      await this.executeQuery(
-        `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ${values_warnings};`,
-        [],
-      );
+      for (const warning of values_warnings) {
+        await this.executeQuery(
+          `INSERT INTO productwarnings.warnings (warning_id, warning_type, warning_link, publishedDate, title, description, image) VALUES ($1, $2, $3, $4, $5, $6, $7);`,
+          [
+            warning.warning_id,
+            warning.warning_type,
+            warning.warning_link,
+            warning.publishedDate,
+            warning.title,
+            warning.description,
+            warning.image,
+          ],
+        );
+      }
     }
   }
 
   private async saveProductInformations(warnings: IProductWarningModel[]) {
-    const values_productInformations = warnings
-      .filter(
-        (warning) =>
-          warning.manufacturer != null ||
-          warning.category != null ||
-          warning.affectedProducts != null,
-      )
-      .map(
-        (warning) =>
-          `(${warning.warning_id}, '${warning.manufacturer}', '${warning.category}', '${warning.affectedProducts}')`,
-      )
-      .join(",");
+    const values_productInformations = warnings.filter(
+      (warning) =>
+        warning.manufacturer != null ||
+        warning.category != null ||
+        warning.affectedProducts != null,
+    );
     if (this.valueCheck(values_productInformations)) {
-      await this.executeQuery(
-        `INSERT INTO productwarnings.productInformations (warning_id, manufacturer, category, affectedProducts) VALUES ${values_productInformations};`,
-        [],
-      );
+      for (const warning of values_productInformations) {
+        await this.executeQuery(
+          `INSERT INTO productwarnings.productInformations (warning_id, manufacturer, category, affectedProducts) VALUES ($1, $2, $3, $4);`,
+          [
+            warning.warning_id,
+            warning.manufacturer,
+            warning.category,
+            warning.affectedProducts,
+          ],
+        );
+      }
     }
   }
 
   private async saveSafetyInformations(warnings: IProductWarningModel[]) {
-    const values_safetyInformations = warnings
-      .filter((warning) => warning.hazard != null || warning.injury != null)
-      .map(
-        (warning) =>
-          `(${warning.warning_id}, '${warning.hazard}', '${warning.injury}')`,
-      )
-      .join(",");
+    const values_safetyInformations = warnings.filter(
+      (warning) => warning.hazard != null || warning.injury != null,
+    );
     if (this.valueCheck(values_safetyInformations)) {
-      await this.executeQuery(
-        `INSERT INTO productwarnings.safetyInformations (warning_id, hazard, injury) VALUES ${values_safetyInformations};`,
-        [],
-      );
+      for (const warning of values_safetyInformations) {
+        await this.executeQuery(
+          `INSERT INTO productwarnings.safetyInformations (warning_id, hazard, injury) VALUES ($1, $2, $3);`,
+          [warning.warning_id, warning.hazard, warning.injury],
+        );
+      }
     }
   }
 
   private async saveFoodInformations(warnings: IFoodWarningModel[]) {
-    const values_foodInformations = warnings
-      .filter(
-        (warning) =>
-          warning.manufacturer != null || warning.affectedStates != null,
-      )
-      .map((warning) => {
+    const values_foodInformations = warnings.filter(
+      (warning) =>
+        warning.manufacturer != null || warning.affectedStates != null,
+    );
+
+    if (this.valueCheck(values_foodInformations)) {
+      for (const warning of values_foodInformations) {
         const affectedStatesArray =
           warning.affectedStates != null
             ? warning.affectedStates.map((state) => `'${state}'`).join(",")
             : null;
-        return `(${warning.warning_id}, '${warning.manufacturer}', ARRAY[${affectedStatesArray}])`;
-      })
-      .join(",");
 
-    if (this.valueCheck(values_foodInformations)) {
-      await this.executeQuery(
-        `INSERT INTO productwarnings.foodInformations (warning_id, manufacturer, affectedStates) VALUES ${values_foodInformations};`,
-        [],
-      );
+        const query = `INSERT INTO productwarnings.foodInformations (warning_id, manufacturer, affectedStates) VALUES ($1, $2, ARRAY[$3]);`;
+
+        await this.executeQuery(query, [
+          warning.warning_id,
+          warning.manufacturer,
+          affectedStatesArray,
+        ]);
+      }
     }
   }
 
@@ -163,15 +174,16 @@ export class ProductWarningRepository {
     try {
       const values_warningids_products = this.mapIds(warnings.products);
       const values_warningids_foods = this.mapIds(warnings.foods);
-
       const values_warningids = [
         values_warningids_products,
         values_warningids_foods,
-      ].join(",");
+      ].flat();
+
       const result = await this.executeQuery(
-        `SELECT warning_id FROM productwarnings.warnings WHERE warning_id in (${values_warningids});`,
-        [],
+        `SELECT warning_id FROM productwarnings.warnings WHERE warning_id = ANY($1);`,
+        [values_warningids],
       );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       result.rows.forEach((row: any) => {
         warnings.products = this.filterNewWarnings(
           warnings.products,
@@ -191,6 +203,7 @@ export class ProductWarningRepository {
   }
 
   private transformWarning(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     row: any,
     result_productInformations: QueryResult,
     result_safetyInformations: QueryResult,
@@ -212,6 +225,7 @@ export class ProductWarningRepository {
 
     if (row.warning_type === "p") {
       const productInformation = result_productInformations.rows.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (row2: any) => row2.warning_id === row.warning_id,
       );
       if (productInformation) {
@@ -220,6 +234,7 @@ export class ProductWarningRepository {
       }
 
       const safetyInformation = result_safetyInformations.rows.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (row2: any) => row2.warning_id === row.warning_id,
       );
       if (safetyInformation) {
@@ -234,6 +249,7 @@ export class ProductWarningRepository {
           : productInformation?.affectedproducts;
     } else if (row.warning_type === "f") {
       const foodInformation = result_foodInformations.rows.find(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (row2: any) => row2.warning_id === row.warning_id,
       );
       if (foodInformation) {
@@ -268,17 +284,18 @@ export class ProductWarningRepository {
       const values_warningids = this.mapIds(resultwarnings.rows);
 
       const result_productInformations = await this.executeQuery(
-        `SELECT * FROM productwarnings.productInformations WHERE warning_id in (${values_warningids});`,
-        [],
+        `SELECT * FROM productwarnings.productInformations WHERE warning_id = ANY($1);`,
+        [values_warningids],
       );
       const result_safetyInformations = await this.executeQuery(
-        `SELECT * FROM productwarnings.safetyInformations WHERE warning_id in (${values_warningids});`,
-        [],
+        `SELECT * FROM productwarnings.safetyInformations WHERE warning_id = ANY($1);`,
+        [values_warningids],
       );
       const result_foodInformations = await this.executeQuery(
-        `SELECT * FROM productwarnings.foodInformations WHERE warning_id in (${values_warningids});`,
-        [],
+        `SELECT * FROM productwarnings.foodInformations WHERE warning_id = ANY($1);`,
+        [values_warningids],
       );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       resultwarnings.rows.forEach((row: any) => {
         const warning = this.transformWarning(
           row,
