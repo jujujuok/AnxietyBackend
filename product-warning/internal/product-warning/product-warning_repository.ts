@@ -1,5 +1,5 @@
 import { IWarningsModel } from "../models/warnings";
-import { Pool, QueryResult } from "pg";
+import { Pool, QueryResult, QueryResultRow } from "pg";
 import { IReturnSchema } from "../models/return-schema";
 import { IDetailsReturnSchema } from "../models/return-details";
 import { IProductWarningModel } from "../models/product-warning";
@@ -183,8 +183,7 @@ export class ProductWarningRepository {
         `SELECT warning_id FROM productwarnings.warnings WHERE warning_id = ANY($1);`,
         [values_warningids],
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      result.rows.forEach((row: any) => {
+      result.rows.forEach((row: QueryResultRow) => {
         warnings.products = this.filterNewWarnings(
           warnings.products,
           row.warning_id,
@@ -203,8 +202,7 @@ export class ProductWarningRepository {
   }
 
   private transformWarning(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    row: any,
+    row: QueryResultRow,
     result_productInformations: QueryResult,
     result_safetyInformations: QueryResult,
     result_foodInformations: QueryResult,
@@ -225,8 +223,7 @@ export class ProductWarningRepository {
 
     if (row.warning_type === "p") {
       const productInformation = result_productInformations.rows.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (row2: any) => row2.warning_id === row.warning_id,
+        (row2: QueryResultRow) => row2.warning_id === row.warning_id,
       );
       if (productInformation) {
         details.manufacturer = productInformation.manufacturer;
@@ -234,8 +231,7 @@ export class ProductWarningRepository {
       }
 
       const safetyInformation = result_safetyInformations.rows.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (row2: any) => row2.warning_id === row.warning_id,
+        (row2: QueryResultRow) => row2.warning_id === row.warning_id,
       );
       if (safetyInformation) {
         details.hazard = safetyInformation.hazard;
@@ -249,8 +245,7 @@ export class ProductWarningRepository {
           : productInformation?.affectedproducts;
     } else if (row.warning_type === "f") {
       const foodInformation = result_foodInformations.rows.find(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (row2: any) => row2.warning_id === row.warning_id,
+        (row2: QueryResultRow) => row2.warning_id === row.warning_id,
       );
       if (foodInformation) {
         details.manufacturer = foodInformation.manufacturer;
@@ -295,8 +290,7 @@ export class ProductWarningRepository {
         `SELECT * FROM productwarnings.foodInformations WHERE warning_id = ANY($1);`,
         [values_warningids],
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      resultwarnings.rows.forEach((row: any) => {
+      resultwarnings.rows.forEach((row: QueryResultRow) => {
         const warning = this.transformWarning(
           row,
           result_productInformations,
