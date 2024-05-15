@@ -32,7 +32,10 @@ services:
       - "traefik.enable=false"
 
   frontend:
-    image: frontend:latest
+    image: frontend
+    build:
+      context: ../AnxietyFrontend
+      dockerfile: Dockerfile
     container_name: frontend
     restart: unless-stopped
     ports:
@@ -49,6 +52,9 @@ services:
 
   risiko-radar:
     image: risiko-radar-api
+    build:
+      context: ./risiko-radar
+      dockerfile: Dockerfile
     container_name: risiko-radar
     depends_on:
       - db
@@ -70,6 +76,9 @@ services:
 
   product-warning:
     image: product-warning-api
+    build:
+      context: ./product-warning
+      dockerfile: Dockerfile
     container_name: product-warning
     depends_on:
       - db
@@ -87,6 +96,9 @@ services:
 
   nina:
     image: nina-api
+    build:
+      context: ./nina
+      dockerfile: Dockerfile
     container_name: nina
     depends_on:
       - db
@@ -104,6 +116,9 @@ services:
 
   autobahn:
     image: autobahn-api
+    build:
+      context: ./autobahn
+      dockerfile: Dockerfile
     container_name: autobahn
     depends_on:
       - db
@@ -121,6 +136,9 @@ services:
 
   dwd:
     image: dwd-api
+    build:
+      context: ./dwd
+      dockerfile: Dockerfile
     container_name: dwd
     depends_on:
       - db
@@ -138,6 +156,9 @@ services:
 
   awa:
     image: awa-api
+    build:
+      context: ./awa
+      dockerfile: Dockerfile
     container_name: awa
     depends_on:
       - db

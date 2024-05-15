@@ -42,9 +42,15 @@ yarn.lock
 
 # Docker image
 *.tar
+/dockerImages
 
 # Redis
 redis.conf
+/redis-data
 
 # SSL
 /.ssl
+/etc
+
+#Postgres
+/postgres-data
