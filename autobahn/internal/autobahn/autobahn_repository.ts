@@ -1,10 +1,25 @@
-import { Pool } from "pg";
+import { Pool, QueryResult, QueryResultRow } from "pg";
 import { IWarningModel } from "../models/warning";
 import { IReturnSchema } from "../models/return-schema";
 import { IDetailsReturnSchema } from "../models/return-details";
 
 export class AutobahnRepository {
   constructor(private db: Pool) {}
+
+  private async executeQuery(
+    query: string,
+    values: unknown[],
+  ): Promise<QueryResult> {
+    const client = await this.db.connect();
+    try {
+      return await client.query(query, values);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
 
   async closeData(warningids: any) {
     const client = await this.db.connect();
@@ -23,7 +38,7 @@ export class AutobahnRepository {
     const values = warnings
       .map((warning: IWarningModel) => `'${warning.warning_id}'`)
       .join(",");
-    const closeresult = await this.closeData(values);
+    await this.closeData(values);
 
     const client = await this.db.connect();
     try {
@@ -82,7 +97,7 @@ export class AutobahnRepository {
       return [];
     }
 
-    var warningids = [];
+    let warningids = [];
 
     const client = await this.db.connect();
     try {

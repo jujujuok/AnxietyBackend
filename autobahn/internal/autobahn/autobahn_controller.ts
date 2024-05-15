@@ -11,10 +11,6 @@ export class AutobahnController {
   }
 
   async getData(req: updateRequest, reply: FastifyReply) {
-    if (!req.query.timestamp) {
-      const timestamp = null;
-    }
-
     const timestamp = req.query.timestamp as number;
     const data = await this.autobahnService.getData(timestamp);
     return reply.send(data);
@@ -22,7 +18,7 @@ export class AutobahnController {
 
   async getDetails(req: detailsRequest, reply: FastifyReply) {
     if (!req.params.id) {
-      console.log("No id provided");
+      console.error("No id provided");
       return reply.status(400).send();
     }
 

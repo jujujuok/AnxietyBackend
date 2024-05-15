@@ -2,11 +2,12 @@ import { AutobahnRepository } from "./autobahn_repository";
 import axios from "axios";
 import https from "https";
 import { IWarningModel } from "../models/warning";
+import { error } from "console";
 
 export class AutobahnService {
   constructor(private readonly autobahnRepository: AutobahnRepository) {}
 
-  async callApi(url: string) {
+  private async callApi(url: string) {
     const headers = {
       accept: "application/json",
     };
@@ -20,43 +21,52 @@ export class AutobahnService {
       return response.data;
     } catch (error) {
       console.error(error);
-      return null;
+      throw error;
     }
   }
 
-  async fetchAutobahnWarnings(autobahnArray: []) {
-    const autobahnWarnings: IWarningModel[] = [];
+  private checkIfBanned(type: string): boolean {
     const bannedWarnings = [
       "STATIONARY_TRAFFIC",
       "SLOW_TRAFFIC",
       "QUEUING_TRAFFIC",
     ];
+    return bannedWarnings.includes(type);
+  }
+
+  private buildDescription(inputDescription: string[]): string {
+    const description_index = inputDescription.indexOf("");
+    const temp_description = inputDescription.slice(description_index + 3);
+    let description = inputDescription[description_index + 2].replaceAll(
+      "\n",
+      " ",
+    );
+
+    temp_description.forEach((description_part: string) => {
+      const indexOfdescription_part =
+        temp_description.indexOf(description_part);
+      if (indexOfdescription_part != 0) {
+        description += ", ";
+      } else {
+        description += ": ";
+      }
+      description += description_part.replaceAll("\n", " ");
+    });
+    return description;
+  }
+
+  private async fetchAutobahnWarnings(autobahnArray: string[]) {
+    const autobahnWarnings: IWarningModel[] = [];
 
     for (const autobahn of autobahnArray) {
       const autobahnWarningResult = await this.callApi(
         `https://verkehr.autobahn.de/o/autobahn/${autobahn}/services/warning`,
       );
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       autobahnWarningResult.warning.forEach((warning: any) => {
-        if (!bannedWarnings.includes(warning.abnormalTrafficType)) {
-          const description_index = warning.description.indexOf("");
-          const temp_description = warning.description.slice(
-            description_index + 3,
-          );
-          let description = warning.description[
-            description_index + 2
-          ].replaceAll("\n", " ");
-
-          temp_description.forEach((description_part: string) => {
-            const indexOfdescription_part =
-              temp_description.indexOf(description_part);
-            if (indexOfdescription_part != 0) {
-              description += ", ";
-            } else {
-              description += ": ";
-            }
-            description += description_part.replaceAll("\n", " ");
-          });
-
+        if (!this.checkIfBanned(warning.abnormalTrafficType)) {
+          const description = this.buildDescription(warning.description);
           const coordinates = [warning.geometry.coordinates];
 
           const warning_in_model: IWarningModel = {
@@ -79,15 +89,19 @@ export class AutobahnService {
     return autobahnWarnings;
   }
 
-  async fetchData() {
+  private async fetchAutobahn(): Promise<string[]> {
     const autobahnApiResult = await this.callApi(
       "https://verkehr.autobahn.de/o/autobahn/",
     );
     if (autobahnApiResult === null) {
-      return 500;
+      console.error("Error fetching autobahn data");
+      throw error;
     }
-    const autobahnArray = autobahnApiResult.roads;
+    return autobahnApiResult.roads;
+  }
 
+  async fetchData() {
+    const autobahnArray = await this.fetchAutobahn();
     const autobahnWarnings = await this.fetchAutobahnWarnings(autobahnArray);
 
     if (autobahnWarnings === null) {
