@@ -226,7 +226,7 @@ export class AwARepository {
         const warning: IReturnWarningSchema = {
           id: "tra." + row.warning_id,
           type: "travel_warning",
-          severity: row.severity,
+          severity: row.severity.trim(),
           country: row.country,
           iso3: row.iso3,
           details: {
