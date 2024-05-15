@@ -69,7 +69,7 @@ export class AutobahnRepository {
     }
   }
 
-  private transformCoordinates(inputCoordinates: string[]) {
+  private transformCoordinates(inputCoordinates: string[]): string {
     const geojson = {
       type: "Polygon",
       coordinates: inputCoordinates,
@@ -111,7 +111,7 @@ export class AutobahnRepository {
     }
   }
 
-  async getClosedData(timestamp: number) {
+  async getClosedData(timestamp: number): Promise<string[]> {
     if (!timestamp) {
       return [];
     }
@@ -182,7 +182,7 @@ export class AutobahnRepository {
     return details;
   }
 
-  async getDetails(id: string) {
+  async getDetails(id: string): Promise<IDetailsReturnSchema | number> {
     let details: IDetailsReturnSchema | undefined = undefined;
     try {
       const result_warnings = await this.executeQuery(

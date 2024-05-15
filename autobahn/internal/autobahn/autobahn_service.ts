@@ -3,6 +3,8 @@ import axios from "axios";
 import https from "https";
 import { IWarningModel } from "../models/warning";
 import { error } from "console";
+import { IReturnSchema } from "../models/return-schema";
+import { IDetailsReturnSchema } from "../models/return-details";
 
 export class AutobahnService {
   constructor(private readonly autobahnRepository: AutobahnRepository) {}
@@ -55,7 +57,9 @@ export class AutobahnService {
     return description;
   }
 
-  private async fetchAutobahnWarnings(autobahnArray: string[]) {
+  private async fetchAutobahnWarnings(
+    autobahnArray: string[],
+  ): Promise<IWarningModel[] | null> {
     const autobahnWarnings: IWarningModel[] = [];
 
     for (const autobahn of autobahnArray) {
@@ -110,12 +114,12 @@ export class AutobahnService {
     return this.autobahnRepository.fetchData(autobahnWarnings);
   }
 
-  async getData(timestamp: number) {
+  async getData(timestamp: number): Promise<[IReturnSchema[], string[]]> {
     const data = this.autobahnRepository.getData(timestamp);
     return data;
   }
 
-  async getDetails(id: string) {
+  async getDetails(id: string): Promise<IDetailsReturnSchema | number> {
     const data = this.autobahnRepository.getDetails(id);
     return data;
   }
