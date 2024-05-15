@@ -46,6 +46,9 @@ export class NinaRepository {
         warnings[3] = warnings[3].filter(
           (warning: IWarningModel) => warning.id != row.warning_id,
         );
+        warnings[4] = warnings[4].filter(
+          (warning: IWarningModel) => warning.id != row.warning_id,
+        );
       });
     } finally {
       client.release();
@@ -54,7 +57,8 @@ export class NinaRepository {
           (warnings[0].length +
             warnings[1].length +
             warnings[2].length +
-            warnings[3].length),
+            warnings[3].length +
+            warnings[4].length),
       );
       return warnings;
     }
@@ -67,7 +71,8 @@ export class NinaRepository {
       newwarnings[0].length == 0 &&
       newwarnings[1].length == 0 &&
       newwarnings[2].length == 0 &&
-      newwarnings[3].length == 0
+      newwarnings[3].length == 0 &&
+      newwarnings[4].length == 0
     ) {
       console.log("No new data");
       return 200;

@@ -93,6 +93,10 @@ export class NinaService {
     const polizei_warnungen = await this.callApi(polizei_url);
     warnings.push(await this.getWarnings(polizei_warnungen));
 
+    const lhp_url = "https://nina.api.proxy.bund.dev/api31/lhp/mapData.json";
+    const lhp_warnungen = await this.callApi(lhp_url);
+    warnings.push(await this.getWarnings(lhp_warnungen));
+
     return this.ninaRepository.fetchData(warnings);
   }
 
