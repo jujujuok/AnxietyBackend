@@ -7,6 +7,7 @@ import {
 } from "../models/world-map";
 import { Cache } from "../utils/cache";
 import { getDataFromApi } from "../utils/apiCalls";
+import { IMapItem } from "../models/map";
 
 /**
  * WorldMap repository
@@ -46,13 +47,18 @@ export class WorldMapRepository {
   }
 
   /**
-   * Get list of nina warnings
+   * Get list of warnings
    * @returns MapUpdate Object
    */
   async getWarnings(api: string): Promise<IWorldMapUpdate> {
-    const warningResponseData = await getDataFromApi(
+    let warningResponseData = await getDataFromApi(
       `http://${api}.risiko-radar.info/getData`,
     );
+
+    // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
+    if (api === "awa") {
+      warningResponseData = warningResponseData[0];
+    }
 
     const warningData: IWorldMapUpdate = {
       add: warningResponseData[0],
@@ -66,9 +72,14 @@ export class WorldMapRepository {
     api: string,
     timestamp: number,
   ): Promise<IWorldMapUpdate> {
-    const warningResponseData = await getDataFromApi(
+    let warningResponseData = await getDataFromApi(
       `http://${api}.risiko-radar.info/getData?timestamp=${timestamp}`,
     );
+
+    // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
+    if (api === "awa") {
+      warningResponseData = warningResponseData[0];
+    }
 
     const warningData: IWorldMapUpdate = {
       add: warningResponseData[0],
