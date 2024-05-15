@@ -1,12 +1,12 @@
 openapi: '3.0.2'
 info:
-  title: Anxiety
+  title: Risiko-Radar
   description: | 
     Collection of all security related APIs for Germany.
     Supplying the information to anxiety frontend.
   version: '0.2'
 servers:
-  - url: http://212.132.100.147/
+  - url: http://api.risiko-radar.de
     description: Main server
 
 tags:
