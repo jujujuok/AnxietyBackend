@@ -9,7 +9,7 @@ export class ProductWarningService {
     private readonly productWarningRepository: ProductWarningRepository,
   ) {}
 
-  async callApi(body: object) {
+  private async callApi(body: object) {
     const url =
       "https://megov.bayern.de/verbraucherschutz/baystmuv-verbraucherinfo/rest/api/warnings/merged";
     const headers = {
