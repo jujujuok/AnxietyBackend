@@ -67,6 +67,10 @@ export class DashboardService {
           item.severity = "information";
           return;
         }
+        if (item.type === "awa") {
+          item.severity = "information";
+          return;
+        }
       }
     });
   }
@@ -78,11 +82,17 @@ export class DashboardService {
   async getDashboard(): Promise<IDashboardItem[]> {
     const dashboardItems: IDashboardUpdate = { add: [], delete: [] };
 
+    //### Product Warning ###
     let productWarningData =
       await this.dashboardRepository.getProductWarnings();
     // Save details of product warnings to cache and remove from object
     productWarningData = this.stripDetails(productWarningData);
     this.concatData(dashboardItems, productWarningData);
+
+    //### AWA ###
+    let awaData = await this.dashboardRepository.getWarnings("awa");
+    awaData = this.stripDetails(awaData);
+    this.concatData(dashboardItems, awaData);
 
     this.addSeverity(dashboardItems.add);
     return dashboardItems.add;
@@ -118,11 +128,21 @@ export class DashboardService {
   async getDashboardUpdate(timestamp: number) {
     const update: IDashboardUpdate = { add: [], delete: [] };
 
+    //### Product Warning ###
     const productWarningData =
       await this.dashboardRepository.getProductWarningUpdate(timestamp);
     this.stripDetails(productWarningData);
     this.cleanCache(productWarningData);
     this.concatData(update, productWarningData);
+
+    //### AWA ###
+    let awaData = await this.dashboardRepository.getWarningUpdate(
+      "awa",
+      timestamp,
+    );
+    awaData = this.stripDetails(awaData);
+    this.cleanCache(awaData);
+    this.concatData(update, awaData);
 
     this.addSeverity(update.add);
     return update;

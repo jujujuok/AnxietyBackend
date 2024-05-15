@@ -5,13 +5,7 @@ import { IDeleteItem } from "../utils/apiCalls";
  */
 export interface IDashboardItem {
   id: string;
-  type:
-    | "interpol_red"
-    | "interpol_un"
-    | "food_warning"
-    | "product_warning"
-    | "travel_warning"
-    | "country_representative";
+  type: string;
   severity: "information" | "warning" | "danger" | "extreme_danger";
   title: string;
   description: string;
