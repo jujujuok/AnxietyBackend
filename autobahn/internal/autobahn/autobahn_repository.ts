@@ -150,13 +150,12 @@ export class AutobahnRepository {
     const warnings: IReturnSchema[] = [];
     let closedWarningIds: string[] = [];
     try {
-      let timestampstatement = "WHERE";
-      if (timestamp) {
-        timestampstatement = `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000) AND`;
-      }
+      const timestampStatement = timestamp
+        ? `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000)`
+        : "WHERE";
 
       const resultwarnings = await this.executeQuery(
-        `SELECT warning_id, title, description, ST_AsGeoJSON(coordinates) AS coordinates FROM autobahn.warnings ${timestampstatement} loadenddate IS NULL`,
+        `SELECT warning_id, title, description, ST_AsGeoJSON(coordinates) AS coordinates FROM autobahn.warnings ${timestampStatement} loadenddate IS NULL`,
         [],
       );
 
