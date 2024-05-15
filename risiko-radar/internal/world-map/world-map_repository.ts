@@ -52,7 +52,7 @@ export class WorldMapRepository {
    */
   async getWarnings(api: string): Promise<IWorldMapUpdate> {
     let warningResponseData = await getDataFromApi(
-      `http://${api}.risiko-radar.info/getData`,
+      `http://${api}:8000/getData`,
     );
 
     // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
@@ -73,7 +73,7 @@ export class WorldMapRepository {
     timestamp: number,
   ): Promise<IWorldMapUpdate> {
     let warningResponseData = await getDataFromApi(
-      `http://${api}.risiko-radar.info/getData?timestamp=${timestamp}`,
+      `http://${api}:8000/getData?timestamp=${timestamp}`,
     );
 
     // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
@@ -101,7 +101,7 @@ export class WorldMapRepository {
     const warningType = this.findTypeById(id);
     if (warningType) {
       const detailsData = await getDataFromApi(
-        `http://${warningType}.risiko-radar.info/getDetails/${id}`,
+        `http://${warningType}:8000/getDetails/${id}`,
       );
       detailsData.type = warningType;
       return detailsData;
@@ -110,7 +110,7 @@ export class WorldMapRepository {
     // If the warning type is not found, try all types
     for (const element of ["awa"]) {
       const detailsData = await getDataFromApi(
-        `http://${element}.risiko-radar.info/getDetails/${id}`,
+        `http://${element}:8000/getDetails/${id}`,
       );
       if (detailsData) {
         detailsData.type = element;
