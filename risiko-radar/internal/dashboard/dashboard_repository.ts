@@ -44,15 +44,16 @@ export class DashboardRepository {
    * @returns MapUpdate Object
    */
   async getWarnings(api: string): Promise<IDashboardUpdate> {
-    let warningResponseData = await getDataFromApi(
+    const warningResponseData = await getDataFromApi(
       `http://${api}:8000/getData`,
     );
 
     // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
     if (api === "awa") {
-      const awaData = warningResponseData;
-      warningResponseData = awaData[0];
-      warningResponseData = warningResponseData.concat(awaData[1]);
+      const embassyData = warningResponseData[0];
+      const warningData = warningResponseData[1];
+      warningResponseData[0] = embassyData[0].concat(warningData[0]);
+      warningResponseData[1] = embassyData[1].concat(warningData[1]);
     }
 
     const warningData: IDashboardUpdate = {
