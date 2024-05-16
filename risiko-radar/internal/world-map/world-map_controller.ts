@@ -16,6 +16,11 @@ export class WorldMapController {
    */
   async getWorldMap(req: FastifyRequest, reply: FastifyReply) {
     const worldMapData = await this.worldMapService.getWorldMap();
+
+    if (worldMapData.length === 0) {
+      return reply.status(202).send("No data available");
+    }
+
     return reply.send(worldMapData);
   }
 
@@ -36,6 +41,12 @@ export class WorldMapController {
     const worldMapDetails =
       await this.worldMapService.getWorldMapDetails(worldMapId);
 
+    if (!worldMapDetails) {
+      return reply.status(404).send({
+        message: "WorldMap item not found",
+      });
+    }
+
     return reply.send(worldMapDetails);
   }
 
@@ -55,6 +66,12 @@ export class WorldMapController {
     const timestamp = req.query.timestamp as number;
     const worldMapUpdate =
       await this.worldMapService.getWorldMapUpdate(timestamp);
+
+    if (!worldMapUpdate) {
+      return reply.status(404).send({
+        message: "WorldMap item not found",
+      });
+    }
 
     return reply.send(worldMapUpdate);
   }

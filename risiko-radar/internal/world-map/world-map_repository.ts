@@ -1,13 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { faker } from "@faker-js/faker";
-import {
-  IWorldMapItem,
-  IWorldMapItemDetails,
-  IWorldMapUpdate,
-} from "../models/world-map";
+import { IWorldMapItemDetails, IWorldMapUpdate } from "../models/world-map";
 import { Cache } from "../utils/cache";
 import { getDataFromApi } from "../utils/apiCalls";
-import { IMapItem } from "../models/map";
 
 /**
  * WorldMap repository
