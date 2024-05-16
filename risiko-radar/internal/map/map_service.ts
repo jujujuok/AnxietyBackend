@@ -52,21 +52,6 @@ export class MapService {
     mapItems.delete.push(...ids);
   }
 
-  addSeverity(mapItems: IMapItem[]) {
-    mapItems.forEach((item) => {
-      if (!item.severity) {
-        if (item.type === "street_report") {
-          item.severity = "warning";
-          return;
-        }
-        if (item.type === "weather") {
-          item.severity = "warning";
-          return;
-        }
-      }
-    });
-  }
-
   /**
    * Get object containing map items to add and ids to delete
    * @returns List of map items

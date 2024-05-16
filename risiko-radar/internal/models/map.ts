@@ -5,15 +5,10 @@ import { IDeleteItem } from "../utils/apiCalls";
  */
 export interface IMapItem {
   id: string;
-  type: "weather" | "street_report" | "police" | "air_quality" | "radiation";
-  severity: "information" | "warning" | "danger" | "extreme_danger";
+  type: "nina" | "street_report" | "weather";
+  warning: string;
   title: string;
-  position: {
-    lat: number;
-    lon: number;
-  };
-  area: number[] | number;
-  since: number;
+  area: Array<Array<[number, number]>>;
   details?: IMapItemDetails;
 }
 
@@ -21,9 +16,9 @@ export interface IMapItem {
  * MapItem details model
  */
 export interface IMapItemDetails {
-  id: string;
-  type: "weather" | "street_report" | "police" | "air_quality" | "radiation";
-  details: object;
+  type: "nina" | "street_report" | "weather";
+  description: string;
+  instruction?: string;
 }
 
 export interface IMapUpdate {

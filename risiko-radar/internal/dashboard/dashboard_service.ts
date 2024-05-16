@@ -56,25 +56,6 @@ export class DashboardService {
     dashboardItems.delete.push(...ids);
   }
 
-  addSeverity(dashboardItems: IDashboardItem[]) {
-    dashboardItems.forEach((item) => {
-      if (!item.severity) {
-        if (item.type === "food_warning") {
-          item.severity = "warning";
-          return;
-        }
-        if (item.type === "product_warning") {
-          item.severity = "information";
-          return;
-        }
-        if (item.type === "awa") {
-          item.severity = "information";
-          return;
-        }
-      }
-    });
-  }
-
   /**
    * Get object containing dashboard items to add and ids to delete
    * @returns DashboardUpdate Object
@@ -94,7 +75,6 @@ export class DashboardService {
     awaData = this.stripDetails(awaData);
     this.concatData(dashboardItems, awaData);
 
-    this.addSeverity(dashboardItems.add);
     return dashboardItems.add;
   }
 
@@ -144,7 +124,6 @@ export class DashboardService {
     this.cleanCache(awaData);
     this.concatData(update, awaData);
 
-    this.addSeverity(update.add);
     return update;
   }
 }
