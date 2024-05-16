@@ -50,7 +50,9 @@ export class DashboardRepository {
 
     // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
     if (api === "awa") {
-      warningResponseData = warningResponseData[1];
+      const awaData = warningResponseData;
+      warningResponseData = awaData[0];
+      warningResponseData = warningResponseData.concat(awaData[1]);
     }
 
     const warningData: IDashboardUpdate = {
@@ -87,7 +89,7 @@ export class DashboardRepository {
     if (/^\d+$/.test(id)) {
       return "product-warning";
     }
-    if (id.includes("emb.")) {
+    if (id.includes("emb.") || id.includes("tra.")) {
       return "awa";
     }
     return undefined;

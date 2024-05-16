@@ -59,6 +59,11 @@ export class MapService {
   async getMap(): Promise<IMapItem[]> {
     const mapItems: IMapUpdate = { add: [], delete: [] };
 
+    //### DWD ###
+    let dwdData = await this.mapRepository.getWarnings("dwd");
+    dwdData = this.stripDetails(dwdData);
+    this.concatData(mapItems, dwdData);
+
     //### NINA ###
     let ninaData = await this.mapRepository.getWarnings("nina");
     ninaData = this.stripDetails(ninaData);
@@ -68,11 +73,6 @@ export class MapService {
     let autobahnData = await this.mapRepository.getWarnings("autobahn");
     autobahnData = this.stripDetails(autobahnData);
     this.concatData(mapItems, autobahnData);
-
-    //### DWD ###
-    let dwdData = await this.mapRepository.getWarnings("dwd");
-    dwdData = this.stripDetails(dwdData);
-    this.concatData(mapItems, dwdData);
 
     return mapItems.add;
   }
