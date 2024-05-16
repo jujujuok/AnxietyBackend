@@ -38,8 +38,8 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     restart: unless-stopped
-    ports:
-      - "8090:80"
+    # ports:
+    #   - "8090:80"
     networks:
       - backend
     labels:
@@ -62,8 +62,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
     networks:
       - backend
     labels:
@@ -85,13 +85,13 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8080:8000"
+    # ports:
+    #   - "8080:8000"
     networks:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.product-warning.rule=Host(`product-warning.risiko-radar.info`)"
+      - "traefik.http.routers.product-warning.rule=Host(`product-warning.risiko-radar.info`) && (PathPrefix(`/fetchUpdate`) || PathPrefix(`/fetchUpdateAll`))"
       - "traefik.http.routers.product-warning.service=product-warning-root"
 
   nina:
@@ -105,13 +105,13 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8081:8000"
+    # ports:
+    #   - "8081:8000"
     networks:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.nina.rule=Host(`nina.risiko-radar.info`)"
+      - "traefik.http.routers.nina.rule=Host(`nina.risiko-radar.info`) && PathPrefix(`/fetchData`)"
       - "traefik.http.routers.nina.service=nina-root"
 
   autobahn:
@@ -125,13 +125,13 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8082:8000"
+    # ports:
+    #   - "8082:8000"
     networks:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.autobahn.rule=Host(`autobahn.risiko-radar.info`)"
+      - "traefik.http.routers.autobahn.rule=Host(`autobahn.risiko-radar.info`) && PathPrefix(`/fetchData`)"
       - "traefik.http.routers.autobahn.service=autobahn-root"
 
   dwd:
@@ -145,13 +145,13 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8083:8000"
+    # ports:
+    #   - "8083:8000"
     networks:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.dwd.rule=Host(`dwd.risiko-radar.info`)"
+      - "traefik.http.routers.dwd.rule=Host(`dwd.risiko-radar.info`) && PathPrefix(`/fetchData`)"
       - "traefik.http.routers.dwd.service=dwd-root"
 
   awa:
@@ -165,13 +165,13 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-    ports:
-      - "8084:8000"
+    # ports:
+    #   - "8084:8000"
     networks:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.awa.rule=Host(`awa.risiko-radar.info`)"
+      - "traefik.http.routers.awa.rule=Host(`awa.risiko-radar.info`) && (PathPrefix(`/fetchWarnings`) || PathPrefix(`/fetchEmbassys`))"
       - "traefik.http.routers.awa.service=awa-root"
 
   traefik:
@@ -179,7 +179,7 @@ services:
     container_name: traefik
     restart: unless-stopped
     command:
-      - "--api.insecure=true"
+      - "--api.insecure=false"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
