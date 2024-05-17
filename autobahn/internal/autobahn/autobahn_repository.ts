@@ -56,6 +56,10 @@ export class AutobahnRepository {
       const values = this.mapIds(warnings);
       await this.closeData(values);
 
+      if (values.length == 0) {
+        return [];
+      }
+
       const result = await this.executeQuery(
         `SELECT warning_id FROM autobahn.warnings WHERE warning_id = ANY ($1)`,
         [values],
