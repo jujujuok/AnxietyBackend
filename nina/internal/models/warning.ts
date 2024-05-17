@@ -2,7 +2,7 @@ export interface IWarningModel {
   id: string;
   type: string;
   title: string;
-  description: string;
-  instruction: string;
-  coordinates: any;
+  description: string | null;
+  instruction: string | null;
+  coordinates: string[];
 }

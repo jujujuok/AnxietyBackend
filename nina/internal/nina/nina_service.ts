@@ -6,7 +6,7 @@ import https from "https";
 export class NinaService {
   constructor(private readonly ninaRepository: NinaRepository) {}
 
-  async callApi(url: string) {
+  private async callApi(url: string) {
     const agent = new https.Agent({
       rejectUnauthorized: false,
     });
@@ -20,50 +20,66 @@ export class NinaService {
       return response.data;
     } catch (error) {
       console.error(error);
+      throw error;
     }
   }
 
-  async getWarnings(data: any) {
+  private transformDetailPart(detailPart: string): string | null {
+    let result = null;
+    if (detailPart !== undefined) {
+      result = detailPart.replaceAll("<br/>", " ");
+    }
+    return result;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private transformCoordinates(geojsonFeatures: any): string[] {
+    const coordinates: string[] = [];
+    for (const feature of geojsonFeatures) {
+      feature.geometry.coordinates.forEach((coordinate: string) =>
+        coordinates.push(coordinate),
+      );
+    }
+    return coordinates;
+  }
+
+  private transformWarning(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    details: any, // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    geojson: any, // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    element: any,
+  ): IWarningModel {
+    const description = this.transformDetailPart(details.info[0].description);
+    const instruction = this.transformDetailPart(details.info[0].instruction);
+    const coordinates = this.transformCoordinates(geojson.features);
+
+    return {
+      id: element.id,
+      type: element.type,
+      title: element.i18nTitle.de,
+      description: description,
+      instruction: instruction,
+      coordinates: coordinates,
+    };
+  }
+
+  private checkIfNew(startDate: string): boolean {
+    return new Date(Date.parse(startDate)).getTime() > new Date().getTime();
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async getWarnings(data: any) {
     const warnings: IWarningModel[] = [];
 
     for (const element of data) {
-      if (
-        new Date(Date.parse(element.startDate)).getTime() <=
-        new Date().getTime()
-      ) {
+      if (this.checkIfNew(element.startDate)) {
         const details = await this.callApi(
           `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.json`,
         );
         const geojson = await this.callApi(
           `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.geojson`,
         );
-
-        let description = null;
-        if (details.info[0].description !== undefined) {
-          description = details.info[0].description.replaceAll("<br/>", " ");
-        }
-
-        let instruction = null;
-        if (details.info[0].instruction !== undefined) {
-          instruction = details.info[0].instruction.replaceAll("<br/>", " ");
-        }
-
-        const coordinates: any = [];
-
-        for (const feature of geojson.features) {
-          feature.geometry.coordinates.forEach((coordinate: any) =>
-            coordinates.push(coordinate),
-          );
-        }
-
-        const warning: IWarningModel = {
-          id: element.id,
-          type: element.type,
-          title: element.i18nTitle.de,
-          description: description,
-          instruction: instruction,
-          coordinates: coordinates,
-        };
+        const warning = this.transformWarning(details, geojson, element);
         warnings.push(warning);
       }
     }
@@ -97,7 +113,7 @@ export class NinaService {
     const lhp_warnungen = await this.callApi(lhp_url);
     warnings.push(await this.getWarnings(lhp_warnungen));
 
-    return this.ninaRepository.fetchData(warnings);
+    return this.ninaRepository.fetchData(warnings.flat());
   }
 
   async getData(timestamp: number) {
