@@ -44,13 +44,16 @@ export class DashboardRepository {
    * @returns MapUpdate Object
    */
   async getWarnings(api: string): Promise<IDashboardUpdate> {
-    let warningResponseData = await getDataFromApi(
-      `http://${api}.risiko-radar.info/getData`,
+    const warningResponseData = await getDataFromApi(
+      `http://${api}:8000/getData`,
     );
 
     // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
     if (api === "awa") {
-      warningResponseData = warningResponseData[1];
+      const embassyData = warningResponseData[0];
+      const warningData = warningResponseData[1];
+      warningResponseData[0] = embassyData[0].concat(warningData[0]);
+      warningResponseData[1] = embassyData[1].concat(warningData[1]);
     }
 
     const warningData: IDashboardUpdate = {
@@ -66,7 +69,7 @@ export class DashboardRepository {
     timestamp: number,
   ): Promise<IDashboardUpdate> {
     let warningResponseData = await getDataFromApi(
-      `http://${api}.risiko-radar.info/getData?timestamp=${timestamp}`,
+      `http://${api}:8000/getData?timestamp=${timestamp}`,
     );
 
     // awa returns an array of two arrays, where the first array contains worldmap items and the second one dashboard items
@@ -87,7 +90,7 @@ export class DashboardRepository {
     if (/^\d+$/.test(id)) {
       return "product-warning";
     }
-    if (id.includes("emb.")) {
+    if (id.includes("emb.") || id.includes("tra.")) {
       return "awa";
     }
     return undefined;
@@ -97,7 +100,7 @@ export class DashboardRepository {
     const warningType = this.findTypeById(id);
     if (warningType) {
       const detailsData = await getDataFromApi(
-        `http://${warningType}.risiko-radar.info/getDetails/${id}`,
+        `http://${warningType}:8000/getDetails/${id}`,
       );
       detailsData.type = warningType;
       return await detailsData;
@@ -106,7 +109,7 @@ export class DashboardRepository {
     // If the warning type is not found, check all APIs
     for (const element of ["product-warning", "awa"]) {
       const detailsData = await getDataFromApi(
-        `http://${element}.risiko-radar.info/getDetails/${id}`,
+        `http://${element}:8000/getDetails/${id}`,
       );
       if (detailsData) {
         detailsData.type = element;
@@ -123,7 +126,7 @@ export class DashboardRepository {
    */
   async getProductWarnings(): Promise<IDashboardUpdate> {
     const productWarningData = await getDataFromApi(
-      "http://product-warning.risiko-radar.info/getData",
+      "http://product-warning:8000/getData",
     );
 
     return { add: productWarningData, delete: [] };
@@ -136,7 +139,7 @@ export class DashboardRepository {
    */
   async getProductWarningUpdate(timestamp: number): Promise<IDashboardUpdate> {
     const productWarningData = await getDataFromApi(
-      "http://product-warning.risiko-radar.info/getData?timestamp=" + timestamp,
+      "http://product-warning:8000/getData?timestamp=" + timestamp,
     );
 
     return { add: productWarningData, delete: [] };

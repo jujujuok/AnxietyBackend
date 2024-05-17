@@ -6,10 +6,10 @@ import { IDeleteItem } from "../utils/apiCalls";
 export interface IDashboardItem {
   id: string;
   type: string;
-  severity: "information" | "warning" | "danger" | "extreme_danger";
   title: string;
-  description: string;
-  since: number;
+  publishedDate?: number;
+  country?: string;
+  city?: string;
   details?: IDashboardItemDetails;
 }
 
@@ -17,9 +17,15 @@ export interface IDashboardItem {
  * Dashboard details model.
  */
 export interface IDashboardItemDetails {
-  id: string;
+  title?: string;
+  description?: string;
+  link?: string;
+  manufacturer?: string;
+  image?: string;
+  address?: string;
+  phone?: string;
+  mail?: string;
   type: string;
-  details: object;
 }
 
 export interface IDashboardUpdate {

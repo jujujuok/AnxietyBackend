@@ -16,6 +16,11 @@ export class DashboardController {
    */
   async getDashboard(req: FastifyRequest, reply: FastifyReply) {
     const dashboardData = await this.dashboardService.getDashboard();
+
+    if (dashboardData.length === 0) {
+      return reply.status(202).send("No data available");
+    }
+
     return reply.send(dashboardData);
   }
 
@@ -36,6 +41,12 @@ export class DashboardController {
     const dashboardDetails =
       await this.dashboardService.getDashboardDetails(dashboardId);
 
+    if (!dashboardDetails) {
+      return reply.status(404).send({
+        message: "Dashboard item not found",
+      });
+    }
+
     return reply.send(dashboardDetails);
   }
 
@@ -55,6 +66,13 @@ export class DashboardController {
     const timestamp = req.query.timestamp as number;
     const dashboardUpdate =
       await this.dashboardService.getDashboardUpdate(timestamp);
+
+    if (
+      dashboardUpdate.add.length === 0 &&
+      dashboardUpdate.delete.length === 0
+    ) {
+      return reply.status(202).send("No update available");
+    }
 
     return reply.send(dashboardUpdate);
   }

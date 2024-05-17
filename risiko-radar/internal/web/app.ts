@@ -1,4 +1,7 @@
 import fastify, { FastifyInstance, FastifyPluginCallback } from "fastify";
+import { RedisClientType, createClient } from "redis";
+import dotenv from "dotenv";
+
 import { DashboardController } from "../dashboard/dashboard_controller";
 import { DashboardService } from "../dashboard/dashboard_service";
 import { DashboardRepository } from "../dashboard/dashboard_repository";
@@ -8,9 +11,7 @@ import { MapService } from "../map/map_service";
 import { WorldMapController } from "../world-map/world-map_controller";
 import { WorldMapRepository } from "../world-map/world-map_repository";
 import { WorldMapService } from "../world-map/world-map_service";
-import { RedisClientType, createClient } from "redis";
 import { Cache } from "../utils/cache";
-import dotenv from "dotenv";
 
 /**
  * Start routine of the application
@@ -26,9 +27,8 @@ const start = async () => {
   setupCors(server);
 
   // setup services and routes for the different modules
-  const [dashboardService, mapService, worldMapService] = await setupServices(
-    redis,
-  );
+  const [dashboardService, mapService, worldMapService] =
+    await setupServices(redis);
   await setupRoutes(
     server,
     dashboardService as DashboardService,
@@ -50,6 +50,11 @@ const start = async () => {
   gracefulShutdown(server);
 };
 
+/**
+ * Setup the cache for the application
+ * @param server Instance of Fastify
+ * @returns Instance of the Cache
+ */
 const setupCache = (server: FastifyInstance): Cache => {
   const host = process.env.REDIS_HOST;
   const port = process.env.REDIS_PORT || "6379";

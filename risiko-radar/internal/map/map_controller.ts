@@ -16,6 +16,11 @@ export class MapController {
    */
   async getMap(req: FastifyRequest, reply: FastifyReply) {
     const mapData = await this.mapService.getMap();
+
+    if (mapData.length === 0) {
+      return reply.status(202).send("No data available");
+    }
+
     return reply.send(mapData);
   }
 
@@ -35,6 +40,12 @@ export class MapController {
     const mapId = req.params.id;
     const mapDetails = await this.mapService.getMapDetails(mapId);
 
+    if (!mapDetails) {
+      return reply.status(404).send({
+        message: "Map item not found",
+      });
+    }
+
     return reply.send(mapDetails);
   }
 
@@ -53,6 +64,12 @@ export class MapController {
 
     const timestamp = req.query.timestamp as number;
     const mapUpdate = await this.mapService.getMapUpdate(timestamp);
+
+    if (!mapUpdate) {
+      return reply.status(404).send({
+        message: "No updates available",
+      });
+    }
 
     return reply.send(mapUpdate);
   }

@@ -5,14 +5,10 @@ import { IDeleteItem } from "../utils/apiCalls";
  */
 export interface IWorldMapItem {
   id: string;
-  type:
-    | "interpol_red"
-    | "interpol_un"
-    | "travel_warning"
-    | "country_representative";
-  title: string;
+  type: "travel_warning";
   country: string;
-  since: number;
+  severity: string;
+  iso3: string;
   details?: IWorldMapItemDetails;
 }
 
@@ -20,13 +16,10 @@ export interface IWorldMapItem {
  * WorldMap details model
  */
 export interface IWorldMapItemDetails {
-  id: string;
-  type:
-    | "interpol_red"
-    | "interpol_un"
-    | "travel_warning"
-    | "country_representative";
-  details: object;
+  type: "travel_warning";
+  aktuell: string;
+  sicherheit: string;
+  gesundheit: string;
 }
 
 export interface IWorldMapUpdate {

@@ -45,7 +45,7 @@ export class MapRepository {
    */
   async getWarnings(api: string): Promise<IMapUpdate> {
     const warningResponseData = await getDataFromApi(
-      `http://${api}.risiko-radar.info/getData`,
+      `http://${api}:8000/getData`,
     );
 
     const warningData: IMapUpdate = {
@@ -58,7 +58,7 @@ export class MapRepository {
 
   async getWarningUpdate(api: string, timestamp: number): Promise<IMapUpdate> {
     const warningResponseData = await getDataFromApi(
-      `http://${api}.risiko-radar.info/getData?timestamp=${timestamp}`,
+      `http://${api}:8000/getData?timestamp=${timestamp}`,
     );
 
     const warningData: IMapUpdate = {
@@ -90,7 +90,7 @@ export class MapRepository {
     const warningType = this.findTypeById(id);
     if (warningType) {
       const detailsData = await getDataFromApi(
-        `http://${warningType}.risiko-radar.info/getDetails/${id}`,
+        `http://${warningType}:8000/getDetails/${id}`,
       );
       detailsData.type = warningType;
       return detailsData;
@@ -99,7 +99,7 @@ export class MapRepository {
     // If the warning type is not found, try all types
     for (const element of ["autobahn", "dwd", "nina"]) {
       const detailsData = await getDataFromApi(
-        `http://${element}.risiko-radar.info/getDetails/${id}`,
+        `http://${element}:8000/getDetails/${id}`,
       );
       if (detailsData) {
         detailsData.type = element;

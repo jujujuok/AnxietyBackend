@@ -7,7 +7,6 @@ info:
   version: '0.2'
 servers:
   - url: http://api.risiko-radar.de
-    description: Main server
 
 tags:
   - name: dashboard
@@ -44,7 +43,7 @@ paths:
           description: 'ID of the dashboard item to get.'
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: OK
@@ -112,7 +111,7 @@ paths:
           description: 'ID of the map item to get.'
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: OK
@@ -179,7 +178,7 @@ paths:
           description: 'ID of the WorldMap item to get.'
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: OK
@@ -231,40 +230,66 @@ components:
         type:
           type: string
           enum:
-            - interpol_red
-            - interpol_un
             - food_warning
             - product_warning
-            - travel_warning
-            - country_representetive
-        severity:
-          type: string
-          enum:
-            - information
-            - warning
-            - danger
-            - extreme_danger
+            - embassy
         title:
           type: string
-        description:
+        area:
+          type: array
+          items:
+            type: string
+            description: Bundesland
+          nullable: true
+        publishedDate:
           type: string
+          format: timestamp
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
     dashboardItemDetails:
-      type: object
-      properties:
-        id:
-          type: string
-        type:
-          type: string
-          enum:
-            - interpol_red
-            - interpol_un
-            - food_warning
-            - product_warning
-            - travel_warning
-            - country_representetive
-        details:
-          type: object
-          description: 'Details of the event. Depending of the type of event.'
+      oneOf:
+        - type: object
+          properties:
+            title:
+              type: string
+            description:
+              type: string
+              nullable: true
+            link:
+              type: string
+              nullable: true
+            manufacturer:
+              type: string
+              nullable: true
+            image:
+              type: string
+              description: 'URL to the image.'
+              nullable: true
+            type:
+              type: string
+              enum:
+                - food_warning
+                - product_warning
+        - type: object
+          properties:
+            address:
+              type: string
+              nullable: true
+            phone:
+              type: string
+              nullable: true
+            mail:
+              type: string
+              nullable: true
+            type:
+              type: string
+              enum:
+                - embassy
     mapItem:
       type: object
       properties:
@@ -273,57 +298,46 @@ components:
         type:
           type: string
           enum:
-            - weather_flood
-            - weather_storm
-            - weather_disaster
-            - street_closure
+            - nina
             - street_report
-            - police
-            - air_quality
-            - radiation
-        severity:
+            - weather
+        warning:
           type: string
-          enum:
-            - information
-            - warning
-            - danger
-            - extreme_danger
         title:
           type: string
-        position:
-          type: object
-          properties:
-            lat:
-              type: number
-            lon:
-              type: number
         area:
-          oneOf:
-            - type: number
-              description: 'Radius in meters.'
-            - type: array
-              description: 'Array for polygon.'
+          type: array
+          description: 'Array for multiple polygons.'
+          items:
+            type: array
+            description: 'Array for a single polygon.'
+            items:
+              type: array
+              description: 'Array for a single point.'
+              maxLength: 2
               items:
                 type: number
     mapItemDetails:
-      type: object
-      properties:
-        id:
-          type: string
-        type:
-          type: string
-          enum:
-            - weather_flood
-            - weather_storm
-            - weather_disaster
-            - street_closure
-            - street_report
-            - police
-            - air_quality
-            - radiation
-        details:
-          type: object
-          description: 'Details of the event. Depending of the type of event.'
+      oneOf:
+        - type: object
+          properties:
+            description:
+              type: string
+            instruction:
+              type: string
+            type:
+              type: string
+              enum:
+                - weather
+        - type: object
+          properties:
+            description:
+              type: string
+            type:
+              type: string
+              enum:
+                - nina
+                - street_report
 
     worldMapItem:
       type: object
@@ -333,10 +347,7 @@ components:
         type:
           type: string
           enum:
-            - interpol_red
-            - interpol_un
             - travel_warning
-            - country_representetive
         country:
           type: string
         severity:
@@ -346,15 +357,19 @@ components:
     worldMapItemDetails:
       type: object
       properties:
-        id:
-          type: string
         type:
           type: string
           enum:
-            - interpol_red
-            - interpol_un
             - travel_warning
-            - country_representetive
-        details:
-          type: object
-          description: 'Details of the event. Depending of the type of event.'
+        aktuell:
+          type: array
+          items:
+            type: string
+        sicherheit:
+          type: array
+          items:
+            type: string
+        gesundheit:
+          type: array
+          items:
+            type: string

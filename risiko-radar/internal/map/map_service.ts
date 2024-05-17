@@ -52,27 +52,17 @@ export class MapService {
     mapItems.delete.push(...ids);
   }
 
-  addSeverity(mapItems: IMapItem[]) {
-    mapItems.forEach((item) => {
-      if (!item.severity) {
-        if (item.type === "street_report") {
-          item.severity = "warning";
-          return;
-        }
-        if (item.type === "weather") {
-          item.severity = "warning";
-          return;
-        }
-      }
-    });
-  }
-
   /**
    * Get object containing map items to add and ids to delete
    * @returns List of map items
    */
   async getMap(): Promise<IMapItem[]> {
     const mapItems: IMapUpdate = { add: [], delete: [] };
+
+    //### DWD ###
+    let dwdData = await this.mapRepository.getWarnings("dwd");
+    dwdData = this.stripDetails(dwdData);
+    this.concatData(mapItems, dwdData);
 
     //### NINA ###
     let ninaData = await this.mapRepository.getWarnings("nina");
@@ -83,11 +73,6 @@ export class MapService {
     let autobahnData = await this.mapRepository.getWarnings("autobahn");
     autobahnData = this.stripDetails(autobahnData);
     this.concatData(mapItems, autobahnData);
-
-    //### DWD ###
-    let dwdData = await this.mapRepository.getWarnings("dwd");
-    dwdData = this.stripDetails(dwdData);
-    this.concatData(mapItems, dwdData);
 
     return mapItems.add;
   }
