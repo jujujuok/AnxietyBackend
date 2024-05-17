@@ -190,6 +190,9 @@ export class AutobahnRepository {
       if (result_warnings.rows.length > 0) {
         details = this.transformDetails(result_warnings.rows[0]);
       }
+    } catch (error) {
+      console.error(error);
+      throw error;
     } finally {
       if (details !== undefined) {
         return details;
