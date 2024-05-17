@@ -69,7 +69,7 @@ export class AutobahnRepository {
     }
   }
 
-  private transformCoordinates(inputCoordinates: string[]): string {
+  private transformCoordinates(inputCoordinates: any): any {
     const geojson = {
       type: "Polygon",
       coordinates: inputCoordinates,
@@ -93,13 +93,12 @@ export class AutobahnRepository {
       for (const warning of newwarnings) {
         const coordinates = this.transformCoordinates(warning.coordinates);
         await this.executeQuery(
-          `INSERT INTO autobahn.warnings (warning_id, title, publisheddate, description, coordinates) VALUES ($1, $2, $3, $4, $5)`,
+          `INSERT INTO autobahn.warnings (warning_id, title, publisheddate, description, coordinates) VALUES ($1, $2, $3, $4, ${coordinates})`,
           [
             warning.warning_id,
             warning.title,
             warning.publisheddate,
             warning.description,
-            coordinates,
           ],
         );
       }
