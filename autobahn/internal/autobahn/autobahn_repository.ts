@@ -28,8 +28,8 @@ export class AutobahnRepository {
   async closeData(warningids: string[]): Promise<number> {
     try {
       await this.executeQuery(
-        `Update autobahn.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id != ANY($1) AND loadenddate IS NULL`,
-        [warningids],
+        `Update autobahn.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN ${warningids} AND loadenddate IS NULL`,
+        [],
       );
     } catch (error) {
       console.error(error);
