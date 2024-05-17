@@ -150,7 +150,7 @@ export class AutobahnRepository {
     let closedWarningIds: string[] = [];
     try {
       const timestampStatement = timestamp
-        ? `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000)`
+        ? `WHERE loaddate > TO_TIMESTAMP(${timestamp}/1000) AND`
         : "WHERE";
 
       const resultwarnings = await this.executeQuery(
