@@ -65,6 +65,7 @@ export class AutobahnRepository {
         [values],
       );
       warnings = this.filterNewData(result.rows, warnings);
+      console.log(warnings);
     } catch (error) {
       console.error(error);
       throw error;
@@ -79,11 +80,7 @@ export class AutobahnRepository {
       coordinates: inputCoordinates,
     };
 
-    const coordinates = `ST_SetSRID(ST_GeomFromGeoJSON('${JSON.stringify(
-      geojson,
-    )}'), 4326)`;
-
-    return coordinates;
+    return JSON.stringify(geojson);
   }
 
   async fetchData(warnings: IWarningModel[]): Promise<number> {
@@ -92,12 +89,12 @@ export class AutobahnRepository {
     if (newwarnings.length == 0) {
       return 200;
     }
-
+    console.log(newwarnings);
     try {
       for (const warning of newwarnings) {
         const coordinates = this.transformCoordinates(warning.coordinates);
         await this.executeQuery(
-          `INSERT INTO autobahn.warnings (warning_id, title, publisheddate, description, coordinates) VALUES ($1, $2, $3, $4, (${coordinates}))`,
+          `INSERT INTO autobahn.warnings (warning_id, title, publisheddate, description, coordinates) VALUES ($1, $2, $3, $4, ST_SetSRID(ST_GeomFromGeoJSON('${coordinates}'), 4326))`,
           [
             warning.warning_id,
             warning.title,
