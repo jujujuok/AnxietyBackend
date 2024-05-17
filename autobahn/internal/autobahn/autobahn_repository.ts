@@ -65,7 +65,6 @@ export class AutobahnRepository {
         [values],
       );
       warnings = this.filterNewData(result.rows, warnings);
-      console.log(warnings);
     } catch (error) {
       console.error(error);
       throw error;
@@ -89,7 +88,7 @@ export class AutobahnRepository {
     if (newwarnings.length == 0) {
       return 200;
     }
-    console.log(newwarnings);
+
     try {
       for (const warning of newwarnings) {
         const coordinates = this.transformCoordinates(warning.coordinates);
