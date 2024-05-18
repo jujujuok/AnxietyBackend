@@ -3,7 +3,7 @@ export interface IReturnSchema {
   type: string;
   warning: string;
   title: string | undefined;
-  area: any;
+  area: [[number[]]];
   details: {
     description: string;
     instruction: string;

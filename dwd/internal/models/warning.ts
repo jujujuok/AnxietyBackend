@@ -4,5 +4,5 @@ export interface IWarningModel {
   title: string;
   description: string;
   instruction: string;
-  coordinates: [];
+  coordinates: string[];
 }
