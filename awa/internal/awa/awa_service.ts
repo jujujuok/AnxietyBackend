@@ -195,11 +195,6 @@ export class AwAService {
     return returnvalue;
   }
 
-  //async getCoordinatesEmbassy(address: string, country: string): Promise<any>{
-  //  const apiResponse = await this.callApi(`https://nominatim.openstreetmap.org/search?${address},${country}&format=json&addressdetails=1`);
-  //  return apiResponse;
-  //}
-
   transformEmbassy(embassysCountry: any) {
     const embassyContent: string[] = embassysCountry.contentList;
     const embassys: IEmbassyModel[] = [];
