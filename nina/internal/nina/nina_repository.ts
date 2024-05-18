@@ -23,10 +23,13 @@ export class NinaRepository {
 
   private async closeData(warningids: string[]): Promise<number> {
     try {
-      await this.executeQuery(
-        `Update nina.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN ${warningids} AND loadenddate IS NULL`,
-        [],
-      );
+      let SQL = `Update nina.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN ${warningids} AND loadenddate IS NULL`;
+
+      if (warningids.length == 0) {
+        SQL = `Update nina.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE loadenddate IS NULL`;
+      }
+
+      await this.executeQuery(SQL, []);
     } catch (error) {
       console.error(error);
       throw error;
