@@ -70,6 +70,8 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.risiko-radar.rule=Host(`api.risiko-radar.info`)"
       - "traefik.http.routers.risiko-radar.service=risiko-radar-root"
+      - "traefik.http.routers.risiko-radar.tls=true"
+      - "traefik.http.routers.risiko-radar.tls.certresolver=myresolver"
 
   product-warning:
     image: product-warning-api
@@ -176,21 +178,24 @@ services:
     container_name: traefik
     restart: unless-stopped
     command:
-      - "--api.insecure=false"
+      - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--providers.file.directory=/ssl/"
-      - "--providers.file.watch=true"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=kontakt@risiko-radar.info"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+
     ports:
       - "80:80"
       - "443:443"
       - "9000:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./etc/ssl/ionos:/ssl/"
+      - "./letsencrypt:/letsencrypt/"
     networks:
       - backend
 
