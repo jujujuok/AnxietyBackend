@@ -142,7 +142,7 @@ export class NinaRepository {
 
     return {
       id: row.warning_id,
-      type: row.warning_type,
+      type: "nina",
       warning: row.warning_type,
       title: row.title,
       area: coordinates,
