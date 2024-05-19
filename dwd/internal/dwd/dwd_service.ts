@@ -39,6 +39,7 @@ export class DwDService {
           coordinates.push(polygon);
         });
       });
+      return coordinates;
     }
     return [];
   }
