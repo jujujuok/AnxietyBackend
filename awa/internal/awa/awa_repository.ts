@@ -49,12 +49,12 @@ export class AwARepository {
     warnings: IWarningModel[],
   ): Promise<number> {
     try {
-      warnings.forEach(async (warning: IWarningModel) => {
+      for (const warning of warnings) {
         await this.executeQuery(
-          `Update awa.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE iso3 = '$1' AND loadenddate IS NULL AND loaddate < TO_TIMESTAMP($2/1000)`,
+          `Update awa.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE iso3 = $1 AND loadenddate IS NULL AND loaddate < TO_TIMESTAMP($2/1000)`,
           [warning.ISO3, warning.lastModified],
         );
-      });
+      }
     } catch (error) {
       console.error(error);
       throw error;
