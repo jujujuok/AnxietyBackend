@@ -98,7 +98,7 @@ export class NinaRepository {
       for (const warning of newwarnings) {
         const coordinates = this.transformCoordinates(warning.coordinates);
         await this.executeQuery(
-          `INSERT INTO nina.warnings (warning_id, warning_type, title, description, instruction, coordinates) VALUES ($1, $2, $3, $4, $5, ST_SetSRID(ST_GeomFromGeoJSON('${coordinates}'), 4326))`,
+          `INSERT INTO nina.warnings (warning_id, warning_type, title, description, instruction, coordinates) VALUES ($1, $2, $3, $4, $5, ST_SetSRID(ST_Force2D(ST_GeomFromGeoJSON('${coordinates}')), 4326))`,
           [
             warning.id,
             warning.type,
