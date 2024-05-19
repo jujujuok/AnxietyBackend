@@ -63,25 +63,19 @@ export class NinaService {
     };
   }
 
-  private checkIfNew(startDate: string): boolean {
-    return new Date(Date.parse(startDate)).getTime() > new Date().getTime();
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async getWarnings(data: any) {
     const warnings: IWarningModel[] = [];
 
     for (const element of data) {
-      if (this.checkIfNew(element.startDate)) {
-        const details = await this.callApi(
-          `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.json`,
-        );
-        const geojson = await this.callApi(
-          `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.geojson`,
-        );
-        const warning = this.transformWarning(details, geojson, element);
-        warnings.push(warning);
-      }
+      const details = await this.callApi(
+        `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.json`,
+      );
+      const geojson = await this.callApi(
+        `https://nina.api.proxy.bund.dev/api31/warnings/${element.id}.geojson`,
+      );
+      const warning = this.transformWarning(details, geojson, element);
+      warnings.push(warning);
     }
     return warnings;
   }

@@ -12,12 +12,12 @@ export class NinaRepository {
   ): Promise<QueryResult> {
     const client = await this.db.connect();
     try {
-      return await client.query(query, values);
+      const result = await client.query(query, values);
+      client.release();
+      return result;
     } catch (error) {
       console.error(error);
       throw error;
-    } finally {
-      client.release();
     }
   }
 
@@ -25,7 +25,7 @@ export class NinaRepository {
     const stringWarningIds = warningids.map((id) => `'${id}'`).join(",");
 
     try {
-      let SQL = `Update nina.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN (${stringWarningIds}}) AND loadenddate IS NULL`;
+      let SQL = `Update nina.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE warning_id NOT IN (${stringWarningIds}) AND loadenddate IS NULL`;
 
       if (warningids.length == 0) {
         SQL = `Update nina.warnings SET loadenddate = CURRENT_TIMESTAMP WHERE loadenddate IS NULL`;
@@ -66,7 +66,7 @@ export class NinaRepository {
 
     try {
       const result = await this.executeQuery(
-        `SELECT warning_id FROM nina.warnings WHERE warning_id ANY($1)`,
+        `SELECT warning_id FROM nina.warnings WHERE warning_id = ANY($1)`,
         [values],
       );
       warnings = this.filterNewData(result.rows, warnings);

@@ -12,12 +12,12 @@ export class DwDRepository {
   ): Promise<QueryResult> {
     const client = await this.db.connect();
     try {
-      return await client.query(query, values);
+      const result = await client.query(query, values);
+      client.release();
+      return result;
     } catch (error) {
       console.error(error);
       throw error;
-    } finally {
-      client.release();
     }
   }
 
