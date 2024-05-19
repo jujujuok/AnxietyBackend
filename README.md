@@ -1,4 +1,4 @@
-![Website](https://img.shields.io/website?url=http%3A%2F%2Fapi.risiko-radar.info%2Fhealth&label=API%20Status&link=https%3A%2F%2Frisiko-radar.info%2F)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fapi.risiko-radar.info%2Fhealth&label=API%20Status&link=https%3A%2F%2Frisiko-radar.info%2F)
 
 # Risiko Radar Backend
 
@@ -34,6 +34,11 @@ git clone https://github.com/jujujuok/AnxietyBackend.git
 Create a `.env` file in the root directory of the repository with content based on the `.env.example` file.
 
 The values for the .env file can be copied from the server.
+
+### Microserivce Template
+
+The ./ms-template directory contains a template for a microservice.
+This can be copied and used as a base for new services.
 
 ### Start single service
 
