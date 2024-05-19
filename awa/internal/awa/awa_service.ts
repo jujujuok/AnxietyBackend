@@ -7,11 +7,7 @@ import { IEmbassyModel } from "../models/embassy";
 export class AwAService {
   constructor(private readonly awaRepository: AwARepository) {}
 
-  async callApi(url: string) {
-    const headers = {
-      accept: "text/json;charset=UTF-8",
-    };
-
+  private async callApi(url: string) {
     const agent = new https.Agent({
       rejectUnauthorized: false,
     });
@@ -21,11 +17,11 @@ export class AwAService {
       return response.data;
     } catch (error) {
       console.error(error);
-      return null;
+      throw error;
     }
   }
 
-  transformWarning(warning: string) {
+  private transformWarning(warning: string) {
     const warningsArray: object[] = [];
 
     if (!warning.includes("<h3>")) {
@@ -63,7 +59,7 @@ export class AwAService {
     return warningsArray;
   }
 
-  async fetchAndTransformWarnings(id: string) {
+  private async fetchAndTransformWarnings(id: string) {
     const warning = (
       await this.callApi(
         `https://www.auswaertiges-amt.de/opendata/travelwarning/${id}`,
@@ -174,6 +170,7 @@ export class AwAService {
 
     const result: IWarningModel[] | undefined = [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises = countryWarningswithWarning.map(async (country: any) => {
       try {
         const fetchResult = await this.fetchAndTransformWarnings(country.id);
@@ -195,7 +192,8 @@ export class AwAService {
     return returnvalue;
   }
 
-  transformEmbassy(embassysCountry: any) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private transformEmbassy(embassysCountry: any): IEmbassyModel[] {
     const embassyContent: string[] = embassysCountry.contentList;
     const embassys: IEmbassyModel[] = [];
 
@@ -254,7 +252,7 @@ export class AwAService {
     countryIds.forEach(async (countryid: string) => {
       const country = apiResponse[countryid];
       const embassysReturnArray = this.transformEmbassy(country);
-      embassysReturnArray.forEach((embassy: any) => {
+      embassysReturnArray.forEach((embassy: IEmbassyModel) => {
         embassys.push(embassy);
       });
     });
